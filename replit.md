@@ -1,26 +1,32 @@
 # TryRebooto
 
 ## Overview
-TryRebooto is a modern pre-launch landing page for an interactive IT support learning platform. The MVP validates user interest through email signups and showcases the platform's value proposition with a polished, credible design.
+TryRebooto is a modern pre-launch landing page for an interactive IT support learning platform. The MVP features a premium minimalist design with playful 3D elements, smooth scrolling, and a secret Konami code easter egg that reveals an admin dashboard. The platform validates user interest through email signups while building anticipation for launch.
 
 ## Purpose
 - Validate interest in learning IT support through interactive experiences
 - Collect user emails for launch notifications
-- Build early brand trust with a functional, visually strong web presence
+- Build early brand trust with a polished, premium web presence
 - Demonstrate the platform's concept and build anticipation
+- Provide secret admin access via Konami code easter egg
 
 ## Tech Stack
-- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, GSAP animations
+- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis
 - **Backend**: Express.js, Node.js
 - **Storage**: In-memory storage (MemStorage)
-- **Design**: Dark theme with blue/green gradients, Space Grotesk + Inter fonts
+- **Animations**: GSAP (ScrollTrigger), Framer Motion, Lenis smooth scroll
+- **Design**: Premium/minimalist with playful elements - white backgrounds, glassmorphism, blue-purple gradients, Space Grotesk + Inter fonts
 
 ## Project Architecture
 
 ### Frontend Structure
-- `/client/src/pages/home.tsx` - Main landing page
-- `/client/src/components/sections/` - Page sections (Hero, Value Proposition, How It Works, etc.)
-- `/client/src/components/countdown-timer.tsx` - Countdown timer component
+- `/client/src/pages/home.tsx` - Premium landing page
+- `/client/src/pages/dashboard.tsx` - Protected admin dashboard
+- `/client/src/components/sections/premium-*.tsx` - Premium sections (Hero, Value, How, Skills, Signup, Footer)
+- `/client/src/components/smooth-scroll.tsx` - Lenis smooth scroll wrapper
+- `/client/src/components/floating-nav.tsx` - Floating glassmorphic navigation
+- `/client/src/components/admin-panel.tsx` - Sliding admin login panel
+- `/client/src/hooks/use-konami.tsx` - Konami code detection hook
 - `/client/src/components/ui/` - Shadcn UI components
 
 ### Backend Structure
@@ -30,78 +36,146 @@ TryRebooto is a modern pre-launch landing page for an interactive IT support lea
 
 ## Key Features
 
-### 1. Hero Section with Countdown Timer
-- Full viewport height hero with gradient background
-- Live countdown to launch date (Dec 31, 2025)
-- Animated entrance with GSAP
-- Dual CTAs for engagement
+### 1. Lenis Smooth Scrolling
+- Buttery smooth scroll performance throughout site
+- Integrated with GSAP ScrollTrigger for animations
+- Configurable duration and easing
+- Enhanced user experience
 
-### 2. Value Proposition Section
-- Three key benefits with icons
-- Card-based layout with hover effects
-- Scroll-triggered animations
+### 2. Floating Glassmorphic Navigation
+- Auto-hides on scroll down, shows on scroll up
+- Rounded-full design with backdrop-blur-xl
+- Mobile responsive with hamburger menu
+- Contains logo, nav links, and CTA button
+- Smooth transitions with Framer Motion
 
-### 3. How It Works Section
-- Three-step process explanation
-- Numbered cards with icons
-- Staggered animation on scroll
+### 3. Premium Hero Section
+- Animated 3D gradient orbs following cursor movement
+- Parallax effects on scroll
+- Large responsive typography (5xl to 8xl)
+- Gradient text effects on headline
+- Glassmorphic countdown timer cards
+- Dual CTAs with gradient buttons
 
-### 4. What You'll Learn Section
-- Three skill categories (Hardware, Network, Software)
-- Topic lists with checkmarks
-- Gradient border treatment on hover
+### 4. Premium Value Proposition
+- Three benefit cards with glassmorphic design
+- Gradient icon backgrounds (blue/purple/green)
+- Hover scale effects and shadows
+- Scroll-triggered Framer Motion animations
 
-### 5. Email Signup Section
+### 5. Premium How It Works
+- Three numbered step cards
+- Gradient numbered badges
+- Icon illustrations for each step
+- Glassmorphic card design with hover effects
+
+### 6. Premium Skills Section
+- Three category cards (Hardware, Network, Software)
+- Checkmark lists for each category
+- Glassmorphic design with gradient accents
+- Responsive grid layout
+
+### 7. Premium Email Signup
+- Glassmorphic form design
 - Form validation with Zod
-- Real-time signup counter
-- Success state handling
+- Real-time signup counter display
+- Success state with confetti-style message
 - Privacy reassurance
 
-### 6. Footer
-- Social media links (Twitter, LinkedIn, GitHub)
-- Navigation links (About, Contact, Privacy)
+### 8. Konami Code Easter Egg
+- Secret sequence: ↑↑↓↓←→←→BA
+- Triggers admin panel to slide in from right
+- Visual feedback with animations
+- Fun discovery mechanism for admin access
+
+### 9. Admin Login Panel
+- Slides in from right with spring animation
+- Username and password form
+- Connects to auth backend
+- Success message about finding easter egg
+- Close button to dismiss
+
+### 10. Protected Admin Dashboard
+- Authentication check via /api/auth/me
+- Redirects to home if not authenticated
+- Displays signup statistics
+- Quick action buttons (Manage Scenarios, View Signups, Analytics, Settings)
+- Logout functionality
+- Premium glassmorphic design matching landing page
+
+### 11. Premium Footer
+- Social media links (X/Twitter, LinkedIn, GitHub)
+- Navigation links
 - Copyright information
+- Glassmorphic design
 
 ## Design System
 
 ### Colors
-- **Primary**: Blue gradient (HSL 210 85% 48%)
-- **Secondary**: Green accent (HSL 165 75% 55%)
-- **Background**: Dark theme (HSL 220 6% 8%)
-- **Gradients**: Blue-to-green brand gradient
-- **Glassmorphism**: backdrop-blur-sm/md with semi-transparent backgrounds
+- **Primary**: Blue gradient (HSL 217 91% 60%)
+- **Secondary**: Purple accent (HSL 271 91% 65%)
+- **Background**: White/Light gray (HSL 0 0% 100%)
+- **Gradients**: Blue-to-purple brand gradient
+- **Glassmorphism**: backdrop-blur-lg/xl with bg-white/60 semi-transparent backgrounds
+- **Text**: Dark gray (900) for headlines, gray (600-700) for body
 
 ### Typography
 - **Display Font**: Space Grotesk (headlines, section titles)
 - **Body Font**: Inter (UI elements, body text)
 - **Responsive Hierarchy**: 
-  - Mobile: 4xl headlines → Desktop: 7xl headlines
-  - Mobile: base-lg body → Desktop: xl-2xl body
+  - Mobile: 4xl-5xl headlines → Desktop: 6xl-8xl headlines
+  - Mobile: base-lg body → Desktop: lg-xl body
   - Smart scaling with sm:, md:, lg: breakpoints
+
+### Glassmorphism Style
+- **Navigation**: backdrop-blur-xl bg-white/70 border-white/20
+- **Cards**: backdrop-blur-lg bg-white/60 border-gray-200/50
+- **Accents**: rounded-3xl corners throughout
+- **Shadows**: Soft shadows with color hints (shadow-blue-500/30)
+- **3D Depth**: Layered glass effects with subtle borders
 
 ### Spacing
 - **Mobile-first approach**: 
-  - Mobile: px-4, py-16, gap-3/4
-  - Desktop: px-6, py-24/32, gap-6/8
-- **Sections**: py-16 md:py-24 lg:py-32 for vertical spacing
-- **Cards**: p-6 md:p-8 for internal padding
+  - Mobile: px-4-6, py-16-20, gap-4-6
+  - Desktop: px-6-8, py-24-32, gap-8-12
+- **Sections**: py-20 md:py-32 lg:py-40 for vertical spacing
+- **Cards**: p-6 md:p-10 for glassmorphic cards
+- **Max widths**: max-w-7xl for content containers
 
-### Animations (GSAP)
-- **Hero**: 
-  - Staged timeline animations with overlapping delays
-  - Parallax scrolling on background gradients (0.3x speed)
-  - Pulsing gradient orbs
-- **Countdown**: 
-  - Stagger entrance with back.out easing (0.08s between)
-  - Hover effects: scale-105 + glow + border color transition
-- **Sections**: 
-  - Scroll-triggered reveals (80-85% viewport)
-  - Cards: alternating X-axis slide animations on How It Works
-  - Staggered Y-axis entrances (0.15s) on other sections
-- **Hover interactions**: 
-  - Cards: elevation with glow effects, scale transforms
-  - Buttons: shadow intensification, smooth transitions
-  - Icons: scale-110 transforms
+### Animations
+
+#### Lenis Smooth Scroll
+- Duration: 1.2s
+- Easing: ease-in-out
+- Integrated with GSAP ScrollTrigger
+- Smooth momentum scrolling
+
+#### Framer Motion
+- **Entrance animations**: 
+  - Initial: opacity 0, y 20-40
+  - Animate: opacity 1, y 0
+  - Duration: 0.5-0.8s with delays
+- **Scroll triggers**: whileInView with once: true
+- **Hover effects**: 
+  - Scale: 1.02-1.05
+  - Transition: spring physics
+- **Admin panel**: 
+  - Slide in: x from 100% to 0
+  - Spring: type "spring", stiffness 300, damping 30
+
+#### GSAP Effects
+- **3D Orbs**: 
+  - Parallax following cursor movement
+  - Smooth transforms with GSAP
+  - Gradient animations
+- **ScrollTrigger**: 
+  - Integrated with Lenis
+  - Trigger points at 80% viewport
+
+#### Hover Interactions
+- **Cards**: scale-105 + shadow enhancement
+- **Buttons**: Gradient shifts, glow effects
+- **Icons**: Subtle rotations, scale-110
 
 ## Data Model
 
@@ -116,16 +190,35 @@ TryRebooto is a modern pre-launch landing page for an interactive IT support lea
 
 ## API Endpoints
 
-### POST /api/signups
+### Public Endpoints
+
+#### POST /api/signups
 Create a new email signup
 - **Body**: `{ email: string }`
 - **Validation**: Email format validation with Zod
 - **Response**: Created signup object
 - **Errors**: 400 (validation), 409 (duplicate email)
 
-### GET /api/signups/count
+#### GET /api/signups/count
 Get total signup count
 - **Response**: `{ count: number }`
+
+### Admin Endpoints
+
+#### POST /api/auth/login
+Admin authentication (for Konami easter egg)
+- **Body**: `{ username: string, password: string }`
+- **Response**: Session created, user object returned
+- **Errors**: 401 (invalid credentials)
+
+#### GET /api/auth/me
+Check current authentication status
+- **Response**: Current user object or 401 if not authenticated
+- **Used by**: Dashboard page for protection
+
+#### POST /api/auth/logout
+Logout current admin session
+- **Response**: Success message
 
 ## Running the Application
 ```bash
@@ -142,15 +235,43 @@ npm run dev
 - Lesson completion dashboard
 - User feedback collection
 
+## Routes
+
+### Public Routes
+- `/` - Premium landing page with all sections
+- `/dashboard` - Protected admin dashboard (requires auth)
+
+### Protected Route Behavior
+- Dashboard checks authentication via /api/auth/me
+- Redirects to home if not authenticated
+- Shows loading state during auth check
+
 ## Development Notes
-- GSAP loaded via CDN in index.html
-- ScrollTrigger registered for scroll animations
-- Responsive design: mobile-first with md/lg breakpoints
-- Dark mode only (no light theme toggle in MVP)
-- All interactive elements have data-testid attributes
-- Email validation prevents duplicates
-- In-memory storage resets on server restart
+- **Lenis**: Smooth scroll library integrated with GSAP
+- **GSAP**: ScrollTrigger for scroll-based animations
+- **Framer Motion**: All entrance and interaction animations
+- **Responsive**: Mobile-first design with md/lg breakpoints
+- **Theme**: Light mode only (premium/minimalist aesthetic)
+- **Data-testid**: All interactive elements have test identifiers
+- **Email validation**: Prevents duplicate signups
+- **Storage**: In-memory, resets on server restart
+- **Easter egg**: Konami code (↑↑↓↓←→←→BA) reveals admin panel
+- **Glassmorphism**: backdrop-blur effects throughout
+
+## Performance Considerations
+- Lenis smooth scroll adds ~5KB
+- GSAP + ScrollTrigger included for animations
+- Framer Motion for React animations
+- CSS 3D transforms for hero orbs (no Three.js dependency)
+- Consider motion-reduction media query for accessibility
+
+## Security Notes
+- Admin dashboard protected by session authentication
+- Easter egg provides alternative admin access
+- Session managed server-side with express-session
+- Passwords should be properly hashed (bcrypt)
 
 ## Recent Changes
-- 2025-10-29: Enhanced landing page with modern design, advanced GSAP animations (parallax, scroll-triggered reveals, timeline orchestration), improved mobile responsiveness (responsive grids, full-width buttons, adaptive text sizes), glassmorphism effects, hover interactions (scale, glow, elevation), and polished visual hierarchy across all sections
+- 2025-10-29: **Complete premium redesign** - Implemented Lenis smooth scrolling, floating glassmorphic navigation, premium sections with 3D effects, Konami code easter egg (↑↑↓↓←→←→BA), admin login panel, and protected dashboard with signup analytics. Changed from dark theme to premium/minimalist white aesthetic with glassmorphism throughout. All animations migrated to Framer Motion with scroll triggers.
+- 2025-10-29: Enhanced landing page with modern design, advanced GSAP animations, improved mobile responsiveness, glassmorphism effects, hover interactions, and polished visual hierarchy
 - 2025-10-29: Initial MVP implementation with complete landing page, countdown timer, and email signup functionality
