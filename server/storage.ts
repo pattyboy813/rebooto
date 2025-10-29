@@ -27,6 +27,7 @@ export interface IStorage {
   
   createEmailSignup(signup: InsertEmailSignup): Promise<EmailSignup>;
   getEmailSignupByEmail(email: string): Promise<EmailSignup | undefined>;
+  getAllEmailSignups(): Promise<EmailSignup[]>;
   getEmailSignupsCount(): Promise<number>;
   
   createScenario(scenario: InsertScenario): Promise<Scenario>;
@@ -95,6 +96,10 @@ export class DatabaseStorage implements IStorage {
   async getEmailSignupByEmail(email: string): Promise<EmailSignup | undefined> {
     const [signup] = await db.select().from(emailSignups).where(eq(emailSignups.email, email));
     return signup || undefined;
+  }
+
+  async getAllEmailSignups(): Promise<EmailSignup[]> {
+    return await db.select().from(emailSignups).orderBy(desc(emailSignups.createdAt));
   }
 
   async getEmailSignupsCount(): Promise<number> {

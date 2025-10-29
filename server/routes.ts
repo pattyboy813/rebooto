@@ -30,6 +30,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/signups", requireAuth, async (_req, res) => {
+    try {
+      const signups = await storage.getAllEmailSignups();
+      res.json(signups);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/signups/count", async (_req, res) => {
     try {
       const count = await storage.getEmailSignupsCount();

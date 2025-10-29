@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Mail, BarChart3, LogOut } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Users, Mail, BarChart3, LogOut, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
+import type { EmailSignup } from "@shared/schema";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const [showSignupsDialog, setShowSignupsDialog] = useState(false);
 
   // Check authentication
   const { data: user, isLoading } = useQuery({
@@ -23,6 +26,11 @@ export default function Dashboard() {
 
   const { data: signupStats } = useQuery<{ count: number }>({
     queryKey: ["/api/signups/count"],
+  });
+
+  const { data: signups } = useQuery<EmailSignup[]>({
+    queryKey: ["/api/signups"],
+    enabled: !!user,
   });
 
   const handleLogout = async () => {
@@ -154,6 +162,7 @@ export default function Dashboard() {
                   variant="outline"
                   className="rounded-xl h-14"
                   data-testid="button-view-signups"
+                  onClick={() => setShowSignupsDialog(true)}
                 >
                   View All Signups
                 </Button>
@@ -201,6 +210,56 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </main>
+
+      {/* Signups Dialog */}
+      <Dialog open={showSignupsDialog} onOpenChange={setShowSignupsDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Email Signups</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {signups && signups.length > 0 ? (
+              <div className="divide-y divide-gray-200">
+                {signups.map((signup, index) => (
+                  <div
+                    key={signup.id}
+                    className="py-4 flex items-center justify-between hover-elevate rounded-lg px-4"
+                    data-testid={`signup-item-${index}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <Mail className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900" data-testid={`signup-email-${index}`}>
+                          {signup.email}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="w-4 h-4" />
+                          <span data-testid={`signup-date-${index}`}>
+                            {new Date(signup.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Mail className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600">No signups yet</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
