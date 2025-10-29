@@ -1,30 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { Hero } from "@/components/sections/hero";
-import { ValueProposition } from "@/components/sections/value-proposition";
-import { HowItWorks } from "@/components/sections/how-it-works";
-import { WhatYoullLearn } from "@/components/sections/what-youll-learn";
-import { EmailSignup } from "@/components/sections/email-signup";
-import { Footer } from "@/components/sections/footer";
+import { PremiumHero } from "@/components/sections/premium-hero";
+import { PremiumValue } from "@/components/sections/premium-value";
+import { PremiumHow } from "@/components/sections/premium-how";
+import { PremiumSkills } from "@/components/sections/premium-skills";
+import { PremiumSignup } from "@/components/sections/premium-signup";
+import { PremiumFooter } from "@/components/sections/premium-footer";
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Hero />
-      <ValueProposition />
-      <HowItWorks />
-      <WhatYoullLearn />
-      <EmailSignup />
-      <Footer />
+    <div className="min-h-screen bg-white">
+      <PremiumHero />
+      <PremiumValue />
+      <PremiumHow />
+      <PremiumSkills />
+      <PremiumSignup />
+      <PremiumFooter />
     </div>
   );
 }
