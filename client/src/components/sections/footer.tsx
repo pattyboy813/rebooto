@@ -1,8 +1,8 @@
-import { SiTwitter, SiLinkedin, SiGithub } from "react-icons/si";
+import { SiX, SiLinkedin, SiGithub } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 
 const socialLinks = [
-  { icon: SiTwitter, href: "https://twitter.com", label: "Twitter" },
+  { icon: SiX, href: "https://twitter.com", label: "Twitter" },
   { icon: SiLinkedin, href: "https://linkedin.com", label: "LinkedIn" },
   { icon: SiGithub, href: "https://github.com", label: "GitHub" },
 ];

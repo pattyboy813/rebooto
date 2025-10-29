@@ -106,7 +106,7 @@ export function Hero() {
           <Button
             size="lg"
             onClick={scrollToSignup}
-            className="bg-gradient-brand text-white border border-primary-border px-8 py-6 text-lg font-semibold rounded-xl min-h-14 hover:scale-105 transition-transform"
+            className="bg-gradient-brand text-white border border-primary-border rounded-xl"
             data-testid="button-get-early-access"
           >
             Get Early Access
@@ -115,7 +115,7 @@ export function Hero() {
             size="lg"
             variant="outline"
             onClick={scrollToSignup}
-            className="px-8 py-6 text-lg font-semibold rounded-xl min-h-14"
+            className="rounded-xl"
             data-testid="button-learn-more"
           >
             Learn More

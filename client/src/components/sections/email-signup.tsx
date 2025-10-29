@@ -115,7 +115,7 @@ export function EmailSignup() {
                 <Input
                   type="email"
                   placeholder="your.email@example.com"
-                  className="h-14 text-lg px-6 rounded-xl bg-card/50 border-card-border backdrop-blur-sm"
+                  className="rounded-xl bg-card/50 border-card-border backdrop-blur-sm"
                   {...register("email")}
                   data-testid="input-email"
                 />
@@ -129,7 +129,7 @@ export function EmailSignup() {
                 type="submit"
                 size="lg"
                 disabled={mutation.isPending}
-                className="bg-gradient-brand text-white border border-primary-border px-8 h-14 text-lg font-semibold rounded-xl hover:scale-105 transition-transform"
+                className="bg-gradient-brand text-white border border-primary-border rounded-xl"
                 data-testid="button-signup"
               >
                 {mutation.isPending ? (
