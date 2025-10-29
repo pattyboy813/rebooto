@@ -56,38 +56,45 @@ export function FloatingNav() {
           opacity: isVisible ? 1 : 0
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl"
+        className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-6xl px-2 sm:px-0"
       >
-        <div className="backdrop-blur-xl bg-white/70 border border-gray-200/50 rounded-full px-6 py-3 shadow-lg shadow-gray-200/20">
-          <div className="flex items-center justify-between">
+        <div className="backdrop-blur-xl bg-white/80 border-2 border-white/50 rounded-full px-4 sm:px-6 md:px-8 py-3 md:py-4 shadow-xl shadow-gray-300/20">
+          <div className="flex items-center justify-between gap-4">
             {/* Logo */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">TR</span>
+            <button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex items-center gap-2 sm:gap-3 group transition-all hover:scale-105"
+              data-testid="button-scroll-top"
+            >
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow">
+                <span className="text-white font-bold text-sm sm:text-base">TR</span>
               </div>
-              <span className="font-bold text-lg hidden sm:inline text-gray-900">TryRebooto</span>
-            </div>
+              <span className="font-bold text-lg sm:text-xl hidden sm:inline bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                TryRebooto
+              </span>
+            </button>
 
             {/* Desktop Nav Links */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
                 <button
                   key={link.label}
                   onClick={() => scrollToSection(link.href)}
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                  className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors relative group"
                   data-testid={`nav-link-${link.label.toLowerCase().replace(/\s/g, "-")}`}
                 >
                   {link.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300" />
                 </button>
               ))}
             </div>
 
             {/* CTA Button */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 size="sm"
                 onClick={scrollToSignup}
-                className="hidden sm:inline-flex rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-md shadow-blue-500/20"
+                className="hidden sm:inline-flex rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 px-6 font-semibold"
                 data-testid="nav-button-get-access"
               >
                 Get Early Access
@@ -97,7 +104,7 @@ export function FloatingNav() {
               <Button
                 size="icon"
                 variant="ghost"
-                className="md:hidden"
+                className="lg:hidden rounded-full hover:bg-gray-100/80"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 data-testid="button-mobile-menu"
               >
@@ -112,31 +119,41 @@ export function FloatingNav() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed top-24 left-4 right-4 z-40 md:hidden"
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="fixed top-20 sm:top-24 left-3 right-3 sm:left-4 sm:right-4 z-40 lg:hidden"
           >
-            <div className="backdrop-blur-xl bg-white/90 border border-gray-200/50 rounded-3xl p-6 shadow-xl shadow-gray-200/30">
-              <div className="flex flex-col gap-4">
-                {navLinks.map((link) => (
-                  <button
+            <div className="backdrop-blur-xl bg-white/95 border-2 border-white/50 rounded-3xl p-6 shadow-2xl shadow-gray-300/30">
+              <div className="flex flex-col gap-1">
+                {navLinks.map((link, index) => (
+                  <motion.button
                     key={link.label}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
                     onClick={() => scrollToSection(link.href)}
-                    className="text-left text-base font-medium text-gray-700 hover:text-gray-900 py-2 transition-colors"
+                    className="text-left text-base font-semibold text-gray-700 hover:text-gray-900 py-3 px-4 rounded-2xl hover:bg-gray-100/60 transition-all"
                     data-testid={`mobile-nav-link-${link.label.toLowerCase().replace(/\s/g, "-")}`}
                   >
                     {link.label}
-                  </button>
+                  </motion.button>
                 ))}
-                <Button
-                  onClick={scrollToSignup}
-                  className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-md shadow-blue-500/20 mt-2"
-                  data-testid="mobile-button-get-access"
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="pt-2"
                 >
-                  Get Early Access
-                </Button>
+                  <Button
+                    onClick={scrollToSignup}
+                    className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg shadow-blue-500/30 font-semibold"
+                    data-testid="mobile-button-get-access"
+                  >
+                    Get Early Access
+                  </Button>
+                </motion.div>
               </div>
             </div>
           </motion.div>

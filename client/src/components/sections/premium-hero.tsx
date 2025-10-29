@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ChevronDown } from "lucide-react";
-import { CountdownTimer } from "@/components/countdown-timer";
+import { FlipTimer } from "@/components/flip-timer";
 import { motion } from "framer-motion";
 
 export function PremiumHero() {
@@ -100,14 +100,9 @@ export function PremiumHero() {
           Build confidence by solving real IT problems in a safe learning environment.
         </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-          className="pt-4 md:pt-6"
-        >
-          <CountdownTimer />
-        </motion.div>
+        <div className="pt-4 md:pt-8">
+          <FlipTimer />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
