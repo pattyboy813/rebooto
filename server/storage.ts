@@ -1,37 +1,46 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type EmailSignup, type InsertEmailSignup } from "@shared/schema";
 import { randomUUID } from "crypto";
 
-// modify the interface with any CRUD methods
-// you might need
-
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createEmailSignup(signup: InsertEmailSignup): Promise<EmailSignup>;
+  getEmailSignupByEmail(email: string): Promise<EmailSignup | undefined>;
+  getEmailSignupsCount(): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+  private emailSignups: Map<string, EmailSignup>;
 
   constructor() {
-    this.users = new Map();
+    this.emailSignups = new Map();
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async createEmailSignup(insertSignup: InsertEmailSignup): Promise<EmailSignup> {
+    const existing = Array.from(this.emailSignups.values()).find(
+      (signup) => signup.email.toLowerCase() === insertSignup.email.toLowerCase()
+    );
+    
+    if (existing) {
+      throw new Error("Email already registered");
+    }
+
+    const id = randomUUID();
+    const signup: EmailSignup = {
+      ...insertSignup,
+      id,
+      createdAt: new Date(),
+    };
+    this.emailSignups.set(id, signup);
+    return signup;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
+  async getEmailSignupByEmail(email: string): Promise<EmailSignup | undefined> {
+    return Array.from(this.emailSignups.values()).find(
+      (signup) => signup.email.toLowerCase() === email.toLowerCase()
     );
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async getEmailSignupsCount(): Promise<number> {
+    return this.emailSignups.size;
   }
 }
 
