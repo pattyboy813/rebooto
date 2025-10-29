@@ -54,7 +54,14 @@ TryRebooto is a modern pre-launch landing page for an interactive IT support lea
 - Parallax effects on scroll
 - Large responsive typography (5xl to 8xl)
 - Gradient text effects on headline
-- Glassmorphic countdown timer cards
+- **Vintage flip timer countdown** with split-flap display aesthetic:
+  - Mechanical/industrial design (dark gray panels, white text)
+  - 3D flip animations using Framer Motion rotateX transforms
+  - Responsive sizing (mobile 40px tiles → desktop 96px tiles)
+  - Two-digit displays for days, hours, mins, secs
+  - Metallic rivets/screws in corners
+  - "LAUNCH COUNTDOWN" branding
+  - Fits 375px+ viewports with px-1 mobile padding
 - Dual CTAs with gradient buttons
 
 ### 4. Premium Value Proposition
@@ -98,8 +105,17 @@ TryRebooto is a modern pre-launch landing page for an interactive IT support lea
 ### 10. Protected Admin Dashboard
 - Authentication check via /api/auth/me
 - Redirects to home if not authenticated
-- Displays signup statistics
-- Quick action buttons (Manage Scenarios, View Signups, Analytics, Settings)
+- Displays signup statistics (Total Signups count)
+- Quick action buttons:
+  - Manage Scenarios
+  - **View All Signups** (opens dialog with full signups list)
+  - Analytics Dashboard
+  - Settings
+- **Signups List Dialog**:
+  - Fetches all signups via GET /api/signups
+  - Displays email and timestamp for each signup
+  - Scrollable list with proper test IDs
+  - Glassmorphic design with gradient icons
 - Logout functionality
 - Premium glassmorphic design matching landing page
 
@@ -203,7 +219,12 @@ Create a new email signup
 Get total signup count
 - **Response**: `{ count: number }`
 
-### Admin Endpoints
+### Admin Endpoints (Protected - requireAuth)
+
+#### GET /api/signups
+Get all email signups (sorted by newest first)
+- **Response**: `EmailSignup[]`
+- **Auth**: Requires admin session
 
 #### POST /api/auth/login
 Admin authentication (for Konami easter egg)
@@ -272,6 +293,7 @@ npm run dev
 - Passwords should be properly hashed (bcrypt)
 
 ## Recent Changes
+- 2025-10-29: **Vintage flip timer implementation** - Replaced standard countdown with authentic split-flap display (old train station/airport aesthetic) featuring 3D flip animations, mechanical styling, dark gradient panels, white text, metallic rivets. Fully responsive with mobile-first sizing (fits 375px+ viewports). Fixed navigation with logo scroll-to-top button and proper test IDs. Fixed dashboard signups bug - added GET /api/signups endpoint and dialog UI to display full signups list with emails and timestamps.
 - 2025-10-29: **Complete premium redesign** - Implemented Lenis smooth scrolling, floating glassmorphic navigation, premium sections with 3D effects, Konami code easter egg (↑↑↓↓←→←→BA), admin login panel, and protected dashboard with signup analytics. Changed from dark theme to premium/minimalist white aesthetic with glassmorphism throughout. All animations migrated to Framer Motion with scroll triggers.
 - 2025-10-29: Enhanced landing page with modern design, advanced GSAP animations, improved mobile responsiveness, glassmorphism effects, hover interactions, and polished visual hierarchy
 - 2025-10-29: Initial MVP implementation with complete landing page, countdown timer, and email signup functionality
