@@ -43,25 +43,26 @@ export function CountdownTimer() {
       const boxes = document.querySelectorAll(".countdown-box");
       window.gsap.from(boxes, {
         opacity: 0,
+        y: 20,
         scale: 0.9,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: "back.out(1.4)",
+        duration: 0.6,
+        stagger: 0.08,
+        ease: "back.out(1.7)",
       });
     }
   }, [mounted]);
 
   if (!mounted) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl mx-auto px-4">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="countdown-box flex flex-col items-center justify-center p-6 rounded-2xl bg-card/50 border border-card-border backdrop-blur-sm"
+            className="countdown-box flex flex-col items-center justify-center p-4 md:p-6 rounded-xl md:rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-card-border backdrop-blur-md"
           >
-            <div className="text-4xl md:text-6xl font-bold mb-2">--</div>
-            <div className="text-sm uppercase tracking-widest text-muted-foreground">
-              {["Days", "Hours", "Minutes", "Seconds"][i]}
+            <div className="text-3xl md:text-5xl lg:text-6xl font-bold mb-1 md:mb-2">--</div>
+            <div className="text-xs md:text-sm uppercase tracking-wider text-muted-foreground">
+              {["Days", "Hours", "Mins", "Secs"][i]}
             </div>
           </div>
         ))}
@@ -70,25 +71,29 @@ export function CountdownTimer() {
   }
 
   const timeUnits = [
-    { value: timeLeft.days, label: "Days" },
-    { value: timeLeft.hours, label: "Hours" },
-    { value: timeLeft.minutes, label: "Minutes" },
-    { value: timeLeft.seconds, label: "Seconds" },
+    { value: timeLeft.days, label: "Days", shortLabel: "Days" },
+    { value: timeLeft.hours, label: "Hours", shortLabel: "Hours" },
+    { value: timeLeft.minutes, label: "Minutes", shortLabel: "Mins" },
+    { value: timeLeft.seconds, label: "Seconds", shortLabel: "Secs" },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto" role="timer" aria-live="polite">
-      {timeUnits.map((unit, index) => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl mx-auto px-4" role="timer" aria-live="polite">
+      {timeUnits.map((unit) => (
         <div
           key={unit.label}
-          className="countdown-box flex flex-col items-center justify-center p-6 rounded-2xl bg-card/50 border border-card-border backdrop-blur-sm hover-elevate"
+          className="countdown-box group flex flex-col items-center justify-center p-4 md:p-6 rounded-xl md:rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-card-border backdrop-blur-md hover-elevate transition-all duration-300 hover:scale-105 hover:border-primary/30"
           data-testid={`countdown-${unit.label.toLowerCase()}`}
         >
-          <div className="text-4xl md:text-6xl font-bold text-gradient-brand mb-2">
-            {String(unit.value).padStart(2, "0")}
+          <div className="relative">
+            <div className="text-3xl md:text-5xl lg:text-6xl font-bold text-gradient-brand mb-1 md:mb-2 transition-all duration-300">
+              {String(unit.value).padStart(2, "0")}
+            </div>
+            <div className="absolute inset-0 bg-gradient-brand opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300" />
           </div>
-          <div className="text-sm uppercase tracking-widest text-muted-foreground">
-            {unit.label}
+          <div className="text-xs md:text-sm uppercase tracking-wider text-muted-foreground">
+            <span className="hidden md:inline">{unit.label}</span>
+            <span className="md:hidden">{unit.shortLabel}</span>
           </div>
         </div>
       ))}

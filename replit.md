@@ -69,23 +69,39 @@ TryRebooto is a modern pre-launch landing page for an interactive IT support lea
 - **Secondary**: Green accent (HSL 165 75% 55%)
 - **Background**: Dark theme (HSL 220 6% 8%)
 - **Gradients**: Blue-to-green brand gradient
+- **Glassmorphism**: backdrop-blur-sm/md with semi-transparent backgrounds
 
 ### Typography
 - **Display Font**: Space Grotesk (headlines, section titles)
 - **Body Font**: Inter (UI elements, body text)
-- **Hierarchy**: 5xl-7xl headlines, xl-2xl subheadings, base-lg body
+- **Responsive Hierarchy**: 
+  - Mobile: 4xl headlines → Desktop: 7xl headlines
+  - Mobile: base-lg body → Desktop: xl-2xl body
+  - Smart scaling with sm:, md:, lg: breakpoints
 
 ### Spacing
-- Consistent use of Tailwind units: 4, 6, 8, 12, 16, 20, 24
-- Sections: py-20 md:py-32 for vertical spacing
-- Cards: p-8 for internal padding
+- **Mobile-first approach**: 
+  - Mobile: px-4, py-16, gap-3/4
+  - Desktop: px-6, py-24/32, gap-6/8
+- **Sections**: py-16 md:py-24 lg:py-32 for vertical spacing
+- **Cards**: p-6 md:p-8 for internal padding
 
 ### Animations (GSAP)
-- Hero entrance: fade + slide up (0.8s)
-- Countdown boxes: stagger entrance (0.1s between)
-- Section headers: scroll-triggered fade + slide
-- Cards: stagger entrance on scroll (0.15s)
-- Hover effects: scale transforms on buttons/cards
+- **Hero**: 
+  - Staged timeline animations with overlapping delays
+  - Parallax scrolling on background gradients (0.3x speed)
+  - Pulsing gradient orbs
+- **Countdown**: 
+  - Stagger entrance with back.out easing (0.08s between)
+  - Hover effects: scale-105 + glow + border color transition
+- **Sections**: 
+  - Scroll-triggered reveals (80-85% viewport)
+  - Cards: alternating X-axis slide animations on How It Works
+  - Staggered Y-axis entrances (0.15s) on other sections
+- **Hover interactions**: 
+  - Cards: elevation with glow effects, scale transforms
+  - Buttons: shadow intensification, smooth transitions
+  - Icons: scale-110 transforms
 
 ## Data Model
 
@@ -136,4 +152,5 @@ npm run dev
 - In-memory storage resets on server restart
 
 ## Recent Changes
+- 2025-10-29: Enhanced landing page with modern design, advanced GSAP animations (parallax, scroll-triggered reveals, timeline orchestration), improved mobile responsiveness (responsive grids, full-width buttons, adaptive text sizes), glassmorphism effects, hover interactions (scale, glow, elevation), and polished visual hierarchy across all sections
 - 2025-10-29: Initial MVP implementation with complete landing page, countdown timer, and email signup functionality

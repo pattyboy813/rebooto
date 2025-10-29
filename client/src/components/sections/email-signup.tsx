@@ -94,28 +94,29 @@ export function EmailSignup() {
     <section
       id="signup"
       ref={sectionRef}
-      className="py-20 md:py-32 px-6 relative overflow-hidden"
+      className="py-16 md:py-24 lg:py-32 px-4 md:px-6 relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-chart-2/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-card/50 to-transparent pointer-events-none" />
       
       <div className="relative z-10 max-w-3xl mx-auto">
-        <div className="signup-header text-center mb-12">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
+        <div className="signup-header text-center mb-8 md:mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 md:mb-4">
             Be First to Learn
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground px-4">
             Join the early access list and get notified when we launch
           </p>
         </div>
 
         {!submitted ? (
-          <form onSubmit={handleSubmit(onSubmit)} className="signup-form space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="signup-form space-y-4 md:space-y-6">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
               <div className="flex-1">
                 <Input
                   type="email"
                   placeholder="your.email@example.com"
-                  className="rounded-xl bg-card/50 border-card-border backdrop-blur-sm"
+                  className="rounded-xl bg-card/50 border-card-border backdrop-blur-sm text-base"
                   {...register("email")}
                   data-testid="input-email"
                 />
@@ -129,7 +130,7 @@ export function EmailSignup() {
                 type="submit"
                 size="lg"
                 disabled={mutation.isPending}
-                className="bg-gradient-brand text-white border border-primary-border rounded-xl"
+                className="w-full sm:w-auto bg-gradient-brand text-white border border-primary-border rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                 data-testid="button-signup"
               >
                 {mutation.isPending ? (
@@ -145,25 +146,25 @@ export function EmailSignup() {
                 )}
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-xs md:text-sm text-muted-foreground text-center px-4">
               We respect your privacy. No spam, just launch updates.
             </p>
           </form>
         ) : (
-          <div className="signup-form text-center p-8 rounded-2xl bg-card/50 border border-card-border backdrop-blur-sm">
-            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-8 h-8 text-primary" />
+          <div className="signup-form text-center p-6 md:p-8 rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-card-border backdrop-blur-sm">
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-brand/20 flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 md:w-10 md:h-10 text-primary" />
             </div>
-            <h3 className="text-2xl font-semibold mb-2">You're in!</h3>
-            <p className="text-muted-foreground">
+            <h3 className="text-xl md:text-2xl font-semibold mb-2">You're in!</h3>
+            <p className="text-sm md:text-base text-muted-foreground">
               Check your inbox for a confirmation email.
             </p>
           </div>
         )}
 
         {stats && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-muted-foreground">
-            <Users className="w-5 h-5" />
+          <div className="mt-6 md:mt-8 flex items-center justify-center gap-2 text-sm md:text-base text-muted-foreground">
+            <Users className="w-4 h-4 md:w-5 md:h-5" />
             <span data-testid="text-signup-count">
               Join {stats.count}+ early supporters
             </span>
