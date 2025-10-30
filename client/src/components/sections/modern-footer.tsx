@@ -1,4 +1,5 @@
 import { Github, Twitter, Linkedin } from "lucide-react";
+import { Link } from "wouter";
 
 export function ModernFooter() {
   return (
@@ -19,9 +20,10 @@ export function ModernFooter() {
               Product
             </h4>
             <ul className="space-y-2">
-              <li><a href="#features" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-features">Features</a></li>
-              <li><a href="#pricing" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-pricing">Pricing</a></li>
-              <li><a href="#faq" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-faq">FAQ</a></li>
+              <li><Link href="/#features" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-features">Features</Link></li>
+              <li><Link href="/pricing" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-pricing">Pricing</Link></li>
+              <li><Link href="/faq" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-faq">FAQ</Link></li>
+              <li><Link href="/about" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-about">About Us</Link></li>
             </ul>
           </div>
 
@@ -30,9 +32,9 @@ export function ModernFooter() {
               Resources
             </h4>
             <ul className="space-y-2">
-              <li><a href="#docs" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-docs">Documentation</a></li>
-              <li><a href="#blog" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-blog">Blog</a></li>
-              <li><a href="#support" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-support">Support</a></li>
+              <li><Link href="/documentation" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-docs">Documentation</Link></li>
+              <li><Link href="/blog" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-blog">Blog</Link></li>
+              <li><Link href="/support" className="text-sm text-gray-600 hover:text-teal-600 transition-colors" data-testid="link-support">Support</Link></li>
             </ul>
           </div>
 

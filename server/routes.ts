@@ -491,39 +491,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
         Advanced: 200,
       };
 
-      const prompt = `Generate ${lessonCount} realistic IT support lessons for a course titled "${title}".
+      const prompt = `Generate ${lessonCount} PRACTICAL, hands-on IT support lessons for a course titled "${title}".
 Description: ${description}
 Category: ${category}
 Difficulty: ${difficulty}
 
-For each lesson, provide:
-1. Title (concise, action-oriented, related to real IT support scenarios)
-2. Description (2-3 sentences explaining what the user will learn)
-3. Content (detailed interactive scenario with problem description, troubleshooting steps, and solution. Format as JSON object with: problem, steps array, and solution)
-4. XP Reward (use ${xpRewards[difficulty as keyof typeof xpRewards]} for ${difficulty} difficulty)
+CRITICAL: These must be REAL-WORLD, PRACTICAL scenarios, not theoretical knowledge. Each lesson should simulate an actual help desk ticket.
 
-Return ONLY a valid JSON array of lessons in this exact format:
+For each lesson, create:
+1. **Title**: Specific problem (e.g., "Computer Won't Boot - 3 Beep Code Error" not "Understanding Boot Processes")
+
+2. **Description**: Brief 1-2 sentence summary of the practical scenario
+
+3. **Content** (THIS IS THE MOST IMPORTANT PART - Make it detailed and hands-on):
+   
+   **Problem**: Write like a real help desk ticket. Include:
+   - User's complaint/symptoms (exactly as a user would describe it)
+   - Specific error messages, codes, or beep codes if applicable
+   - What the user was doing when the problem occurred
+   - Any troubleshooting they've already attempted
+   Example: "User reports laptop won't turn on. When pressing power button, they hear 3 short beeps repeatedly. Screen remains black. User states it was working fine yesterday but laptop was dropped. Battery indicator light blinks amber 3 times."
+
+   **Steps**: Detailed, actionable troubleshooting steps (${difficulty === 'Beginner' ? '7-12' : difficulty === 'Intermediate' ? '10-15' : '12-18'} steps). Each step should:
+   - Be specific and actionable ("Press F2 during boot" not "Access BIOS")
+   - Include exact commands, buttons, or tools to use
+   - Mention what to look for or expect
+   - Build logically from diagnosis to solution
+   Example steps:
+   - "Power off the laptop completely and disconnect the power adapter"
+   - "Locate the RAM access panel on the bottom of the laptop (usually marked with a memory icon)"
+   - "Use a Phillips #0 screwdriver to remove the 2 screws securing the panel"
+   - "Carefully press the retention clips outward on both sides of the RAM module"
+   - "Remove the RAM stick and inspect for visible damage or debris"
+   - "Clean the gold contacts with a soft, dry cloth or pencil eraser"
+   - "Firmly reseat the RAM module at a 30-degree angle, then press down until clips lock"
+   - "Replace the access panel and secure with screws"
+   - "Reconnect power adapter and press the power button"
+   - "Listen for the normal single beep and check if system boots to BIOS/OS"
+
+   **Solution**: Comprehensive resolution with:
+   - Root cause explanation (what actually caused the problem)
+   - Why the fix works (technical reasoning)
+   - Prevention tips for the future
+   - When to escalate (if fix doesn't work)
+   Example: "The 3-beep POST code indicates a RAM failure. In this case, the laptop drop likely caused the RAM module to become unseated. Reseating the RAM allows proper contact with the motherboard, resolving the boot failure. The amber light pattern confirms Dell's RAM diagnostic code. If reseating doesn't work, the RAM module itself may be damaged and need replacement. Always document the beep code pattern as it provides crucial diagnostic information."
+
+4. **XP Reward**: ${xpRewards[difficulty as keyof typeof xpRewards]}
+
+${category === 'Hardware Headaches' ? `
+HARDWARE SCENARIOS should include:
+- Specific error codes (beep codes, LED patterns, BIOS codes)
+- Physical components to check (RAM, HDD, cables, power supply)
+- Diagnostic tools (POST cards, multimeters, hardware diagnostics)
+- Actual hardware models/brands when relevant
+` : category === 'Network Nightmares' ? `
+NETWORK SCENARIOS should include:
+- Specific error messages ("Cannot obtain IP address", "DNS server not responding")
+- Exact commands (ipconfig /all, ping 8.8.8.8, tracert)
+- Tools to use (Network Diagnostics, Device Manager, router admin panel)
+- IP addresses, subnet masks, gateway configurations
+- Troubleshooting from Layer 1 (physical) up to Layer 7 (application)
+` : `
+SOFTWARE SCENARIOS should include:
+- Actual error codes and messages (e.g., "Error 0x80070005", "Application has stopped working")
+- Specific applications and versions
+- Registry paths or config file locations if relevant
+- Command-line tools (sfc /scannow, DISM, event viewer)
+- Log file locations and what to look for
+`}
+
+Return ONLY a valid JSON array with NO additional text:
 [
   {
-    "title": "Lesson title here",
-    "description": "Lesson description here",
+    "title": "Specific problem title",
+    "description": "Brief scenario summary",
     "content": {
-      "problem": "Description of the IT problem",
-      "steps": ["Step 1", "Step 2", "Step 3"],
-      "solution": "The final solution"
+      "problem": "Detailed help desk ticket with symptoms, error messages, user actions",
+      "steps": ["Actionable step 1", "Actionable step 2", ...],
+      "solution": "Root cause + why fix works + prevention tips"
     },
     "xpReward": ${xpRewards[difficulty as keyof typeof xpRewards]}
   }
 ]
 
-Make the scenarios realistic, educational, and engaging for IT support trainees.`;
+Make every scenario feel like a real support ticket you'd actually encounter. Include specific details, real tools, actual commands, and practical troubleshooting logic.`;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are an expert IT support instructor who creates engaging, realistic training scenarios. Always respond with valid JSON only, no additional text.",
+            content: "You are a senior IT support specialist and training instructor with 15+ years of hands-on help desk experience. You create PRACTICAL, realistic training scenarios based on actual support tickets you've handled. Your scenarios include specific error messages, exact commands, real tools, and detailed troubleshooting steps - NOT theoretical knowledge. Every scenario should feel like a real ticket from a real user. Always respond with valid JSON only, no additional text or markdown.",
           },
           {
             role: "user",

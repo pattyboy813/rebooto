@@ -14,6 +14,12 @@ import Courses from "@/pages/courses";
 import CourseDetail from "@/pages/course-detail";
 import LessonPlayer from "@/pages/lesson-player";
 import AdminCourseCreator from "@/pages/admin-course-creator";
+import Documentation from "@/pages/documentation";
+import Blog from "@/pages/blog";
+import FAQ from "@/pages/faq";
+import Support from "@/pages/support";
+import About from "@/pages/about";
+import Pricing from "@/pages/pricing";
 import NotFound from "@/pages/not-found";
 
 function UserDashboard() {
@@ -195,6 +201,12 @@ function Router() {
       {/* Public routes */}
       <Route path="/" component={Home} />
       <Route path="/auth" component={PremiumAuth} />
+      <Route path="/documentation" component={Documentation} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/faq" component={FAQ} />
+      <Route path="/support" component={Support} />
+      <Route path="/about" component={About} />
+      <Route path="/pricing" component={Pricing} />
       
       {/* User portal routes - protected by UserLayout */}
       <Route path="/app/dashboard" component={UserDashboard} />
