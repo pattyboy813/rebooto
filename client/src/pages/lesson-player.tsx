@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { Card } from "@/components/ui/card";
@@ -45,6 +45,34 @@ export default function LessonPlayer() {
     queryKey: ["/api/courses", parsedCourseId],
   });
 
+  const content = useMemo(() => {
+    if (!lesson) return [];
+    const lessonContentObj = lesson.content as any;
+    
+    return Array.isArray(lessonContentObj) 
+      ? lessonContentObj as LessonContent[] 
+      : lessonContentObj?.problem && lessonContentObj?.steps && lessonContentObj?.solution
+      ? [
+          { type: "scenario" as const, content: lessonContentObj.problem },
+          ...lessonContentObj.steps.map((step: string) => ({ type: "text" as const, content: step })),
+          { type: "text" as const, content: lessonContentObj.solution }
+        ]
+      : [];
+  }, [lesson]);
+
+  const calculateScore = () => {
+    const quizItems = content.filter((item) => item.type === "quiz");
+    if (quizItems.length === 0) return 100;
+
+    let correct = 0;
+    quizItems.forEach((item, index) => {
+      if (item.correctAnswer === userChoices[index]) {
+        correct++;
+      }
+    });
+    return Math.round((correct / quizItems.length) * 100);
+  };
+
   const completeMutation = useMutation({
     mutationFn: async () => {
       if (!isAuthenticated) {
@@ -80,21 +108,6 @@ export default function LessonPlayer() {
     },
   });
 
-  const calculateScore = () => {
-    if (!lesson?.content) return 0;
-    const content = lesson.content as LessonContent[];
-    const quizItems = content.filter((item) => item.type === "quiz");
-    if (quizItems.length === 0) return 100;
-
-    let correct = 0;
-    quizItems.forEach((item, index) => {
-      if (item.correctAnswer === userChoices[index]) {
-        correct++;
-      }
-    });
-    return Math.round((correct / quizItems.length) * 100);
-  };
-
   const handleChoice = (choiceIndex: number) => {
     const newChoices = [...userChoices];
     newChoices[currentStep] = choiceIndex;
@@ -102,7 +115,7 @@ export default function LessonPlayer() {
   };
 
   const handleNext = () => {
-    if (lesson?.content && currentStep < (lesson.content as LessonContent[]).length - 1) {
+    if (content && currentStep < content.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -163,8 +176,6 @@ export default function LessonPlayer() {
     );
   }
 
-  const content = Array.isArray(lesson.content) ? lesson.content as LessonContent[] : [];
-  
   if (content.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center">
