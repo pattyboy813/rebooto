@@ -14,6 +14,7 @@ import Dashboard from "@/pages/dashboard";
 import Courses from "@/pages/courses";
 import CourseDetail from "@/pages/course-detail";
 import LessonPlayer from "@/pages/lesson-player";
+import AdminCourseCreator from "@/pages/admin-course-creator";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/courses" component={Courses} />
       <Route path="/courses/:id" component={CourseDetail} />
       <Route path="/courses/:courseId/lessons/:lessonId" component={LessonPlayer} />
+      <Route path="/admin/courses/new" component={AdminCourseCreator} />
       <Route component={NotFound} />
     </Switch>
   );

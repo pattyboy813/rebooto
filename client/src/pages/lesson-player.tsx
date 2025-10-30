@@ -48,7 +48,7 @@ export default function LessonPlayer() {
   const completeMutation = useMutation({
     mutationFn: async () => {
       if (!isAuthenticated) {
-        window.location.href = "/api/auth/login";
+        window.location.href = "/api/login";
         return;
       }
       const res = await apiRequest("POST", `/api/lessons/${parsedLessonId}/complete`, {
@@ -163,7 +163,27 @@ export default function LessonPlayer() {
     );
   }
 
-  const content = lesson.content as LessonContent[];
+  const content = Array.isArray(lesson.content) ? lesson.content as LessonContent[] : [];
+  
+  if (content.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 text-lg">Lesson content is not available</p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => setLocation(`/courses/${parsedCourseId}`)}
+            data-testid="button-back-to-course"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Course
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const currentContent = content[currentStep];
   const isLastStep = currentStep === content.length - 1;
 

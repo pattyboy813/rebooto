@@ -40,7 +40,7 @@ export default function CourseDetail() {
   const enrollMutation = useMutation({
     mutationFn: async () => {
       if (!isAuthenticated) {
-        window.location.href = "/api/auth/login";
+        window.location.href = "/api/login";
         return;
       }
       const res = await apiRequest("POST", `/api/courses/${courseId}/enroll`, {});
