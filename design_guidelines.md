@@ -1,232 +1,202 @@
 # Rebooto Design Guidelines
 
-## Design Approach
-**Reference-Based Approach** drawing from premium EdTech and modern SaaS:
-- **Linear**: Clean typography, smooth interactions, refined spacing
-- **Stripe**: Professional elegance, strategic use of whitespace
-- **Apple**: Premium minimalism with delightful details
-- **Spline**: Playful 3D integration, interactive depth
+## Design Philosophy
+**Dual Identity System**:
+- **User Portal** (/app/*): Engagement-focused with 3D elements, glassmorphism, blue-purple gradients
+- **Admin Portal** (/admin/*): Efficiency-focused with dark theme, data clarity, orange-red accents
 
-## Core Design Principles
-1. **Premium Minimalism**: Clean white canvas with subtle depth through glassmorphism and 3D elements
-2. **Playful Professionalism**: Balance credibility with bouncy animations and interactive 3D shapes
-3. **Delightful Interactions**: Cursor-aware elements, tilt effects, and smooth micro-interactions
-4. **Progressive Engagement**: Strategic scrolling reveals interactive 3D geometric shapes and content
+---
 
-## Typography System
-**Font Stack**: Plus Jakarta Sans (primary choice) or Inter via Google Fonts
+# USER PORTAL
 
-**Hierarchy**:
-- Hero Headline: text-6xl md:text-8xl, font-bold, tracking-tight
-- Section Headers: text-4xl md:text-6xl, font-bold
-- Subheadings: text-xl md:text-3xl, font-semibold
-- Body Text: text-base md:text-lg, leading-relaxed
-- Small Text: text-sm, tracking-wide
+## Typography
+**Fonts**: Space Grotesk (headlines), Inter (body)
+- Hero: `text-6xl md:text-8xl font-bold tracking-tight`
+- Sections: `text-4xl md:text-6xl font-bold`
+- Subheads: `text-xl md:text-3xl font-semibold`
+- Body: `text-base md:text-lg leading-relaxed`
 
-## Color Palette
-**Base Colors**:
-- Background: White (#FFFFFF) with subtle gray gradients
-- Surface: Light gray (#F8F9FA to #F1F3F5)
-- Text: Dark gray (#1A1A1A) for primary, (#6B7280) for secondary
+## Colors
+- Background: `#FFFFFF`, Surface: `#F8F9FA`
+- Text: `#1A1A1A` (primary), `#6B7280` (secondary)
+- Gradient: `#667EEA → #A78BFA` (blue-purple)
+- Glassmorphic: `bg-white/60 backdrop-blur-lg border-gray-200/50`
 
-**Accent Gradients**:
-- Primary: Soft blue to purple (from #667EEA to #A78BFA)
-- Hover states: Subtle intensity shifts
-- Glassmorphic overlays: White with 10-20% opacity + backdrop blur
-
-## Layout System
-**Spacing Primitives**: Tailwind units of 4, 8, 12, 16, 20, 24, 32
-
-**Container Strategy**:
-- Full-width sections with `max-w-7xl mx-auto px-6 md:px-12`
-- Hero: `min-h-screen` with centered content
-- Content sections: `py-24 md:py-32`
-- Mobile: `py-16 md:py-24`
-
-**Grid Patterns**:
-- Features: `grid-cols-1 md:grid-cols-3 gap-8 md:gap-12`
-- How It Works: `grid-cols-1 lg:grid-cols-2 gap-16` with 3D visuals
-- Hero/CTA sections: Centered single column, `max-w-4xl`
+## Layout
+**Containers**: `max-w-7xl mx-auto px-6 md:px-12`
+**Sections**: `py-24 md:py-32` (content), `py-16 md:py-24` (mobile)
+**Grids**: `grid-cols-1 md:grid-cols-3 gap-8 md:gap-12`
 
 ## Navigation
-**Floating Glassmorphic Header**:
-- Fixed position, top: 24px
-- Glassmorphic treatment: `backdrop-blur-xl bg-white/70 border border-gray-200/50`
-- Rounded full corners: `rounded-full`
-- Inner padding: `px-8 py-4`
-- Contains: Logo, navigation links, "Get Access" CTA button
-- Subtle drop shadow for depth
-- Smooth hide/show on scroll direction change
+Floating glassmorphic header: `fixed top-24 backdrop-blur-xl bg-white/70 border-gray-200/50 rounded-full px-8 py-4`
+- Hide/show on scroll direction
+- Components: Logo, nav links, user avatar, CTA
 
-## Page Structure & Sections
+## Key Pages
 
-### 1. Hero Section
-**Layout**: Full viewport with large hero image background
-**Components**:
-- Large hero image: Abstract 3D geometric shapes (spheres, cubes, toruses) floating in light space with soft blue/purple gradient overlay
-- Floating glassmorphic navigation at top
-- Main headline: "Learn IT Support Through Real Scenarios"
-- Subheading with value proposition
-- Countdown timer: 2x2 grid on mobile, 1x4 on desktop with glassmorphic cards
-- Primary CTA button with backdrop-blur-md bg-white/10 border border-white/20
-- Interactive 3D sphere element floating in corner (responds to cursor movement)
-- Smooth scroll indicator
+### Landing (/app)
+**Hero**: Full viewport, 3D geometric background (spheres/cubes in blue-purple space)
+- Headline + subheading + countdown timer (vintage flip to Dec 31 2025)
+- CTA: `backdrop-blur-md bg-white/10 border-white/20`
+- Interactive 3D sphere with cursor parallax
 
-### 2. Value Proposition Section
-**Layout**: Three-column grid of benefit cards
-**Components**:
-- Section header: "Why Rebooto?"
-- Three glassmorphic cards with 3D tilt effect on hover
-- Each card: Icon (3D-style), headline, description
-- Subtle shadow and border treatment
-- Interactive 3D geometric shape (pyramid) floating between cards on desktop
+**Value Props**: 3-card grid, glassmorphic with 3D tilt on hover, floating pyramid decoration
 
-### 3. How It Works Section
-**Layout**: Two-column alternating layout (image + text)
-**Components**:
-- Three steps with large numbers (01, 02, 03)
-- Step 1: Text left, 3D mockup right showing scenario selection
-- Step 2: 3D mockup left, text right showing problem-solving interface
-- Step 3: Text left, progress dashboard mockup right
-- Connecting curved lines between steps (desktop)
-- Each mockup has subtle 3D depth and tilt on scroll
+**How It Works**: Alternating 2-column, 3 numbered steps (01-03), 3D mockups with scroll-triggered tilt, curved connecting lines
 
-### 4. Interactive Skills Section
-**Layout**: Four-column grid of skill categories
-**Components**:
-- Glassmorphic cards with hover lift effect
-- 3D icon illustrations for each category
-- Category name + sample topics list
-- Cards respond to cursor proximity with subtle movement
-- Floating 3D cube element in background
+**Skills**: 4-column grid, glassmorphic cards, 3D icons (hardware/networking/software/security), cursor proximity response
 
-### 5. Email Signup Section
-**Layout**: Centered with generous padding
-**Components**:
-- Compelling headline: "Start Your Journey"
-- Glassmorphic email input with inline submit button
-- Social proof counter: "Join 1,200+ learners"
-- Privacy text below form
-- Subtle gradient background overlay
-- Floating 3D torus shape decoratively placed
+**Signup**: Centered, glassmorphic email input + inline button, "Join 1,200+ learners", floating torus
 
-### 6. Footer
-**Layout**: Three-column grid (brand, links, social)
-**Content**:
-- Logo + minimal tagline
-- Quick links: About, Support, Privacy, Terms
-- Social icons with hover bounce
-- Copyright notice
+### Dashboard (/app/dashboard)
+Sidebar (profile card, stats, categories) + main area (progress cards, scenario grid, badges)
+- Interactive progress rings with gradient fills
 
-## Component Library
+### Scenario (/app/scenarios/:id)
+Full-screen decision tree: white background, glassmorphic decision nodes, animated connecting lines, floating progress tracker, hint drawer, 3D visual aids
+
+### Progress (/app/progress)
+Grid: skill radar chart (blue-purple gradient), timeline, achievement masonry, streak calendar
+
+## Components
 
 ### Buttons
-**Primary CTA**:
-- When over images: `backdrop-blur-md bg-white/10 border border-white/20`
-- When over solid backgrounds: Blue-to-purple gradient background
-- `px-8 py-4 rounded-full text-base font-semibold`
-- Bouncy hover animation (scale with spring physics)
-
-**Secondary CTA**:
-- `border-2 border-gray-300 bg-white hover:bg-gray-50`
-- Rounded full, smooth transition
+- **Primary (on images)**: `backdrop-blur-md bg-white/10 border-white/20 px-8 py-4 rounded-full`
+- **Primary (solid)**: Blue-purple gradient, `px-8 py-4 rounded-full`
+- **Secondary**: `border-2 border-gray-300 bg-white hover:bg-gray-50 rounded-full`
 
 ### Cards
-**Glassmorphic Cards**:
-- `backdrop-blur-lg bg-white/60 border border-gray-200/50`
-- `rounded-3xl p-8 md:p-10`
-- Subtle drop shadow: `shadow-xl shadow-gray-200/50`
-- 3D tilt effect on hover using transform perspective
-- Bouncy entrance animation on scroll
+**Glassmorphic**: `backdrop-blur-lg bg-white/60 border-gray-200/50 rounded-3xl p-8 md:p-10 shadow-xl` + 3D tilt hover
 
-**Countdown Timer Boxes**:
-- Glassmorphic treatment matching cards
-- `rounded-2xl p-6`
-- Large number: `text-5xl md:text-7xl font-bold`
-- Label: `text-sm uppercase tracking-wider text-gray-500`
+**Countdown Boxes**: Glassmorphic `rounded-2xl p-6`, vintage flip animation, `text-5xl md:text-7xl font-bold`
 
-### Form Elements
-**Email Input**:
-- Glassmorphic: `backdrop-blur-lg bg-white/60 border border-gray-200/50`
-- `rounded-full px-6 py-4 text-lg`
-- Inline with button on desktop, stacked on mobile
-- Focus: Subtle glow with gradient border
+### Forms
+**Email Input**: `backdrop-blur-lg bg-white/60 border-gray-200/50 rounded-full px-6 py-4`, gradient border on focus
 
-### 3D Interactive Elements
-**Floating Geometric Shapes**:
-- Scattered throughout page (sphere in hero, pyramid in value prop, cube in skills, torus in signup)
-- Respond to cursor movement with parallax effect
-- Subtle rotation animation loop
-- Semi-transparent with gradient fills
-- Maintain 1:1 aspect ratios
+### 3D Elements
+Floating shapes (sphere/pyramid/cube/torus): semi-transparent gradients, cursor parallax, subtle rotation, 1:1 aspect ratios
 
-## Animations & Interactions
+## Animations
+- **Lenis**: Smooth scrolling sitewide
+- **Framer Motion**: Page transitions, stagger fade-up card entrances
+- **GSAP**: Section reveals, parallax, progress fills
+- **Micro**: Button spring scale, 3D card tilt, proximity movement
 
-**Micro-interactions**:
-- Button hover: Bouncy scale with spring physics
-- Card hover: 3D tilt based on cursor position + lift
-- Card entrance: Stagger fade-up with bounce
-- Cursor proximity: Cards subtly move toward/away from cursor
+---
 
-**Scroll Animations**:
-- Section reveals: Fade + slide up with easing
-- 3D shapes: Parallax movement at different speeds
-- Progress indicators: Smooth fill animations
+# ADMIN PORTAL
 
-**Easter Egg (Konami Code)**:
-- Trigger: Up, Up, Down, Down, Left, Right, Left, Right, B, A
-- Effect: Admin portal panel slides in from right side
-- Panel: Glassmorphic with admin controls mockup
-- Close button with smooth slide-out
-- Celebration particle effect on activation
+## Typography
+**Font**: Inter (all contexts)
+- Dashboard: `text-3xl md:text-5xl font-bold`
+- Sections: `text-2xl md:text-3xl font-semibold`
+- Cards: `text-xl font-semibold`
+- Body: `text-sm md:text-base`
+- Labels: `text-xs uppercase tracking-wide`
 
-**Interactive Cursor**:
-- Custom cursor dot that follows mouse
-- Expands on interactive elements
-- Trail effect with gradient
+## Colors
+- Background: `#0F0F11`, Surface: `#1A1A1D → #24242A`
+- Text: `#FFFFFF` (primary), `#9CA3AF` (secondary)
+- Gradient: `#FF7A18 → #FF3B30` (orange-red)
+- Glassmorphic: `bg-black/40 backdrop-blur-lg border-white/10`
+- Status: Success `#10B981`, Warning `#F59E0B`, Danger `#EF4444`
 
-## Images
+## Layout
+**Structure**: Top nav (h-16) + left sidebar (w-64) + main content (`p-8 md:p-12`)
 
-### Hero Image
-**Description**: Large, high-quality abstract 3D render featuring floating geometric shapes (spheres, cubes, toruses) in a light, airy space with soft blue-purple gradient lighting
-**Placement**: Full-screen background covering entire hero section
-**Treatment**: Subtle overlay for text readability, fixed background attachment for parallax effect
+## Navigation
+**Top Bar**: `h-16 backdrop-blur-xl bg-black/80 border-b border-white/10`
+- Logo, global search, notifications, admin avatar
+- Active: orange-red gradient underline
 
-### How It Works Mockups
-**Description**: Clean, 3D-styled interface screenshots showing scenario selection, problem-solving decision trees, and progress dashboards with depth and perspective
-**Placement**: Alternating right/left in How It Works section
-**Treatment**: Floating with drop shadow, subtle 3D tilt, rounded corners (rounded-3xl)
+**Sidebar**: `w-64 bg-black/40 backdrop-blur-lg border-r border-white/10`
+- Sections: Dashboard, Users, Scenarios, Analytics, Campaigns, Settings
+- Active: `border-left-4` orange-red gradient + `bg-white/5`
+- Hover: `bg-white/5`
+- Collapsible to icons (tablet), hidden (mobile hamburger)
 
-### Skill Category Icons
-**Description**: 3D illustrated icons for hardware, networking, software with isometric perspective
-**Placement**: Top of each skill category card
-**Treatment**: 80x80px with subtle shadow and gradient treatment
+## Key Pages
 
-## Responsive Behavior
-**Breakpoints**:
-- Mobile: Single column stacking, simplified 3D effects
-- Tablet (md:): Two-column grids, reduced animations
-- Desktop (lg:): Full 3D interactions, cursor effects, floating shapes
+### Dashboard (/admin/dashboard)
+**Stat Cards**: `backdrop-blur-lg bg-black/40 border-white/10 rounded-2xl p-6`
+- Large number with orange-red gradient, trend arrow, mini sparkline
 
-**Mobile Adaptations**:
-- Navigation: Compact floating bar
-- Countdown: 2x2 grid layout
-- 3D shapes: Reduced or static
-- Tilt effects: Disabled
-- Email form: Vertical stack
+**Charts**: User growth line, completion pie, category bars (orange-red gradient fills)
+
+**Activity Feed**: Glassmorphic scrollable list, timestamp + user + action + status badge
+
+### Users (/admin/users)
+Search/filter bar + data table
+- Headers: `text-xs uppercase` orange-red gradient
+- Rows: `hover:bg-white/5`, alternating backgrounds
+- Actions: Edit/Delete icons, bulk checkboxes, pagination
+
+### Scenarios (/admin/scenarios)
+Grid/list toggle: thumbnail cards with stats (completions, time, difficulty) + actions
+
+### Analytics (/admin/analytics)
+Date range selector + engagement metrics, funnel chart, skill heatmap, difficulty scatter, export button
+
+### Campaigns (/admin/campaigns)
+2-column: campaign list + preview
+- Builder: template selector, rich text editor, recipient segments, schedule controls
+
+### Settings (/admin/settings)
+Tabs (General/Security/Integrations/Billing), glassmorphic form sections, orange-red toggle switches
+
+## Components
+
+### Buttons
+- **Primary**: `bg-gradient orange-red px-6 py-3 rounded-lg font-semibold`
+- **Secondary**: `border-white/20 bg-white/5 hover:bg-white/10`
+- **Danger**: `bg-red-600 hover:bg-red-700`
+
+### Cards
+`backdrop-blur-lg bg-black/40 border-white/10 rounded-2xl p-6 md:p-8 hover:border-white/20`
+
+### Tables
+- **Header**: `bg-white/5 border-b border-white/10 text-xs uppercase`
+- **Row**: `hover:bg-white/5 border-b border-white/5`
+
+### Forms
+- **Input**: `backdrop-blur-lg bg-black/40 border-white/10 rounded-lg px-4 py-3 focus:border-orange-500`
+- **Toggle**: `bg-white/10` (off), orange-red gradient (on)
+
+### Badges
+`rounded-full px-3 py-1 text-xs`
+- Active: `bg-green-500/20 text-green-400`
+- Pending: `bg-amber-500/20 text-amber-400`
+- Inactive: `bg-gray-500/20 text-gray-400`
+
+### Charts
+Chart.js/Recharts: dark theme, orange-red gradients, `white/10` gridlines, glassmorphic tooltips
+
+---
+
+# SHARED
+
+## Authentication
+Centered glassmorphic card on gradient background
+- **Providers**: Email/password + Google/GitHub/Apple/X (Replit Auth)
+- **Provider buttons**: Icon + label, `backdrop-blur-md bg-white/10` (user) or `bg-black/40` (admin)
+- Error states: red border + message
+
+## Responsive
+**Breakpoints**: md: 768px, lg: 1024px, xl: 1280px
+- Mobile nav: Hamburger → slide-in drawer with glassmorphic backdrop
+- Admin sidebar: Icons-only (tablet), hidden (mobile)
 
 ## Accessibility
-- Touch targets: Minimum 44px
-- Focus indicators: Prominent gradient outlines
-- Color contrast: 4.5:1 minimum ratio maintained
-- Reduced motion: Disable 3D effects and bouncy animations
-- Countdown: aria-live regions
-- Form labels: Visible or aria-labeled
+- Touch targets: 44px minimum
+- Focus rings: Orange-red (admin), blue-purple (user)
+- Contrast: 4.5:1 minimum
+- Reduced motion: Disable 3D/parallax/complex animations
+- ARIA labels, full keyboard navigation
 
-## Brand Consistency
-- Maintain light, airy premium aesthetic throughout
-- Glassmorphism treatment consistent across all cards/overlays
-- Blue-purple gradient used sparingly for accents
-- Generous whitespace never compromised
-- Playful 3D elements balanced with professional typography
-- All geometric shapes maintain proper 1:1 aspect ratios
+## Images
+**User Portal**:
+- Hero: Full-screen 3D render (floating spheres/cubes/toruses, blue-purple gradient lighting)
+- Mockups: 3D-styled UI screenshots with depth, `rounded-3xl`, alternating placement
+- Icons: 80x80px 3D isometric (hardware/networking/software/security)
+
+**Admin Portal**: No hero images; focus on data visualizations

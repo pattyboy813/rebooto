@@ -92,9 +92,132 @@
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
-  /* Gradient colors for tech-forward aesthetic */
+  /* Gradient colors for tech-forward aesthetic - User Portal */
   --gradient-from: 210 85% 42%;
   --gradient-to: 165 75% 38%;
+  
+  /* Admin Portal Theme Variables - Complete Palette */
+  --admin-background: 220 8% 6%;
+  --admin-foreground: 30 5% 92%;
+  --admin-border: 220 8% 16%;
+  
+  --admin-card: 220 8% 8%;
+  --admin-card-foreground: 30 5% 90%;
+  --admin-card-border: 220 8% 18%;
+  
+  --admin-sidebar: 220 8% 7%;
+  --admin-sidebar-foreground: 30 5% 88%;
+  --admin-sidebar-border: 220 8% 17%;
+  --admin-sidebar-primary: 25 95% 53%;
+  --admin-sidebar-primary-foreground: 25 5% 10%;
+  --admin-sidebar-accent: 220 10% 15%;
+  --admin-sidebar-accent-foreground: 30 5% 85%;
+  --admin-sidebar-ring: 25 95% 53%;
+  
+  --admin-popover: 220 8% 9%;
+  --admin-popover-foreground: 30 5% 86%;
+  --admin-popover-border: 220 8% 20%;
+  
+  --admin-primary: 25 95% 53%;
+  --admin-primary-foreground: 25 5% 10%;
+  
+  --admin-secondary: 220 10% 18%;
+  --admin-secondary-foreground: 220 10% 82%;
+  
+  --admin-muted: 220 10% 14%;
+  --admin-muted-foreground: 220 8% 65%;
+  
+  --admin-accent: 15 85% 48%;
+  --admin-accent-foreground: 15 5% 95%;
+  
+  --admin-destructive: 0 75% 42%;
+  --admin-destructive-foreground: 0 75% 98%;
+  
+  --admin-input: 220 15% 30%;
+  --admin-ring: 25 95% 53%;
+  
+  --admin-chart-1: 25 95% 60%;
+  --admin-chart-2: 165 75% 55%;
+  --admin-chart-3: 280 65% 68%;
+  --admin-chart-4: 30 80% 62%;
+  --admin-chart-5: 340 75% 65%;
+  
+  /* Admin gradient - orange to red */
+  --admin-gradient-from: 25 95% 53%;
+  --admin-gradient-to: 0 84% 60%;
+}
+
+/* Admin Theme Scope - Remaps ALL admin variables to shadcn tokens */
+.admin-theme {
+  /* Base colors */
+  --background: var(--admin-background);
+  --foreground: var(--admin-foreground);
+  --border: var(--admin-border);
+  
+  /* Card */
+  --card: var(--admin-card);
+  --card-foreground: var(--admin-card-foreground);
+  --card-border: var(--admin-card-border);
+  
+  /* Sidebar */
+  --sidebar: var(--admin-sidebar);
+  --sidebar-foreground: var(--admin-sidebar-foreground);
+  --sidebar-border: var(--admin-sidebar-border);
+  --sidebar-primary: var(--admin-sidebar-primary);
+  --sidebar-primary-foreground: var(--admin-sidebar-primary-foreground);
+  --sidebar-accent: var(--admin-sidebar-accent);
+  --sidebar-accent-foreground: var(--admin-sidebar-accent-foreground);
+  --sidebar-ring: var(--admin-sidebar-ring);
+  
+  /* Popover */
+  --popover: var(--admin-popover);
+  --popover-foreground: var(--admin-popover-foreground);
+  --popover-border: var(--admin-popover-border);
+  
+  /* Primary */
+  --primary: var(--admin-primary);
+  --primary-foreground: var(--admin-primary-foreground);
+  
+  /* Secondary */
+  --secondary: var(--admin-secondary);
+  --secondary-foreground: var(--admin-secondary-foreground);
+  
+  /* Muted */
+  --muted: var(--admin-muted);
+  --muted-foreground: var(--admin-muted-foreground);
+  
+  /* Accent */
+  --accent: var(--admin-accent);
+  --accent-foreground: var(--admin-accent-foreground);
+  
+  /* Destructive */
+  --destructive: var(--admin-destructive);
+  --destructive-foreground: var(--admin-destructive-foreground);
+  
+  /* Form elements */
+  --input: var(--admin-input);
+  --ring: var(--admin-ring);
+  
+  /* Charts */
+  --chart-1: var(--admin-chart-1);
+  --chart-2: var(--admin-chart-2);
+  --chart-3: var(--admin-chart-3);
+  --chart-4: var(--admin-chart-4);
+  --chart-5: var(--admin-chart-5);
+  
+  /* Gradients */
+  --gradient-from: var(--admin-gradient-from);
+  --gradient-to: var(--admin-gradient-to);
+  
+  /* Admin-specific shadows for dark theme */
+  --shadow-2xs: 0px 1px 2px 0px hsl(220 10% 2% / 0.35);
+  --shadow-xs: 0px 1px 3px 0px hsl(220 10% 2% / 0.45);
+  --shadow-sm: 0px 2px 4px -1px hsl(220 10% 2% / 0.40), 0px 1px 2px -1px hsl(220 10% 2% / 0.30);
+  --shadow: 0px 4px 6px -1px hsl(220 10% 2% / 0.50), 0px 2px 4px -2px hsl(220 10% 2% / 0.35);
+  --shadow-md: 0px 6px 12px -2px hsl(220 10% 2% / 0.60), 0px 3px 7px -3px hsl(220 10% 2% / 0.45);
+  --shadow-lg: 0px 10px 20px -3px hsl(220 10% 2% / 0.70), 0px 6px 10px -4px hsl(220 10% 2% / 0.50);
+  --shadow-xl: 0px 20px 30px -5px hsl(220 10% 2% / 0.80), 0px 10px 15px -5px hsl(220 10% 2% / 0.55);
+  --shadow-2xl: 0px 30px 50px -10px hsl(220 10% 2% / 0.90);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
 
@@ -378,5 +501,31 @@
 
   .border-gradient-brand {
     border-image: linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--gradient-to)) 100%) 1;
+  }
+  
+  /* Admin Portal Theme Utilities */
+  .bg-gradient-admin {
+    background: linear-gradient(135deg, hsl(var(--admin-gradient-from)) 0%, hsl(var(--admin-gradient-to)) 100%);
+  }
+  
+  .text-gradient-admin {
+    background: linear-gradient(135deg, hsl(var(--admin-gradient-from)) 0%, hsl(var(--admin-gradient-to)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glassmorphic effects for premium user portal */
+  .glass {
+    @apply backdrop-blur-xl bg-white/70 border border-white/20;
+  }
+  
+  .glass-card {
+    @apply backdrop-blur-lg bg-white/60 border border-white/20 rounded-3xl;
+  }
+  
+  /* Admin portal glassmorphic effects (darker) */
+  .admin-glass {
+    @apply backdrop-blur-xl bg-black/40 border border-white/10;
   }
 }
