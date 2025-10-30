@@ -9,7 +9,7 @@ I prefer detailed explanations, especially for complex architectural decisions. 
 ## System Architecture
 
 ### UI/UX Decisions
-The platform adopts a premium minimalist design using a white background, glassmorphism effects, and blue-purple gradients. Typography features Space Grotesk for headlines and Inter for body text, with a responsive hierarchy. Animations utilize Lenis for smooth scrolling, Framer Motion for entrance and interaction effects, and GSAP for scroll-triggered animations and 3D orb parallax effects. Key components like the floating navigation and various content cards incorporate glassmorphic styling, rounded corners, and soft shadows. A vintage flip timer countdown, simplified to a single unified display per time unit, maintains a mechanical/industrial aesthetic.
+The landing page features a modern, clean SaaS-inspired design with a teal-to-emerald gradient color scheme and coral accents. Typography uses Sora for headlines and Inter for body text. The design emphasizes white space, subtle animations via Framer Motion (fade-ups, gentle hovers), and a structured layout with clear sections: hero with email capture, feature cards, social proof stats, final CTA, and footer. Background includes animated gradient orbs and a subtle grid pattern. All elements use rounded corners, clean borders, and smooth transitions.
 
 ### Technical Implementations
 **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis for smooth scrolling, GSAP for advanced animations.  
@@ -17,22 +17,20 @@ The platform adopts a premium minimalist design using a white background, glassm
 **Authentication**: Session-based email/password authentication with bcrypt password hashing. Sessions stored in PostgreSQL for persistence.
 
 ### Feature Specifications
-- **Lenis Smooth Scrolling**: Buttery smooth scroll performance integrated with GSAP ScrollTrigger for animations.
-- **Floating Glassmorphic Navigation**: Auto-hiding, responsive navigation with smooth Framer Motion transitions.
-- **Premium Hero Section**: Features animated 3D gradient orbs, parallax effects, large responsive typography, and a vintage flip timer countdown to December 31, 2025.
-- **Premium Content Sections**: Value proposition, "How It Works," and "Skills" sections utilize glassmorphic cards with gradient accents and hover effects.
-- **Premium Email Signup**: Glassmorphic form with Zod validation, real-time signup counter, and confetti-style success message.
-- **Konami Code Easter Egg**: Secret sequence (↑↑↓↓←→←→BA) triggers a sliding admin login panel.
-- **Admin Login Panel**: Slides in with a spring animation, featuring a "Login with Replit" button for authentication.
-- **Protected Admin Dashboard**: Authenticated users can view user profiles, signup statistics, and a detailed list of all email signups via a scrollable dialog. Includes logout functionality.
-- **Premium Footer**: Contains social media links, navigation, and copyright information with a glassmorphic design.
+- **Modern Hero Section**: Full-viewport hero with animated gradient orbs, grid pattern background, headline with teal gradient text, email signup form inline, and trust indicator showing signup count.
+- **Feature Cards Section**: 4-column grid showcasing Real-World Scenarios, Gamified Learning, AI-Powered Guidance, and Job-Ready Skills. Each card has gradient icon, title, and description with hover lift effect.
+- **Stats Section**: 4-column stats display (1,200+ Learners, 500+ Scenarios, 95% Completion, 24/7 Access) with gradient numbers on teal-emerald background.
+- **Final CTA Section**: Full-width gradient background (teal to emerald) with centered white text, headline, and inline email signup form.
+- **Email Signup**: Inline forms in hero and CTA sections with white rounded-full container, email input, and gradient button. Toast notifications on success/error.
+- **Footer**: Clean 4-column layout with product/resources/company/connect sections, social icons, and copyright info.
+- **Authentication**: Separate auth page accessible at /auth with email/password signup and login tabs (removed all Replit Auth/OAuth providers).
 
 ### System Design Choices
-- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), sections (`premium-*.tsx`), and reusable components (`smooth-scroll.tsx`, `floating-nav.tsx`, `admin-panel.tsx`, `ui/`).
-- **Backend Structure**: Includes API routes (`routes.ts`), database storage (`storage.ts`), Replit Auth integration (`replitAuth.ts`), database connection (`db.ts`), and shared Drizzle schema definitions (`schema.ts`).
+- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), modern landing sections (`modern-*.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components.
+- **Backend Structure**: Includes API routes (`routes.ts`), database storage (`storage.ts`), session-based auth (`auth.ts`), database connection (`db.ts`), and shared Drizzle schema definitions (`schema.ts`).
 - **Data Model**: Comprehensive schema includes `users`, `courses`, `lessons`, `achievements`, `enrollments`, `userProgress`, `userAchievements`, and `emailSignups` tables for a gamified learning experience.
-- **API Endpoints**: Public endpoints for email signups and count; Replit Auth endpoints for login, callback, logout, and user info; protected endpoints for retrieving all signups.
-- **Security**: Admin dashboard protected by Replit Auth session authentication. Sessions are PostgreSQL-backed with secure cookies. OAuth 2.0 with PKCE is used.
+- **API Endpoints**: Public endpoints for email signups and count; local auth endpoints for signup, login, logout, and user info; protected endpoints for courses, progress, and achievements.
+- **Security**: Protected routes use `requireAuth` middleware. Sessions are PostgreSQL-backed with secure cookies. Passwords hashed with bcrypt. User data sanitized before sending to client (removes hashedPassword).
 
 ## External Dependencies
 - **Frontend Libraries**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis, GSAP (ScrollTrigger).
