@@ -5,7 +5,6 @@ import { hashPassword, verifyPassword, requireAuth, getCurrentUser } from "./aut
 import {
   insertEmailSignupSchema,
   insertUserSchema,
-  insertScenarioSchema,
   insertUserProgressSchema,
   insertFeedbackSchema,
 } from "@shared/schema";
@@ -129,40 +128,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(userWithoutPassword);
   });
 
-  app.get("/api/scenarios", async (_req, res) => {
-    try {
-      const scenariosList = await storage.getAllScenarios();
-      res.json(scenariosList);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.get("/api/scenarios/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const scenario = await storage.getScenario(id);
-      if (!scenario) {
-        return res.status(404).json({ message: "Scenario not found" });
-      }
-      res.json(scenario);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.post("/api/scenarios", requireAuth, async (req, res) => {
-    try {
-      const validatedData = insertScenarioSchema.parse(req.body);
-      const scenario = await storage.createScenario(validatedData);
-      res.status(201).json(scenario);
-    } catch (error: any) {
-      if (error.name === "ZodError") {
-        return res.status(400).json({ message: "Validation error", errors: error.errors });
-      }
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
 
   app.get("/api/progress", requireAuth, async (req, res) => {
     try {
@@ -196,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const userId = req.session!.userId!;
       
-      const existing = await storage.getUserProgress(userId, req.body.scenarioId);
+      const existing = await storage.getUserProgress(userId, req.body.lessonId);
       if (!existing || existing.id !== id) {
         return res.status(404).json({ message: "Progress not found" });
       }
@@ -206,9 +171,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updates.completed = req.body.completed;
         if (req.body.completed) {
           updates.completedAt = new Date();
-          const scenario = await storage.getScenario(req.body.scenarioId);
-          if (scenario && !existing.completed) {
-            await storage.updateUserXP(userId, scenario.xpReward);
+          
+          // Award XP only if lesson wasn't already completed
+          if (!existing.completed) {
+            const lesson = await storage.getLesson(req.body.lessonId);
+            if (lesson) {
+              await storage.updateUserXP(userId, lesson.xpReward);
+            }
           }
         }
       }

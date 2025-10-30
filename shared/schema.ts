@@ -1,5 +1,5 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, jsonb, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, jsonb, serial, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -8,6 +8,10 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerificationToken: text("email_verification_token"),
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
   xp: integer("xp").notNull().default(0),
   level: integer("level").notNull().default(1),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -19,27 +23,68 @@ export const emailSignups = pgTable("email_signups", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const scenarios = pgTable("scenarios", {
+export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  category: text("category").notNull(),
-  difficulty: text("difficulty").notNull(),
-  xpReward: integer("xp_reward").notNull().default(100),
-  content: jsonb("content").notNull(),
+  category: text("category").notNull(), // "Hardware Headaches", "Network Nightmares", "Software Struggles"
+  difficulty: text("difficulty").notNull(), // "Beginner", "Intermediate", "Advanced"
+  xpTotal: integer("xp_total").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const lessons = pgTable("lessons", {
+  id: serial("id").primaryKey(),
+  courseId: integer("course_id").notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  orderIndex: integer("order_index").notNull().default(0),
+  xpReward: integer("xp_reward").notNull().default(100),
+  content: jsonb("content").notNull(), // AI-generated lesson content (text, scenarios, quizzes)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(), // "Cable Whisperer", "Router Rescuer"
+  description: text("description").notNull(),
+  iconName: text("icon_name").notNull(), // Lucide icon name
+  category: text("category").notNull(), // "Hardware", "Network", "Software", "General"
+  xpRequired: integer("xp_required").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const enrollments = pgTable("enrollments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  courseId: integer("course_id").notNull().references(() => courses.id, { onDelete: 'cascade' }),
+  enrolledAt: timestamp("enrolled_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+}, (table) => ({
+  uniqueUserCourse: unique().on(table.userId, table.courseId),
+}));
+
 export const userProgress = pgTable("user_progress", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  scenarioId: integer("scenario_id").notNull().references(() => scenarios.id),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  lessonId: integer("lesson_id").notNull().references(() => lessons.id, { onDelete: 'cascade' }),
   completed: boolean("completed").notNull().default(false),
   choices: jsonb("choices").notNull().default([]),
   score: integer("score").notNull().default(0),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  uniqueUserLesson: unique().on(table.userId, table.lessonId),
+}));
+
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  achievementId: integer("achievement_id").notNull().references(() => achievements.id, { onDelete: 'cascade' }),
+  unlockedAt: timestamp("unlocked_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueUserAchievement: unique().on(table.userId, table.achievementId),
+}));
 
 export const feedback = pgTable("feedback", {
   id: serial("id").primaryKey(),
@@ -52,10 +97,36 @@ export const feedback = pgTable("feedback", {
 export const usersRelations = relations(users, ({ many }) => ({
   progress: many(userProgress),
   feedback: many(feedback),
+  enrollments: many(enrollments),
+  achievements: many(userAchievements),
 }));
 
-export const scenariosRelations = relations(scenarios, ({ many }) => ({
+export const coursesRelations = relations(courses, ({ many }) => ({
+  lessons: many(lessons),
+  enrollments: many(enrollments),
+}));
+
+export const lessonsRelations = relations(lessons, ({ one, many }) => ({
+  course: one(courses, {
+    fields: [lessons.courseId],
+    references: [courses.id],
+  }),
   progress: many(userProgress),
+}));
+
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  userAchievements: many(userAchievements),
+}));
+
+export const enrollmentsRelations = relations(enrollments, ({ one }) => ({
+  user: one(users, {
+    fields: [enrollments.userId],
+    references: [users.id],
+  }),
+  course: one(courses, {
+    fields: [enrollments.courseId],
+    references: [courses.id],
+  }),
 }));
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({
@@ -63,9 +134,20 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
     fields: [userProgress.userId],
     references: [users.id],
   }),
-  scenario: one(scenarios, {
-    fields: [userProgress.scenarioId],
-    references: [scenarios.id],
+  lesson: one(lessons, {
+    fields: [userProgress.lessonId],
+    references: [lessons.id],
+  }),
+}));
+
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, {
+    fields: [userAchievements.userId],
+    references: [users.id],
+  }),
+  achievement: one(achievements, {
+    fields: [userAchievements.achievementId],
+    references: [achievements.id],
   }),
 }));
 
@@ -92,15 +174,35 @@ export const insertEmailSignupSchema = createInsertSchema(emailSignups).pick({
   email: z.string().email("Please enter a valid email address"),
 });
 
-export const insertScenarioSchema = createInsertSchema(scenarios).omit({
+export const insertCourseSchema = createInsertSchema(courses).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertLessonSchema = createInsertSchema(lessons).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertEnrollmentSchema = createInsertSchema(enrollments).omit({
+  id: true,
+  enrolledAt: true,
 });
 
 export const insertUserProgressSchema = createInsertSchema(userProgress).omit({
   id: true,
   createdAt: true,
   completedAt: true,
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
 });
 
 export const insertFeedbackSchema = createInsertSchema(feedback).omit({
@@ -115,9 +217,17 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertEmailSignup = z.infer<typeof insertEmailSignupSchema>;
 export type EmailSignup = typeof emailSignups.$inferSelect;
-export type InsertScenario = z.infer<typeof insertScenarioSchema>;
-export type Scenario = typeof scenarios.$inferSelect;
+export type InsertCourse = z.infer<typeof insertCourseSchema>;
+export type Course = typeof courses.$inferSelect;
+export type InsertLesson = z.infer<typeof insertLessonSchema>;
+export type Lesson = typeof lessons.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertEnrollment = z.infer<typeof insertEnrollmentSchema>;
+export type Enrollment = typeof enrollments.$inferSelect;
 export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
 export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type UserAchievement = typeof userAchievements.$inferSelect;
 export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
 export type Feedback = typeof feedback.$inferSelect;
