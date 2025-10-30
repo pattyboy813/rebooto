@@ -47,6 +47,7 @@ export const courses = pgTable("courses", {
   category: text("category").notNull(), // "Hardware Headaches", "Network Nightmares", "Software Struggles"
   difficulty: text("difficulty").notNull(), // "Beginner", "Intermediate", "Advanced"
   xpTotal: integer("xp_total").notNull().default(0),
+  lessonCount: integer("lesson_count").notNull().default(0), // Number of lessons in this course
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

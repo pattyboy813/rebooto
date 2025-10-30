@@ -113,7 +113,7 @@ export default function Courses() {
     );
     
     if (!courseWithLessons || !courseWithLessons.lessons) {
-      return { completed: 0, total: course.lessonCount || 0, percentage: 0 };
+      return { completed: 0, total: 0, percentage: 0 };
     }
 
     const completedLessons = courseWithLessons.lessons.filter((lesson: any) =>
@@ -130,7 +130,7 @@ export default function Courses() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30">
       <div className="max-w-7xl mx-auto px-6 py-12 md:py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -138,7 +138,7 @@ export default function Courses() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold text-gradient-admin mb-4">
             Browse Courses
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
@@ -162,7 +162,7 @@ export default function Courses() {
                 <TabsTrigger
                   key={category}
                   value={category}
-                  className="rounded-xl py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+                  className="rounded-xl py-3 data-[state=active]:bg-gradient-admin data-[state=active]:text-white"
                   data-testid={`tab-${category.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   {category}
@@ -177,13 +177,13 @@ export default function Courses() {
             {[1, 2, 3].map((i) => (
               <Card
                 key={i}
-                className="p-8 backdrop-blur-lg bg-white/60 border border-gray-200/50 rounded-3xl"
+                className="p-8 backdrop-blur-lg bg-white/60 border border-teal-200/50 rounded-3xl"
               >
                 <div className="animate-pulse space-y-4">
-                  <div className="h-6 bg-gray-200 rounded w-3/4" />
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-2/3" />
-                  <div className="h-10 bg-gray-200 rounded" />
+                  <div className="h-6 bg-teal-100 rounded w-3/4" />
+                  <div className="h-4 bg-teal-100 rounded w-full" />
+                  <div className="h-4 bg-teal-100 rounded w-2/3" />
+                  <div className="h-10 bg-teal-100 rounded" />
                 </div>
               </Card>
             ))}
@@ -219,12 +219,12 @@ export default function Courses() {
                     </Badge>
                   </div>
 
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-admin flex items-center justify-center shadow-lg shadow-teal-500/30 mb-4">
                     <BookOpen className="w-6 h-6 text-white" />
                   </div>
 
                   <h3
-                    className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors"
+                    className="text-xl font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors"
                     data-testid={`text-title-${course.id}`}
                   >
                     {course.title}
@@ -264,13 +264,13 @@ export default function Courses() {
                       </div>
                       <div className="flex items-center gap-1">
                         <TrendingUp className="w-4 h-4" />
-                        <span>{course.lessonCount || 0} lessons</span>
+                        <span>{course.lessonCount} lessons</span>
                       </div>
                     </div>
                   )}
 
                   <Button
-                    className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    className="w-full rounded-xl bg-gradient-admin text-white"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (isEnrolled(course.id)) {

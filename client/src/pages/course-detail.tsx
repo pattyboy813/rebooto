@@ -93,9 +93,9 @@ export default function CourseDetail() {
 
   if (courseLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-teal-600/20 border-t-teal-600 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading course...</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function CourseDetail() {
 
   if (!courseData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center">
         <div className="text-center">
           <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-600 text-lg">Course not found</p>
@@ -123,7 +123,7 @@ export default function CourseDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30">
       <div className="max-w-6xl mx-auto px-6 py-12">
         <Button
           variant="ghost"
@@ -143,12 +143,12 @@ export default function CourseDetail() {
           <Card className="p-8 md:p-12 backdrop-blur-lg bg-white/60 border border-gray-200/50 rounded-3xl shadow-xl mb-8">
             <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-admin flex items-center justify-center shadow-lg shadow-teal-500/30">
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
                 <div>
                   <h1
-                    className="text-3xl md:text-4xl font-bold text-gray-900 mb-2"
+                    className="text-3xl md:text-4xl font-bold text-gradient-admin mb-2"
                     data-testid="text-course-title"
                   >
                     {courseData.title}
@@ -169,7 +169,7 @@ export default function CourseDetail() {
               </div>
               {!isEnrolled ? (
                 <Button
-                  className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8"
+                  className="rounded-xl bg-gradient-admin text-white px-8"
                   onClick={() => enrollMutation.mutate()}
                   disabled={enrollMutation.isPending}
                   data-testid="button-enroll-now"
@@ -178,7 +178,7 @@ export default function CourseDetail() {
                 </Button>
               ) : (
                 <Button
-                  className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8"
+                  className="rounded-xl bg-gradient-admin text-white px-8"
                   onClick={handleStartLearning}
                   data-testid="button-start-learning"
                 >

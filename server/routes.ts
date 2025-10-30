@@ -567,6 +567,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
       const createdCourse = await storage.createCourse({
         ...validatedCourse,
         xpTotal: totalXP,
+        lessonCount: lessons.length,
       });
 
       const createdLessons = [];

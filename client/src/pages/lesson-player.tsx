@@ -135,9 +135,9 @@ export default function LessonPlayer() {
 
   if (lessonLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-teal-600/20 border-t-teal-600 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading lesson...</p>
         </div>
       </div>
@@ -146,7 +146,7 @@ export default function LessonPlayer() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 text-lg">Lesson not found</p>
           <Button
@@ -167,7 +167,7 @@ export default function LessonPlayer() {
   
   if (content.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 text-lg">Lesson content is not available</p>
           <Button
@@ -188,7 +188,7 @@ export default function LessonPlayer() {
   const isLastStep = currentStep === content.length - 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30">
       <div className="max-w-4xl mx-auto px-6 py-12">
         <Button
           variant="ghost"
@@ -209,7 +209,7 @@ export default function LessonPlayer() {
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h1
-                  className="text-3xl md:text-4xl font-bold text-gray-900 mb-2"
+                  className="text-3xl md:text-4xl font-bold text-gradient-admin mb-2"
                   data-testid="text-lesson-title"
                 >
                   {lesson.title}
@@ -236,7 +236,7 @@ export default function LessonPlayer() {
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-blue-600 to-purple-600"
+                  className="h-full bg-gradient-admin"
                   initial={{ width: 0 }}
                   animate={{ width: `${((currentStep + 1) / content.length) * 100}%` }}
                   transition={{ duration: 0.3 }}
@@ -262,9 +262,9 @@ export default function LessonPlayer() {
                 )}
 
                 {currentContent.type === "scenario" && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                  <div className="bg-teal-50 border border-teal-200 rounded-2xl p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-blue-600" />
+                      <Sparkles className="w-5 h-5 text-teal-600" />
                       Scenario
                     </h3>
                     <p className="text-gray-700 text-lg leading-relaxed" data-testid="text-scenario">
@@ -287,7 +287,7 @@ export default function LessonPlayer() {
                           key={index}
                           className={`p-4 cursor-pointer transition-all hover-elevate ${
                             userChoices[currentStep] === index
-                              ? "border-blue-600 bg-blue-50"
+                              ? "border-teal-600 bg-teal-50"
                               : "border-gray-200"
                           }`}
                           onClick={() => handleChoice(index)}
@@ -297,7 +297,7 @@ export default function LessonPlayer() {
                             <div
                               className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                                 userChoices[currentStep] === index
-                                  ? "border-blue-600 bg-blue-600"
+                                  ? "border-teal-600 bg-teal-600"
                                   : "border-gray-300"
                               }`}
                             >
@@ -330,14 +330,14 @@ export default function LessonPlayer() {
                   <div
                     key={index}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentStep ? "bg-blue-600" : "bg-gray-300"
+                      index === currentStep ? "bg-teal-600" : "bg-gray-300"
                     }`}
                   />
                 ))}
               </div>
               {!isLastStep ? (
                 <Button
-                  className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  className="rounded-xl bg-gradient-admin text-white"
                   onClick={handleNext}
                   data-testid="button-next"
                 >
@@ -345,7 +345,7 @@ export default function LessonPlayer() {
                 </Button>
               ) : (
                 <Button
-                  className="rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  className="rounded-xl bg-gradient-admin text-white"
                   onClick={handleComplete}
                   disabled={completeMutation.isPending}
                   data-testid="button-complete"
@@ -385,7 +385,7 @@ export default function LessonPlayer() {
             </motion.p>
             <p className="text-gray-600 mb-6">Great job! Keep up the momentum!</p>
             <Button
-              className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              className="w-full rounded-xl bg-gradient-admin text-white"
               onClick={handleDialogClose}
               data-testid="button-continue"
             >
