@@ -20,7 +20,8 @@ The entire site features a modern, clean SaaS-inspired design with a consistent 
 
 **Landing Page:**
 - **Sticky Navigation Header**: Backdrop-blur navigation with Rebooto logo, smooth scroll navigation to sections, prominent Login and "Sign Up Free" buttons
-- **Modern Hero Section**: Full-viewport hero with parallax-scrolling gradient orbs, animated grid pattern background, headline with teal gradient text, email signup form inline, trust indicator showing signup count. Content fades out on scroll for depth effect.
+- **Modern Hero Section**: Full-viewport hero with parallax-scrolling gradient orbs, animated grid pattern background, headline with teal gradient text, email signup form inline, trust indicator showing signup count, countdown timer to beta launch (Dec 31, 2025). Hero content remains fully opaque during scroll (no fade effect).
+- **Sticky Countdown Bar**: Appears below header when scrolled past 350px, shows countdown in XX:XX:XX:XX format (no DHMS labels), unmounts from DOM when at top
 - **Feature Cards Section**: 4-column grid with scroll-triggered staggered reveals, whileHover lift animations (y: -8), gradient icons, enhanced shadows on hover. Features: Real-World Scenarios, Gamified Learning, AI-Powered Guidance, Job-Ready Skills.
 - **Stats Section**: 4-column stats with scale-up animations from 0.5 to 1.0, gradient numbers on teal-emerald background, smooth easing transitions.
 - **Final CTA Section**: Full-width gradient background (teal to emerald) with centered white text, headline, and inline email signup form.
@@ -29,7 +30,7 @@ The entire site features a modern, clean SaaS-inspired design with a consistent 
 
 **User Portal:**
 - **Dashboard**: Teal/emerald themed dashboard with sticky header, Level/XP badges, progress tracking, course cards with teal gradients, achievements system with unlocked/locked states, admin portal access card
-- **Authentication**: Separate auth page accessible at /auth with email/password signup and login tabs (local authentication only, no OAuth providers)
+- **Authentication**: Multi-step animated auth flows at /auth with tabs for login and signup. Login: email → password (2 steps). Signup: name → email → password+DOB (3 steps). Features slide transitions, step validation, and back navigation. Collects firstName, lastName, email, password, and dateOfBirth.
 
 ### System Design Choices
 - **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), modern landing sections (`modern-nav.tsx`, `modern-hero.tsx`, `modern-features.tsx`, `modern-stats.tsx`, `modern-cta.tsx`, `modern-footer.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components. All animations use Framer Motion with scroll-triggered reveals (useInView), parallax effects (useTransform), and smooth transitions.
