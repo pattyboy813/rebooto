@@ -116,9 +116,9 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -130,14 +130,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50">
       {/* Header */}
       <header className="backdrop-blur-xl bg-white/70 border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <span className="text-white font-bold text-sm">TR</span>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/30">
+                <span className="text-white font-bold text-sm">RB</span>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Learning Dashboard</h1>
@@ -145,15 +145,15 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-full border border-blue-200">
-                <Trophy className="w-5 h-5 text-blue-600" />
+              <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 rounded-full border border-teal-200">
+                <Trophy className="w-5 h-5 text-teal-600" />
                 <div>
                   <p className="text-xs text-gray-600">Level</p>
                   <p className="text-lg font-bold text-gray-900" data-testid="text-user-level">{user?.level || 1}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-full border border-purple-200">
-                <Zap className="w-5 h-5 text-purple-600" />
+              <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-full border border-emerald-200">
+                <Zap className="w-5 h-5 text-emerald-600" />
                 <div>
                   <p className="text-xs text-gray-600">XP</p>
                   <p className="text-lg font-bold text-gray-900" data-testid="text-user-xp">{user?.xp || 0}</p>
@@ -219,7 +219,7 @@ export default function Dashboard() {
                             <h3 className="text-lg font-bold text-gray-900 flex-1" data-testid={`course-title-${course.id}`}>
                               {course.title}
                             </h3>
-                            <Badge className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 text-blue-700 border-blue-200 flex-shrink-0" data-testid={`course-category-${course.id}`}>
+                            <Badge className="bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-teal-700 border-teal-200 flex-shrink-0" data-testid={`course-category-${course.id}`}>
                               {course.category}
                             </Badge>
                           </div>
@@ -236,16 +236,16 @@ export default function Dashboard() {
 
                           <div className="flex items-center justify-between pt-2">
                             <div className="flex items-center gap-2">
-                              <Zap className="w-4 h-4 text-purple-600" />
+                              <Zap className="w-4 h-4 text-emerald-600" />
                               <span className="text-sm text-gray-600">
-                                <span className="font-bold text-purple-600" data-testid={`course-xp-${course.id}`}>{progress.xpEarned}</span> XP earned
+                                <span className="font-bold text-emerald-600" data-testid={`course-xp-${course.id}`}>{progress.xpEarned}</span> XP earned
                               </span>
                             </div>
                           </div>
 
                           <Link href={`/app/courses/${course.id}`}>
                             <Button 
-                              className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                              className="w-full rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white"
                               data-testid={`button-continue-${course.id}`}
                             >
                               Continue Learning
@@ -264,7 +264,7 @@ export default function Dashboard() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">No courses yet</h3>
                 <p className="text-gray-600 mb-6">Start learning by enrolling in your first course</p>
                 <Link href="/app/courses">
-                  <Button className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white" data-testid="button-browse-courses-empty">
+                  <Button className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white" data-testid="button-browse-courses-empty">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Browse Courses
                   </Button>
@@ -306,14 +306,14 @@ export default function Dashboard() {
                     >
                       <Card className={`p-6 backdrop-blur-lg border rounded-2xl shadow-lg transition-all ${
                         unlocked 
-                          ? 'bg-gradient-to-br from-blue-50/80 to-purple-50/80 border-blue-200/50 hover:shadow-xl hover-elevate' 
+                          ? 'bg-gradient-to-br from-teal-50/80 to-emerald-50/80 border-teal-200/50 hover:shadow-xl hover-elevate' 
                           : 'bg-white/40 border-gray-200/50 opacity-60'
                       }`}>
                         <div className="space-y-4">
                           <div className="flex items-start justify-between gap-4">
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
                               unlocked
-                                ? 'bg-gradient-to-br from-blue-600 to-purple-600 shadow-blue-500/30'
+                                ? 'bg-gradient-to-br from-teal-500 to-emerald-500 shadow-teal-500/30'
                                 : 'bg-gray-300'
                             }`}>
                               {unlocked ? (
@@ -338,8 +338,8 @@ export default function Dashboard() {
 
                           <div className="flex items-center justify-between pt-2 border-t border-gray-200/50">
                             <div className="flex items-center gap-2">
-                              <Zap className={`w-4 h-4 ${unlocked ? 'text-purple-600' : 'text-gray-400'}`} />
-                              <span className={`text-sm ${unlocked ? 'text-purple-600 font-bold' : 'text-gray-500'}`} data-testid={`achievement-xp-${achievement.id}`}>
+                              <Zap className={`w-4 h-4 ${unlocked ? 'text-emerald-600' : 'text-gray-400'}`} />
+                              <span className={`text-sm ${unlocked ? 'text-emerald-600 font-bold' : 'text-gray-500'}`} data-testid={`achievement-xp-${achievement.id}`}>
                                 {achievement.xpRequired} XP
                               </span>
                             </div>
@@ -371,9 +371,9 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <Card className="p-6 backdrop-blur-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200/50 rounded-2xl">
+              <Card className="p-6 backdrop-blur-lg bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-200/50 rounded-2xl">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center flex-shrink-0 mt-1">
                     <Users className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
@@ -387,7 +387,7 @@ export default function Dashboard() {
                       <Link href="/admin/dashboard">
                         <Button
                           variant="default"
-                          className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          className="rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600"
                           data-testid="button-admin-dashboard"
                         >
                           <BarChart3 className="w-4 h-4 mr-2" />
