@@ -3,6 +3,12 @@
 ## Overview  
 Rebooto is a gamified IT support learning platform with email/password authentication, separate user and admin portals, and a modern, smooth-animated interface. The platform features AI-generated courses (OpenAI GPT-4o), progress tracking with XP/levels/achievements, and comprehensive admin management tools.
 
+## Recent Changes (Latest First)
+- **ADMIN PORTAL FULLY FUNCTIONAL**: Admin Users page now has real backend endpoints for role management (toggle admin/user) and user deletion with confirmation dialog
+- **AI COURSE GENERATOR UPGRADED**: Enhanced OpenAI prompt to generate PRACTICAL, hands-on IT support scenarios with real help desk tickets, specific error messages (beep codes, DNS errors, etc.), exact commands (ipconfig /all, sfc /scannow), 7-18 detailed troubleshooting steps based on difficulty, root cause explanations, and category-specific guidance
+- **COMPLETE PUBLIC WEBSITE**: Built all public pages (Documentation, Blog, FAQ, Support/Contact, About Us, Pricing) with proper routing and footer navigation
+- **ADMIN CAMPAIGNS & SETTINGS PAGES**: Created Email Campaigns composer with preview and Settings page with platform configuration (both have UI ready for backend integration)
+
 ## User Preferences
 I prefer detailed explanations, especially for complex architectural decisions. I want iterative development, with clear communication before major changes are made to the codebase. Ensure the design maintains a premium/minimalist aesthetic with playful elements.
 

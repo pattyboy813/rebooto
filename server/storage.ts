@@ -40,6 +40,8 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserXP(userId: number, xpGained: number): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  deleteUser(id: number): Promise<void>;
+  getAllUsers(): Promise<User[]>;
   getTotalUsersCount(): Promise<number>;
   
   // Email signup methods
@@ -161,6 +163,15 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const allUsers = await db.select().from(users).orderBy(users.createdAt);
+    return allUsers;
   }
 
   async getTotalUsersCount(): Promise<number> {
