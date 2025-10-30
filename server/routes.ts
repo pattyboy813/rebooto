@@ -1,15 +1,15 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { hashPassword, verifyPassword, requireAuth, getCurrentUser } from "./auth";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import {
   insertEmailSignupSchema,
-  insertUserSchema,
   insertUserProgressSchema,
   insertFeedbackSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  await setupAuth(app);
   app.post("/api/signups", async (req, res) => {
     try {
       const validatedData = insertEmailSignupSchema.parse(req.body);
@@ -29,7 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/signups", requireAuth, async (_req, res) => {
+  app.get("/api/signups", isAuthenticated, async (_req, res) => {
     try {
       const signups = await storage.getAllEmailSignups();
       res.json(signups);
@@ -47,104 +47,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/register", async (req, res) => {
+  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
-      const validatedData = insertUserSchema.parse(req.body);
-      
-      const existingUsername = await storage.getUserByUsername(validatedData.username);
-      if (existingUsername) {
-        return res.status(409).json({ message: "Username already taken" });
-      }
-
-      const existingEmail = await storage.getUserByEmail(validatedData.email);
-      if (existingEmail) {
-        return res.status(409).json({ message: "Email already registered" });
-      }
-
-      const hashedPassword = await hashPassword(validatedData.password);
-      const user = await storage.createUser({
-        ...validatedData,
-        password: hashedPassword,
-      });
-
-      req.session!.userId = user.id;
-      
-      const { password: _, ...userWithoutPassword } = user;
-      res.status(201).json(userWithoutPassword);
-    } catch (error: any) {
-      if (error.name === "ZodError") {
-        return res.status(400).json({ 
-          message: "Validation error",
-          errors: error.errors 
-        });
-      }
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { username, password } = req.body;
-
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password required" });
-      }
-
-      const user = await storage.getUserByUsername(username);
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const isValid = await verifyPassword(password, user.password);
-      if (!isValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      req.session!.userId = user.id;
-      
-      const { password: _, ...userWithoutPassword } = user;
-      res.json(userWithoutPassword);
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      res.json(user);
     } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  app.post("/api/auth/logout", (req, res) => {
-    req.session?.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Logout failed" });
-      }
-      res.json({ message: "Logged out successfully" });
-    });
-  });
-
-  app.get("/api/auth/me", async (req, res) => {
-    const user = await getCurrentUser(req);
-    if (!user) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-    const { password: _, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
-  });
-
-
-  app.get("/api/progress", requireAuth, async (req, res) => {
+  app.get("/api/auth/me", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session!.userId!;
-      const progressList = await storage.getUserProgressList(userId);
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+
+  app.get("/api/progress", isAuthenticated, async (req: any, res) => {
+    try {
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const progressList = await storage.getUserProgressList(user.id);
       res.json(progressList);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.post("/api/progress", requireAuth, async (req, res) => {
+  app.post("/api/progress", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session!.userId!;
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       const validatedData = insertUserProgressSchema.parse({
         ...req.body,
-        userId,
+        userId: user.id,
       });
       const progress = await storage.createUserProgress(validatedData);
       res.status(201).json(progress);
@@ -156,12 +105,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/progress/:id", requireAuth, async (req, res) => {
+  app.patch("/api/progress/:id", isAuthenticated, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.session!.userId!;
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       
-      const existing = await storage.getUserProgress(userId, req.body.lessonId);
+      const existing = await storage.getUserProgress(user.id, req.body.lessonId);
       if (!existing || existing.id !== id) {
         return res.status(404).json({ message: "Progress not found" });
       }
@@ -176,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (!existing.completed) {
             const lesson = await storage.getLesson(req.body.lessonId);
             if (lesson) {
-              await storage.updateUserXP(userId, lesson.xpReward);
+              await storage.updateUserXP(user.id, lesson.xpReward);
             }
           }
         }
@@ -191,12 +144,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/dashboard/stats", requireAuth, async (req, res) => {
+  app.get("/api/dashboard/stats", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session!.userId!;
-      const user = await storage.getUser(userId);
-      const completedCount = await storage.getUserCompletedCount(userId);
-      const progressList = await storage.getUserProgressList(userId);
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const completedCount = await storage.getUserCompletedCount(user.id);
+      const progressList = await storage.getUserProgressList(user.id);
       
       res.json({
         xp: user?.xp || 0,
@@ -210,12 +166,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/feedback", requireAuth, async (req, res) => {
+  app.post("/api/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.session!.userId!;
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       const validatedData = insertFeedbackSchema.parse({
         ...req.body,
-        userId,
+        userId: user.id,
       });
       const feedbackRecord = await storage.createFeedback(validatedData);
       res.status(201).json(feedbackRecord);

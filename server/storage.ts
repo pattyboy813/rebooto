@@ -10,6 +10,7 @@ import {
   feedback,
   type User,
   type InsertUser,
+  type UpsertUser,
   type EmailSignup,
   type InsertEmailSignup,
   type Course,
@@ -34,8 +35,9 @@ export interface IStorage {
   // User methods
   createUser(user: InsertUser): Promise<User>;
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByReplitId(replitId: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   updateUserXP(userId: number, xpGained: number): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
   
@@ -101,14 +103,36 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+  async getUserByReplitId(replitId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.replitId, replitId));
     return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    if (!userData.replitId) {
+      throw new Error("Replit ID is required for upsert");
+    }
+
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.replitId,
+        set: {
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 
   async updateUserXP(userId: number, xpGained: number): Promise<User> {

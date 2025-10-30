@@ -6,23 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Users, Mail, BarChart3, LogOut, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import type { EmailSignup } from "@shared/schema";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [showSignupsDialog, setShowSignupsDialog] = useState(false);
+  const { toast } = useToast();
 
   // Check authentication
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/auth/me"],
-    retry: false,
-  });
+  const { user, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "Please log in to access the dashboard.",
+      });
       setLocation("/");
     }
-  }, [user, isLoading, setLocation]);
+  }, [isAuthenticated, isLoading, setLocation, toast]);
 
   const { data: signupStats } = useQuery<{ count: number }>({
     queryKey: ["/api/signups/count"],
@@ -33,9 +38,8 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setLocation("/");
+  const handleLogout = () => {
+    window.location.href = "/api/logout";
   };
 
   if (isLoading) {
@@ -65,7 +69,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-600">Welcome back, {(user as any).username}</p>
+                <p className="text-sm text-gray-600">Welcome back, {(user as any).firstName || 'User'}</p>
               </div>
             </div>
             <Button

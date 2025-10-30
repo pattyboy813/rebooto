@@ -1,20 +1,32 @@
 import { sql, relations } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, jsonb, serial, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, jsonb, serial, unique, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => ({
+    expireIndex: index("IDX_session_expire").on(table.expire),
+  })
+);
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
-  emailVerified: boolean("email_verified").notNull().default(false),
-  emailVerificationToken: text("email_verification_token"),
-  twoFactorSecret: text("two_factor_secret"),
-  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
+  replitId: varchar("replit_id").notNull().unique(), // Replit Auth user ID (from 'sub' claim)
+  email: varchar("email"),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   xp: integer("xp").notNull().default(0),
   level: integer("level").notNull().default(1),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const emailSignups = pgTable("email_signups", {
@@ -158,15 +170,16 @@ export const feedbackRelations = relations(feedback, ({ one }) => ({
   }),
 }));
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
+// Replit Auth upsert schema (for user login/signup)
+export const upsertUserSchema = createInsertSchema(users).pick({
+  replitId: true,
   email: true,
-  password: true,
-}).extend({
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  firstName: true,
+  lastName: true,
+  profileImageUrl: true,
 });
+
+export const insertUserSchema = upsertUserSchema;
 
 export const insertEmailSignupSchema = createInsertSchema(emailSignups).pick({
   email: true,
@@ -214,6 +227,7 @@ export const insertFeedbackSchema = createInsertSchema(feedback).omit({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertEmailSignup = z.infer<typeof insertEmailSignupSchema>;
 export type EmailSignup = typeof emailSignups.$inferSelect;

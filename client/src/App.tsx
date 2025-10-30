@@ -8,6 +8,7 @@ import { SmoothScroll } from "@/components/smooth-scroll";
 import { FloatingNav } from "@/components/floating-nav";
 import { AdminPanel } from "@/components/admin-panel";
 import { useKonami } from "@/hooks/use-konami";
+import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";

@@ -1,21 +1,8 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Lock } from "lucide-react";
+import { X, Lock, LogIn, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
-
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
 
 interface AdminPanelProps {
   isOpen: boolean;
@@ -23,49 +10,16 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
-  const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-  });
+  const { user, isAuthenticated, isLoading } = useAuth();
 
-  const mutation = useMutation({
-    mutationFn: async (data: LoginForm) => {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        throw new Error("Login failed");
-      }
-      return await response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Welcome back!",
-        description: "Redirecting to admin dashboard...",
-      });
-      setTimeout(() => {
-        setLocation("/dashboard");
-        onClose();
-      }, 1000);
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: "Invalid credentials. Please try again.",
-      });
-    },
-  });
+  const handleLoginClick = () => {
+    window.location.href = "/api/login";
+  };
 
-  const onSubmit = (data: LoginForm) => {
-    mutation.mutate(data);
+  const handleDashboardClick = () => {
+    setLocation("/dashboard");
+    onClose();
   };
 
   return (
@@ -116,55 +70,53 @@ export function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                 <p className="text-sm text-gray-700">
                   <span className="font-semibold">🎉 Easter egg found!</span>
                   <br />
-                  You've discovered the secret admin portal. Login to access the developer dashboard.
+                  You've discovered the secret admin portal.
                 </p>
               </div>
 
-              {/* Login Form */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                    Username
-                  </label>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="Enter your username"
-                    className="rounded-xl"
-                    {...register("username")}
-                    data-testid="input-admin-username"
-                  />
-                  {errors.username && (
-                    <p className="text-destructive text-sm mt-1">{errors.username.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                    Password
-                  </label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="rounded-xl"
-                    {...register("password")}
-                    data-testid="input-admin-password"
-                  />
-                  {errors.password && (
-                    <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                  disabled={mutation.isPending}
-                  data-testid="button-admin-login"
-                >
-                  {mutation.isPending ? "Logging in..." : "Access Dashboard"}
-                </Button>
-              </form>
+              {/* Auth Status & Actions */}
+              <div className="space-y-6">
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-sm text-gray-600">Checking authentication...</p>
+                  </div>
+                ) : isAuthenticated && user ? (
+                  <>
+                    <div className="p-4 rounded-xl bg-green-50 border border-green-200">
+                      <p className="text-sm text-gray-700">
+                        <span className="font-semibold text-green-700">✓ Authenticated</span>
+                        <br />
+                        Logged in as <strong>{(user as any).firstName || 'User'}</strong>
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleDashboardClick}
+                      className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                      data-testid="button-admin-dashboard"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-4 rounded-xl bg-gray-50 border border-gray-200">
+                      <p className="text-sm text-gray-700">
+                        Login with Replit Auth to access the developer dashboard.
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleLoginClick}
+                      className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                      data-testid="button-admin-login"
+                    >
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Login with Replit
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </Button>
+                  </>
+                )}
+              </div>
 
               {/* Info */}
               <div className="mt-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
