@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import type { Request, Response, NextFunction } from "express";
+import type { User } from "@shared/schema";
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
@@ -22,4 +23,10 @@ export async function getCurrentUser(req: Request) {
     return null;
   }
   return await storage.getUser(req.session.userId);
+}
+
+// Sanitize user object to remove sensitive fields before sending to client
+export function sanitizeUser(user: User) {
+  const { hashedPassword, ...safeUser } = user;
+  return safeUser;
 }

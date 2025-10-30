@@ -7,6 +7,7 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { sanitizeUser } from "./auth";
 
 const getOidcConfig = memoize(
   async () => {
@@ -134,9 +135,16 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  const user = req.user as any;
+  const session = req.session as any;
+  
+  // Check for local auth (email/password)
+  if (session?.userId && session?.authProvider === "local") {
+    return next();
+  }
 
-  if (!req.isAuthenticated() || !user.expires_at) {
+  // Check for Replit Auth
+  const user = req.user as any;
+  if (!req.isAuthenticated() || !user?.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -161,3 +169,22 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     return;
   }
 };
+
+// Helper to get current user from either local or Replit auth
+export async function getCurrentUser(req: any) {
+  const session = req.session as any;
+  
+  // Check for local auth
+  if (session?.userId && session?.authProvider === "local") {
+    const user = await storage.getUser(session.userId);
+    return user ? sanitizeUser(user) : null;
+  }
+
+  // Check for Replit auth
+  if (req.user?.claims?.sub) {
+    const user = await storage.getUserByReplitId(req.user.claims.sub);
+    return user ? sanitizeUser(user) : null;
+  }
+
+  return null;
+}

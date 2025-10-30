@@ -1,19 +1,116 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, getCurrentUser } from "./replitAuth";
+import { hashPassword, verifyPassword, sanitizeUser } from "./auth";
 import {
   insertEmailSignupSchema,
   insertUserProgressSchema,
   insertFeedbackSchema,
   insertCourseSchema,
   insertLessonSchema,
+  localSignupSchema,
+  localLoginSchema,
 } from "@shared/schema";
 import OpenAI from "openai";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
+
+  // Local email/password authentication
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      const validatedData = localSignupSchema.parse(req.body);
+      
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+
+      // Hash password
+      const hashedPassword = await hashPassword(validatedData.password);
+
+      // Create user with local auth
+      const user = await storage.createUser({
+        email: validatedData.email,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        authProvider: "local",
+        hashedPassword,
+        isAdmin: false,
+        replitId: null,
+      });
+
+      // Set session
+      req.session.userId = user.id;
+      req.session.authProvider = "local";
+
+      res.status(201).json({
+        user: sanitizeUser(user),
+      });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Validation error",
+          errors: error.errors 
+        });
+      }
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const validatedData = localLoginSchema.parse(req.body);
+
+      // Find user by email
+      const user = await storage.getUserByEmail(validatedData.email);
+      if (!user || !user.hashedPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Verify password
+      const isValid = await verifyPassword(validatedData.password, user.hashedPassword);
+      if (!isValid) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      // Check if account is active
+      if (!user.isActive) {
+        return res.status(403).json({ message: "Account is deactivated" });
+      }
+
+      // Set session
+      req.session.userId = user.id;
+      req.session.authProvider = "local";
+
+      res.json({
+        user: sanitizeUser(user),
+      });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Validation error",
+          errors: error.errors 
+        });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/auth/logout", async (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
   app.post("/api/signups", async (req, res) => {
     try {
       const validatedData = insertEmailSignupSchema.parse(req.body);
@@ -53,9 +150,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
-      res.json(user);
+      const user = await getCurrentUser(req);
+      res.json(sanitizeUser(user));
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -64,9 +160,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/me", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
-      res.json(user);
+      const user = await getCurrentUser(req);
+      res.json(sanitizeUser(user));
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -76,8 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/progress", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -90,8 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/progress", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -112,8 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/progress/:id", isAuthenticated, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -150,8 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/dashboard/stats", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -172,8 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/feedback", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -217,8 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/courses/:id/enroll", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -236,8 +325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/enrollments", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -264,8 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/lessons/:id/complete", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -341,8 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/user/achievements", isAuthenticated, async (req: any, res) => {
     try {
-      const replitId = req.user.claims.sub;
-      const user = await storage.getUserByReplitId(replitId);
+      const user = await getCurrentUser(req);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
