@@ -14,6 +14,7 @@ import {
 } from "@shared/schema";
 import OpenAI from "openai";
 import { z } from "zod";
+import { sendEmail } from "./outlook";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupSession(app);
@@ -139,16 +140,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
           expiresAt,
         });
 
-        // TODO: Send email with reset link
-        // For now, log to console for development
-        console.log(`Password reset requested for ${email}`);
-        console.log(`Reset link: ${req.protocol}://${req.get('host')}/reset-password?token=${token}`);
+        // Send password reset email via Outlook
+        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+        const emailBody = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #14b8a6;">Reset Your Rebooto Password</h2>
+            <p>Hi ${user.firstName},</p>
+            <p>You requested to reset your password for your Rebooto account. Click the button below to create a new password:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" style="background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%); color: white; padding: 12px 32px; text-decoration: none; border-radius: 24px; display: inline-block; font-weight: bold;">Reset Password</a>
+            </div>
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="color: #666; word-break: break-all;">${resetUrl}</p>
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 1 hour. If you didn't request this password reset, please ignore this email.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+            <p style="color: #999; font-size: 12px;">Rebooto - Gamified IT Support Learning Platform</p>
+          </div>
+        `;
+
+        try {
+          await sendEmail(user.email, "Reset Your Rebooto Password", emailBody);
+          console.log(`Password reset email sent to ${email}`);
+        } catch (emailError) {
+          console.error("Failed to send password reset email:", emailError);
+          // Log the reset link for development fallback
+          console.log(`Reset link (email failed): ${resetUrl}`);
+        }
         
-        // In development, return the token in response
+        // In development, also return the token in response for easier testing
         if (process.env.NODE_ENV !== 'production') {
           return res.json({ 
             message: "Password reset email sent. Check your inbox.",
-            devToken: token // Only for development
+            devToken: token
           });
         }
       }
