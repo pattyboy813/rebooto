@@ -58,10 +58,10 @@ export function StickyCountdown() {
   if (!mounted) return null;
 
   const timeUnits = [
-    { value: timeLeft.days, label: "D" },
-    { value: timeLeft.hours, label: "H" },
-    { value: timeLeft.minutes, label: "M" },
-    { value: timeLeft.seconds, label: "S" },
+    { value: timeLeft.days },
+    { value: timeLeft.hours },
+    { value: timeLeft.minutes },
+    { value: timeLeft.seconds },
   ];
 
   return (
@@ -80,29 +80,21 @@ export function StickyCountdown() {
         <span className="text-sm font-semibold uppercase tracking-wider hidden sm:inline">
           Beta Launches In:
         </span>
-        <div className="flex items-center gap-2 md:gap-3">
+        <div className="flex items-center gap-2">
           {timeUnits.map((unit, index) => (
-            <div
-              key={unit.label}
-              className="flex items-center gap-1"
-            >
-              <div className="flex flex-col items-center min-w-[40px] md:min-w-[50px]">
-                <motion.span
-                  key={unit.value}
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-xl md:text-2xl font-bold"
-                  data-testid={`sticky-countdown-value-${unit.label.toLowerCase()}`}
-                >
-                  {String(unit.value).padStart(2, "0")}
-                </motion.span>
-                <span className="text-xs uppercase opacity-90">
-                  {unit.label}
-                </span>
-              </div>
+            <div key={index} className="flex items-center">
+              <motion.span
+                key={unit.value}
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="text-2xl font-bold tabular-nums"
+                data-testid={`sticky-countdown-${index}`}
+              >
+                {String(unit.value).padStart(2, "0")}
+              </motion.span>
               {index < timeUnits.length - 1 && (
-                <span className="text-lg md:text-xl font-bold opacity-50">:</span>
+                <span className="text-xl font-bold mx-2">:</span>
               )}
             </div>
           ))}

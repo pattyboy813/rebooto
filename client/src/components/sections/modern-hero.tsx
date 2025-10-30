@@ -14,9 +14,6 @@ import { CountdownTimer } from "@/components/countdown-timer";
 export function ModernHero() {
   const { toast } = useToast();
   const { scrollY } = useScroll();
-  
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   const form = useForm<InsertEmailSignup>({
     resolver: zodResolver(insertEmailSignupSchema),
@@ -77,10 +74,7 @@ export function ModernHero() {
         style={{ y: useTransform(scrollY, [0, 500], [0, 60]) }}
       />
 
-      <motion.div 
-        className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 lg:px-12 py-20"
-        style={{ y, opacity }}
-      >
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 lg:px-12 py-20">
         <div className="text-center max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -177,7 +171,7 @@ export function ModernHero() {
             Join {count.toLocaleString()}+ IT professionals preparing for 2025
           </motion.p>
         </div>
-      </motion.div>
+      </div>
 
       <style>{`
         @keyframes blob {

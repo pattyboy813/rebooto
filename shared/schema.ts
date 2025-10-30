@@ -22,6 +22,7 @@ export const users = pgTable("users", {
   email: varchar("email").notNull().unique(), // Unique to prevent duplicate accounts
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  dateOfBirth: varchar("date_of_birth"), // Format: YYYY-MM-DD
   profileImageUrl: varchar("profile_image_url"),
   authProvider: varchar("auth_provider").notNull().default("replit"), // "replit", "local", "google", "github", "apple"
   hashedPassword: varchar("hashed_password"), // Only for local auth users
@@ -265,6 +266,7 @@ export const localSignupSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please enter a valid date (YYYY-MM-DD)"),
 });
 
 export const localLoginSchema = z.object({

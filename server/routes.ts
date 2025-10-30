@@ -36,6 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: validatedData.email,
         firstName: validatedData.firstName,
         lastName: validatedData.lastName,
+        dateOfBirth: validatedData.dateOfBirth,
         authProvider: "local",
         hashedPassword,
         isAdmin: false,
