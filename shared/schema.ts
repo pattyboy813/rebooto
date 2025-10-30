@@ -18,11 +18,15 @@ export const sessions = pgTable(
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  replitId: varchar("replit_id").notNull().unique(), // Replit Auth user ID (from 'sub' claim)
-  email: varchar("email"),
+  replitId: varchar("replit_id").unique(), // Replit Auth user ID (from 'sub' claim) - nullable for local auth
+  email: varchar("email").notNull().unique(), // Unique to prevent duplicate accounts
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  authProvider: varchar("auth_provider").notNull().default("replit"), // "replit", "local", "google", "github", "apple"
+  hashedPassword: varchar("hashed_password"), // Only for local auth users
+  isAdmin: boolean("is_admin").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true), // For deactivating accounts
   xp: integer("xp").notNull().default(0),
   level: integer("level").notNull().default(1),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -106,11 +110,46 @@ export const feedback = pgTable("feedback", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const adminInvites = pgTable("admin_invites", {
+  id: serial("id").primaryKey(),
+  email: varchar("email").notNull().unique(),
+  inviteCode: varchar("invite_code").notNull().unique(),
+  createdBy: integer("created_by").notNull().references(() => users.id),
+  usedBy: integer("used_by").references(() => users.id),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const emailTemplates = pgTable("email_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  subject: text("subject").notNull(),
+  body: text("body").notNull(),
+  createdBy: integer("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const sentEmails = pgTable("sent_emails", {
+  id: serial("id").primaryKey(),
+  templateId: integer("template_id").references(() => emailTemplates.id),
+  recipientEmail: varchar("recipient_email").notNull(),
+  subject: text("subject").notNull(),
+  body: text("body").notNull(),
+  sentBy: integer("sent_by").notNull().references(() => users.id),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
+  status: varchar("status").notNull().default("sent"), // "sent", "failed", "bounced"
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   progress: many(userProgress),
   feedback: many(feedback),
   enrollments: many(enrollments),
   achievements: many(userAchievements),
+  createdInvites: many(adminInvites, { relationName: "createdInvites" }),
+  usedInvite: many(adminInvites, { relationName: "usedInvite" }),
+  createdTemplates: many(emailTemplates),
+  sentEmails: many(sentEmails),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -170,16 +209,68 @@ export const feedbackRelations = relations(feedback, ({ one }) => ({
   }),
 }));
 
-// Replit Auth upsert schema (for user login/signup)
+export const adminInvitesRelations = relations(adminInvites, ({ one }) => ({
+  creator: one(users, {
+    fields: [adminInvites.createdBy],
+    references: [users.id],
+    relationName: "createdInvites",
+  }),
+  usedByUser: one(users, {
+    fields: [adminInvites.usedBy],
+    references: [users.id],
+    relationName: "usedInvite",
+  }),
+}));
+
+export const emailTemplatesRelations = relations(emailTemplates, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [emailTemplates.createdBy],
+    references: [users.id],
+  }),
+  sentEmails: many(sentEmails),
+}));
+
+export const sentEmailsRelations = relations(sentEmails, ({ one }) => ({
+  template: one(emailTemplates, {
+    fields: [sentEmails.templateId],
+    references: [emailTemplates.id],
+  }),
+  sender: one(users, {
+    fields: [sentEmails.sentBy],
+    references: [users.id],
+  }),
+}));
+
+// Auth schemas
 export const upsertUserSchema = createInsertSchema(users).pick({
   replitId: true,
   email: true,
   firstName: true,
   lastName: true,
   profileImageUrl: true,
+  authProvider: true,
 });
 
-export const insertUserSchema = upsertUserSchema;
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  xp: true,
+  level: true,
+  isActive: true,
+});
+
+export const localSignupSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+});
+
+export const localLoginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export const insertEmailSignupSchema = createInsertSchema(emailSignups).pick({
   email: true,
@@ -226,8 +317,27 @@ export const insertFeedbackSchema = createInsertSchema(feedback).omit({
   rating: z.number().min(1).max(5).optional(),
 });
 
+export const insertAdminInviteSchema = createInsertSchema(adminInvites).omit({
+  id: true,
+  createdAt: true,
+  usedBy: true,
+});
+
+export const insertEmailTemplateSchema = createInsertSchema(emailTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSentEmailSchema = createInsertSchema(sentEmails).omit({
+  id: true,
+  sentAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
+export type LocalSignup = z.infer<typeof localSignupSchema>;
+export type LocalLogin = z.infer<typeof localLoginSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertEmailSignup = z.infer<typeof insertEmailSignupSchema>;
 export type EmailSignup = typeof emailSignups.$inferSelect;
@@ -245,3 +355,9 @@ export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
 export type UserAchievement = typeof userAchievements.$inferSelect;
 export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
 export type Feedback = typeof feedback.$inferSelect;
+export type InsertAdminInvite = z.infer<typeof insertAdminInviteSchema>;
+export type AdminInvite = typeof adminInvites.$inferSelect;
+export type InsertEmailTemplate = z.infer<typeof insertEmailTemplateSchema>;
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertSentEmail = z.infer<typeof insertSentEmailSchema>;
+export type SentEmail = typeof sentEmails.$inferSelect;
