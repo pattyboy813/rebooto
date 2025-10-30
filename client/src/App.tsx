@@ -14,6 +14,9 @@ import Courses from "@/pages/courses";
 import CourseDetail from "@/pages/course-detail";
 import LessonPlayer from "@/pages/lesson-player";
 import AdminCourseCreator from "@/pages/admin-course-creator";
+import AdminUsersPage from "@/pages/admin-users";
+import AdminCampaignsPage from "@/pages/admin-campaigns";
+import AdminSettingsPage from "@/pages/admin-settings";
 import Documentation from "@/pages/documentation";
 import Blog from "@/pages/blog";
 import FAQ from "@/pages/faq";
@@ -101,66 +104,6 @@ function AdminDashboardPage() {
             </p>
           </Card>
         </div>
-      </div>
-    </AdminLayout>
-  );
-}
-
-function AdminUsersPage() {
-  return (
-    <AdminLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-user-management">
-            User Management
-          </h1>
-          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-user-description">
-            Manage users, roles, and permissions
-          </p>
-        </div>
-        <Card className="p-8" data-testid="card-user-content">
-          <p className="text-muted-foreground">User management features coming soon</p>
-        </Card>
-      </div>
-    </AdminLayout>
-  );
-}
-
-function AdminCampaignsPage() {
-  return (
-    <AdminLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-campaigns">
-            Email Campaigns
-          </h1>
-          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-campaigns-description">
-            Create and manage email campaigns
-          </p>
-        </div>
-        <Card className="p-8" data-testid="card-campaigns-content">
-          <p className="text-muted-foreground">Email campaign features coming soon</p>
-        </Card>
-      </div>
-    </AdminLayout>
-  );
-}
-
-function AdminSettingsPage() {
-  return (
-    <AdminLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-settings">
-            Settings
-          </h1>
-          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-settings-description">
-            Configure system settings
-          </p>
-        </div>
-        <Card className="p-8" data-testid="card-settings-content">
-          <p className="text-muted-foreground">Settings page coming soon</p>
-        </Card>
       </div>
     </AdminLayout>
   );
