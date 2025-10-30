@@ -22,7 +22,7 @@ export function ModernCTA() {
 
   const signupMutation = useMutation({
     mutationFn: async (data: InsertEmailSignup) => {
-      return apiRequest("/api/signups", "POST", data);
+      return apiRequest("POST", "/api/signups", data);
     },
     onSuccess: () => {
       toast({
