@@ -2,7 +2,7 @@ import { PremiumHero } from "@/components/sections/premium-hero";
 import { PremiumValue } from "@/components/sections/premium-value";
 import { PremiumHow } from "@/components/sections/premium-how";
 import { PremiumSkills } from "@/components/sections/premium-skills";
-import { PremiumSignup } from "@/components/sections/premium-signup";
+import { PremiumAuth } from "@/components/sections/premium-auth";
 import { PremiumFooter } from "@/components/sections/premium-footer";
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
       <PremiumValue />
       <PremiumHow />
       <PremiumSkills />
-      <PremiumSignup />
+      <PremiumAuth />
       <PremiumFooter />
     </div>
   );

@@ -34,10 +34,10 @@ export function PremiumHero() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const scrollToSignup = () => {
-    const signupSection = document.getElementById("signup");
-    if (signupSection) {
-      signupSection.scrollIntoView({ behavior: "smooth" });
+  const scrollToAuth = () => {
+    const authSection = document.getElementById("auth");
+    if (authSection) {
+      authSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -112,16 +112,16 @@ export function PremiumHero() {
         >
           <Button
             size="lg"
-            onClick={scrollToSignup}
+            onClick={scrollToAuth}
             className="w-full sm:w-auto rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 px-8"
-            data-testid="button-get-early-access"
+            data-testid="button-get-started"
           >
-            Get Early Access
+            Get Started Free
           </Button>
           <Button
             size="lg"
             variant="outline"
-            onClick={scrollToSignup}
+            onClick={scrollToAuth}
             className="w-full sm:w-auto rounded-full border-2 border-gray-300 hover:border-gray-400 bg-white/50 backdrop-blur-sm hover:bg-white transition-all duration-300 px-8"
             data-testid="button-learn-more"
           >
@@ -139,7 +139,7 @@ export function PremiumHero() {
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="flex flex-col items-center gap-2 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-            onClick={scrollToSignup}
+            onClick={scrollToAuth}
           >
             <span className="text-sm text-gray-500">Scroll to explore</span>
             <ChevronDown className="w-6 h-6 text-gray-500" />
