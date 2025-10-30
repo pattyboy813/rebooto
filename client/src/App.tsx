@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserLayout } from "@/components/layouts/user-layout";
 import { AdminLayout } from "@/components/layouts/admin-layout";
+import { PremiumAuth } from "@/components/sections/premium-auth";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Courses from "@/pages/courses";
@@ -146,6 +147,7 @@ function Router() {
     <Switch>
       {/* Public routes */}
       <Route path="/" component={Home} />
+      <Route path="/auth" component={PremiumAuth} />
       
       {/* User portal routes - protected by UserLayout */}
       <Route path="/app/dashboard" component={UserDashboard} />
