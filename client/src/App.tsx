@@ -11,6 +11,9 @@ import { useKonami } from "@/hooks/use-konami";
 import { useAuth } from "@/hooks/useAuth";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
+import Courses from "@/pages/courses";
+import CourseDetail from "@/pages/course-detail";
+import LessonPlayer from "@/pages/lesson-player";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +21,9 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/courses" component={Courses} />
+      <Route path="/courses/:id" component={CourseDetail} />
+      <Route path="/courses/:courseId/lessons/:lessonId" component={LessonPlayer} />
       <Route component={NotFound} />
     </Switch>
   );

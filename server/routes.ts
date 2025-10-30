@@ -187,6 +187,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Course routes
+  app.get("/api/courses", async (_req, res) => {
+    try {
+      const courses = await storage.getAllCourses();
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/courses/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const course = await storage.getCourse(id);
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      const lessons = await storage.getLessonsByCourse(id);
+      res.json({ ...course, lessons });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/courses/:id/enroll", isAuthenticated, async (req: any, res) => {
+    try {
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const courseId = parseInt(req.params.id);
+      const existing = await storage.getCourseEnrollment(user.id, courseId);
+      if (existing) {
+        return res.status(409).json({ message: "Already enrolled in this course" });
+      }
+      const enrollment = await storage.createEnrollment({ userId: user.id, courseId });
+      res.status(201).json(enrollment);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/enrollments", isAuthenticated, async (req: any, res) => {
+    try {
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const enrollments = await storage.getUserEnrollments(user.id);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Lesson routes
+  app.get("/api/lessons/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const lesson = await storage.getLesson(id);
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      res.json(lesson);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/lessons/:id/complete", isAuthenticated, async (req: any, res) => {
+    try {
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const lessonId = parseInt(req.params.id);
+      const lesson = await storage.getLesson(lessonId);
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+
+      let progress = await storage.getUserProgress(user.id, lessonId);
+      
+      if (!progress) {
+        progress = await storage.createUserProgress({
+          userId: user.id,
+          lessonId,
+          completed: true,
+          choices: req.body.choices || [],
+          score: req.body.score || 0,
+        });
+        const updatedUser = await storage.updateUserXP(user.id, lesson.xpReward);
+        
+        const allAchievements = await storage.getAllAchievements();
+        for (const achievement of allAchievements) {
+          if (updatedUser.xp >= achievement.xpRequired) {
+            const hasAchievement = await storage.checkUserHasAchievement(user.id, achievement.id);
+            if (!hasAchievement) {
+              await storage.unlockAchievement({ userId: user.id, achievementId: achievement.id });
+            }
+          }
+        }
+        
+        return res.json({ progress, xpAwarded: lesson.xpReward });
+      }
+
+      if (progress.completed) {
+        return res.status(409).json({ message: "Lesson already completed" });
+      }
+
+      const updatedProgress = await storage.updateUserProgress(progress.id, {
+        completed: true,
+        choices: req.body.choices || progress.choices,
+        score: req.body.score || progress.score,
+      });
+      
+      const updatedUser = await storage.updateUserXP(user.id, lesson.xpReward);
+      
+      const allAchievements = await storage.getAllAchievements();
+      for (const achievement of allAchievements) {
+        if (updatedUser.xp >= achievement.xpRequired) {
+          const hasAchievement = await storage.checkUserHasAchievement(user.id, achievement.id);
+          if (!hasAchievement) {
+            await storage.unlockAchievement({ userId: user.id, achievementId: achievement.id });
+          }
+        }
+      }
+      
+      res.json({ progress: updatedProgress, xpAwarded: lesson.xpReward });
+    } catch (error) {
+      console.error("Error completing lesson:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Achievement routes
+  app.get("/api/achievements", async (_req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements();
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/user/achievements", isAuthenticated, async (req: any, res) => {
+    try {
+      const replitId = req.user.claims.sub;
+      const user = await storage.getUserByReplitId(replitId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const userAchievements = await storage.getUserAchievements(user.id);
+      res.json(userAchievements);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
