@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { FloatingNav } from "@/components/floating-nav";
 import { SmoothScroll } from "@/components/smooth-scroll";
 
 interface UserLayoutProps {
@@ -20,8 +19,11 @@ export function UserLayout({ children }: UserLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-muted-foreground" data-testid="text-loading">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -32,12 +34,7 @@ export function UserLayout({ children }: UserLayoutProps) {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen bg-background">
-        <FloatingNav />
-        <main className="pt-24">
-          {children}
-        </main>
-      </div>
+      {children}
     </SmoothScroll>
   );
 }

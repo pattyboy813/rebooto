@@ -1,21 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Users, Mail, BarChart3, LogOut, Calendar, Trophy, Award, BookOpen, Zap, Star, Lock, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import { Users, BarChart3, LogOut, Trophy, Award, BookOpen, Zap, Star, Lock, CheckCircle2, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import type { EmailSignup, Course, Enrollment, Achievement, UserAchievement, UserProgress, Lesson } from "@shared/schema";
+import type { Course, Enrollment, Achievement, UserAchievement, UserProgress, Lesson } from "@shared/schema";
 import { Link } from "wouter";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
-  const [showSignupsDialog, setShowSignupsDialog] = useState(false);
   const { toast } = useToast();
 
   // Check authentication
@@ -31,15 +29,6 @@ export default function Dashboard() {
       setLocation("/");
     }
   }, [isAuthenticated, isLoading, setLocation, toast]);
-
-  const { data: signupStats } = useQuery<{ count: number }>({
-    queryKey: ["/api/signups/count"],
-  });
-
-  const { data: signups } = useQuery<EmailSignup[]>({
-    queryKey: ["/api/signups"],
-    enabled: !!user,
-  });
 
   const { data: enrollments } = useQuery<Enrollment[]>({
     queryKey: ["/api/enrollments"],
@@ -204,7 +193,7 @@ export default function Dashboard() {
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-gray-900">My Courses</h2>
-              <Link href="/courses">
+              <Link href="/app/courses">
                 <Button variant="outline" className="rounded-full" data-testid="button-browse-courses">
                   <BookOpen className="w-4 h-4 mr-2" />
                   Browse Courses
@@ -254,7 +243,7 @@ export default function Dashboard() {
                             </div>
                           </div>
 
-                          <Link href={`/courses/${course.id}`}>
+                          <Link href={`/app/courses/${course.id}`}>
                             <Button 
                               className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                               data-testid={`button-continue-${course.id}`}
@@ -274,7 +263,7 @@ export default function Dashboard() {
                 <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">No courses yet</h3>
                 <p className="text-gray-600 mb-6">Start learning by enrolling in your first course</p>
-                <Link href="/courses">
+                <Link href="/app/courses">
                   <Button className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white" data-testid="button-browse-courses-empty">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Browse Courses
@@ -375,101 +364,44 @@ export default function Dashboard() {
             )}
           </motion.div>
 
-          {/* Admin Quick Actions (Hidden in bottom) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Card className="p-6 backdrop-blur-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200/50 rounded-2xl">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-2">
-                    Admin Portal
-                  </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                    You have access to the admin portal. Create courses with AI and manage signups.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <Link href="/admin/courses/new">
-                      <Button
-                        variant="default"
-                        className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                        data-testid="button-create-course"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Create Course with AI
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      className="rounded-xl"
-                      data-testid="button-view-signups"
-                      onClick={() => setShowSignupsDialog(true)}
-                    >
-                      <Mail className="w-4 h-4 mr-2" />
-                      View All Signups ({signupStats?.count || 0})
-                    </Button>
+          {/* Admin Quick Actions - only visible to admins */}
+          {user?.isAdmin && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card className="p-6 backdrop-blur-lg bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200/50 rounded-2xl">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Users className="w-5 h-5 text-white" />
                   </div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </main>
-
-      {/* Signups Dialog */}
-      <Dialog open={showSignupsDialog} onOpenChange={setShowSignupsDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Email Signups</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {signups && signups.length > 0 ? (
-              <div className="divide-y divide-gray-200">
-                {signups.map((signup, index) => (
-                  <div
-                    key={signup.id}
-                    className="py-4 flex items-center justify-between hover-elevate rounded-lg px-4"
-                    data-testid={`signup-item-${index}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                        <Mail className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900" data-testid={`signup-email-${index}`}>
-                          {signup.email}
-                        </p>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Calendar className="w-4 h-4" />
-                          <span data-testid={`signup-date-${index}`}>
-                            {new Date(signup.createdAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Admin Portal
+                    </h3>
+                    <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                      You have access to the admin portal. Manage users and view analytics.
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Link href="/admin/dashboard">
+                        <Button
+                          variant="default"
+                          className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          data-testid="button-admin-dashboard"
+                        >
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          Admin Dashboard
+                        </Button>
+                      </Link>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Mail className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600">No signups yet</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
