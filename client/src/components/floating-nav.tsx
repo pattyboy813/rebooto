@@ -56,9 +56,9 @@ export function FloatingNav() {
           opacity: isVisible ? 1 : 0
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-6xl px-2 sm:px-0"
+        className="fixed top-4 md:top-6 left-0 right-0 z-50 px-4 sm:px-8 md:px-12"
       >
-        <div className="backdrop-blur-xl bg-white/80 border-2 border-white/50 rounded-full px-4 sm:px-6 md:px-8 py-3 md:py-4 shadow-xl shadow-gray-300/20">
+        <div className="max-w-6xl mx-auto backdrop-blur-xl bg-white/80 border-2 border-white/50 rounded-full px-4 sm:px-6 md:px-8 py-3 md:py-4 shadow-xl shadow-gray-300/20">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
             <button 
