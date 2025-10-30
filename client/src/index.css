@@ -98,55 +98,55 @@
   --gradient-from: 210 85% 42%;
   --gradient-to: 165 75% 38%;
   
-  /* Admin Portal Theme Variables - Complete Palette */
-  --admin-background: 220 8% 6%;
-  --admin-foreground: 30 5% 92%;
-  --admin-border: 220 8% 16%;
+  /* Admin Portal Theme Variables - Matches Landing Page (Teal/Emerald) */
+  --admin-background: 220 5% 98%;
+  --admin-foreground: 220 6% 12%;
+  --admin-border: 220 5% 88%;
   
-  --admin-card: 220 8% 8%;
-  --admin-card-foreground: 30 5% 90%;
-  --admin-card-border: 220 8% 18%;
+  --admin-card: 0 0% 100%;
+  --admin-card-foreground: 220 6% 14%;
+  --admin-card-border: 220 5% 90%;
   
-  --admin-sidebar: 220 8% 7%;
-  --admin-sidebar-foreground: 30 5% 88%;
-  --admin-sidebar-border: 220 8% 17%;
-  --admin-sidebar-primary: 25 95% 53%;
-  --admin-sidebar-primary-foreground: 25 5% 10%;
-  --admin-sidebar-accent: 220 10% 15%;
-  --admin-sidebar-accent-foreground: 30 5% 85%;
-  --admin-sidebar-ring: 25 95% 53%;
+  --admin-sidebar: 174 62% 47%;
+  --admin-sidebar-foreground: 0 0% 100%;
+  --admin-sidebar-border: 174 62% 42%;
+  --admin-sidebar-primary: 167 76% 42%;
+  --admin-sidebar-primary-foreground: 0 0% 100%;
+  --admin-sidebar-accent: 174 62% 55%;
+  --admin-sidebar-accent-foreground: 0 0% 100%;
+  --admin-sidebar-ring: 167 76% 42%;
   
-  --admin-popover: 220 8% 9%;
-  --admin-popover-foreground: 30 5% 86%;
-  --admin-popover-border: 220 8% 20%;
+  --admin-popover: 220 5% 96%;
+  --admin-popover-foreground: 220 6% 18%;
+  --admin-popover-border: 220 5% 84%;
   
-  --admin-primary: 25 95% 53%;
-  --admin-primary-foreground: 25 5% 10%;
+  --admin-primary: 174 62% 47%;
+  --admin-primary-foreground: 0 0% 100%;
   
-  --admin-secondary: 220 10% 18%;
-  --admin-secondary-foreground: 220 10% 82%;
+  --admin-secondary: 220 6% 86%;
+  --admin-secondary-foreground: 220 6% 20%;
   
-  --admin-muted: 220 10% 14%;
-  --admin-muted-foreground: 220 8% 65%;
+  --admin-muted: 220 8% 90%;
+  --admin-muted-foreground: 220 8% 35%;
   
-  --admin-accent: 15 85% 48%;
-  --admin-accent-foreground: 15 5% 95%;
+  --admin-accent: 220 10% 88%;
+  --admin-accent-foreground: 220 10% 22%;
   
-  --admin-destructive: 0 75% 42%;
+  --admin-destructive: 0 75% 45%;
   --admin-destructive-foreground: 0 75% 98%;
   
-  --admin-input: 220 15% 30%;
-  --admin-ring: 25 95% 53%;
+  --admin-input: 220 12% 68%;
+  --admin-ring: 174 62% 47%;
   
-  --admin-chart-1: 25 95% 60%;
-  --admin-chart-2: 165 75% 55%;
-  --admin-chart-3: 280 65% 68%;
-  --admin-chart-4: 30 80% 62%;
-  --admin-chart-5: 340 75% 65%;
+  --admin-chart-1: 174 62% 47%;
+  --admin-chart-2: 167 76% 42%;
+  --admin-chart-3: 16 100% 66%;
+  --admin-chart-4: 43 89% 60%;
+  --admin-chart-5: 340 75% 52%;
   
-  /* Admin gradient - orange to red */
-  --admin-gradient-from: 25 95% 53%;
-  --admin-gradient-to: 0 84% 60%;
+  /* Admin gradient - teal to emerald (matches landing page) */
+  --admin-gradient-from: 174 62% 47%;
+  --admin-gradient-to: 167 76% 42%;
 }
 
 /* Admin Theme Scope - Remaps ALL admin variables to shadcn tokens */
@@ -211,15 +211,15 @@
   --gradient-from: var(--admin-gradient-from);
   --gradient-to: var(--admin-gradient-to);
   
-  /* Admin-specific shadows for dark theme */
-  --shadow-2xs: 0px 1px 2px 0px hsl(220 10% 2% / 0.35);
-  --shadow-xs: 0px 1px 3px 0px hsl(220 10% 2% / 0.45);
-  --shadow-sm: 0px 2px 4px -1px hsl(220 10% 2% / 0.40), 0px 1px 2px -1px hsl(220 10% 2% / 0.30);
-  --shadow: 0px 4px 6px -1px hsl(220 10% 2% / 0.50), 0px 2px 4px -2px hsl(220 10% 2% / 0.35);
-  --shadow-md: 0px 6px 12px -2px hsl(220 10% 2% / 0.60), 0px 3px 7px -3px hsl(220 10% 2% / 0.45);
-  --shadow-lg: 0px 10px 20px -3px hsl(220 10% 2% / 0.70), 0px 6px 10px -4px hsl(220 10% 2% / 0.50);
-  --shadow-xl: 0px 20px 30px -5px hsl(220 10% 2% / 0.80), 0px 10px 15px -5px hsl(220 10% 2% / 0.55);
-  --shadow-2xl: 0px 30px 50px -10px hsl(220 10% 2% / 0.90);
+  /* Admin shadows match light theme */
+  --shadow-2xs: 0px 1px 2px 0px hsl(220 10% 10% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(220 10% 10% / 0.08);
+  --shadow-sm: 0px 2px 4px -1px hsl(220 10% 10% / 0.06), 0px 1px 2px -1px hsl(220 10% 10% / 0.04);
+  --shadow: 0px 4px 6px -1px hsl(220 10% 10% / 0.08), 0px 2px 4px -2px hsl(220 10% 10% / 0.05);
+  --shadow-md: 0px 6px 12px -2px hsl(220 10% 10% / 0.10), 0px 3px 7px -3px hsl(220 10% 10% / 0.08);
+  --shadow-lg: 0px 10px 20px -3px hsl(220 10% 10% / 0.12), 0px 6px 10px -4px hsl(220 10% 10% / 0.09);
+  --shadow-xl: 0px 20px 30px -5px hsl(220 10% 10% / 0.15), 0px 10px 15px -5px hsl(220 10% 10% / 0.10);
+  --shadow-2xl: 0px 30px 50px -10px hsl(220 10% 10% / 0.20);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
 
@@ -526,8 +526,5 @@
     @apply backdrop-blur-lg bg-white/60 border border-white/20 rounded-3xl;
   }
   
-  /* Admin portal glassmorphic effects (darker) */
-  .admin-glass {
-    @apply backdrop-blur-xl bg-black/40 border border-white/10;
-  }
+  /* Admin portal removed - using standard cards instead */
 }

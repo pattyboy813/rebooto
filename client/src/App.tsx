@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserLayout } from "@/components/layouts/user-layout";
 import { AdminLayout } from "@/components/layouts/admin-layout";
 import { PremiumAuth } from "@/components/sections/premium-auth";
+import { Card } from "@/components/ui/card";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Courses from "@/pages/courses";
@@ -50,26 +52,30 @@ function AdminDashboardPage() {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-gradient-admin">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Welcome to the Rebooto admin portal</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-admin-dashboard">
+            Admin Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-admin-welcome">
+            Welcome to the Rebooto admin portal
+          </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <div className="admin-glass rounded-2xl p-6">
+          <Card className="p-6 hover-elevate" data-testid="card-total-users">
             <h3 className="text-sm font-medium text-muted-foreground">Total Users</h3>
-            <p className="text-3xl font-bold mt-2">Coming soon</p>
-          </div>
-          <div className="admin-glass rounded-2xl p-6">
+            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+          </Card>
+          <Card className="p-6 hover-elevate" data-testid="card-active-courses">
             <h3 className="text-sm font-medium text-muted-foreground">Active Courses</h3>
-            <p className="text-3xl font-bold mt-2">Coming soon</p>
-          </div>
-          <div className="admin-glass rounded-2xl p-6">
+            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+          </Card>
+          <Card className="p-6 hover-elevate" data-testid="card-email-signups">
             <h3 className="text-sm font-medium text-muted-foreground">Email Signups</h3>
-            <p className="text-3xl font-bold mt-2">Coming soon</p>
-          </div>
-          <div className="admin-glass rounded-2xl p-6">
+            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+          </Card>
+          <Card className="p-6 hover-elevate" data-testid="card-completion-rate">
             <h3 className="text-sm font-medium text-muted-foreground">Completion Rate</h3>
-            <p className="text-3xl font-bold mt-2">Coming soon</p>
-          </div>
+            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+          </Card>
         </div>
       </div>
     </AdminLayout>
@@ -81,12 +87,16 @@ function AdminUsersPage() {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-gradient-admin">User Management</h1>
-          <p className="text-muted-foreground mt-2">Manage users, roles, and permissions</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-user-management">
+            User Management
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-user-description">
+            Manage users, roles, and permissions
+          </p>
         </div>
-        <div className="admin-glass rounded-2xl p-8">
+        <Card className="p-8" data-testid="card-user-content">
           <p className="text-muted-foreground">User management features coming soon</p>
-        </div>
+        </Card>
       </div>
     </AdminLayout>
   );
@@ -97,12 +107,16 @@ function AdminCampaignsPage() {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-gradient-admin">Email Campaigns</h1>
-          <p className="text-muted-foreground mt-2">Create and manage email campaigns</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-campaigns">
+            Email Campaigns
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-campaigns-description">
+            Create and manage email campaigns
+          </p>
         </div>
-        <div className="admin-glass rounded-2xl p-8">
+        <Card className="p-8" data-testid="card-campaigns-content">
           <p className="text-muted-foreground">Email campaign features coming soon</p>
-        </div>
+        </Card>
       </div>
     </AdminLayout>
   );
@@ -113,31 +127,38 @@ function AdminSettingsPage() {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-bold text-gradient-admin">Settings</h1>
-          <p className="text-muted-foreground mt-2">Configure system settings</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-settings">
+            Settings
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-settings-description">
+            Configure system settings
+          </p>
         </div>
-        <div className="admin-glass rounded-2xl p-8">
+        <Card className="p-8" data-testid="card-settings-content">
           <p className="text-muted-foreground">Settings page coming soon</p>
-        </div>
+        </Card>
       </div>
     </AdminLayout>
   );
 }
 
 function AdminLoginPage() {
+  const [, setLocation] = useLocation();
+  
+  useEffect(() => {
+    setLocation("/auth");
+  }, [setLocation]);
+  
   return (
-    <div className="admin-theme min-h-screen flex items-center justify-center">
-      <div className="admin-glass rounded-2xl p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-gradient-admin mb-6">Admin Login</h1>
-        <p className="text-muted-foreground mb-8">Please log in with your admin account to access the admin portal.</p>
-        <a
-          href="/api/auth/replit"
-          className="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-admin text-white rounded-lg font-semibold hover-elevate active-elevate-2"
-          data-testid="button-login-replit"
-        >
-          Login with Replit
-        </a>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-teal-50">
+      <Card className="p-8 max-w-md w-full">
+        <h1 className="text-3xl font-bold text-gradient-admin mb-6" data-testid="heading-admin-login">
+          Admin Login
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          Redirecting to login page...
+        </p>
+      </Card>
     </div>
   );
 }
