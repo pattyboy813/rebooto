@@ -8,6 +8,9 @@ import {
   userProgress,
   userAchievements,
   feedback,
+  passwordResetTokens,
+  blogPosts,
+  documentationArticles,
   type User,
   type InsertUser,
   type UpsertUser,
@@ -27,9 +30,15 @@ import {
   type InsertUserAchievement,
   type Feedback,
   type InsertFeedback,
+  type PasswordResetToken,
+  type InsertPasswordResetToken,
+  type BlogPost,
+  type InsertBlogPost,
+  type DocumentationArticle,
+  type InsertDocumentationArticle,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, gt, lt } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -95,6 +104,31 @@ export interface IStorage {
   createFeedback(feedbackData: InsertFeedback): Promise<Feedback>;
   getAllFeedback(): Promise<Feedback[]>;
   getUserFeedback(userId: number): Promise<Feedback[]>;
+  
+  // Password reset token methods
+  createPasswordResetToken(token: InsertPasswordResetToken): Promise<PasswordResetToken>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markPasswordResetTokenUsed(token: string): Promise<void>;
+  deleteExpiredPasswordResetTokens(): Promise<void>;
+  
+  // Blog post methods
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  getBlogPost(id: number): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  getAllBlogPosts(includeUnpublished?: boolean): Promise<BlogPost[]>;
+  updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost>;
+  publishBlogPost(id: number): Promise<BlogPost>;
+  deleteBlogPost(id: number): Promise<void>;
+  
+  // Documentation article methods
+  createDocumentationArticle(article: InsertDocumentationArticle): Promise<DocumentationArticle>;
+  getDocumentationArticle(id: number): Promise<DocumentationArticle | undefined>;
+  getDocumentationArticleBySlug(slug: string): Promise<DocumentationArticle | undefined>;
+  getAllDocumentationArticles(includeUnpublished?: boolean): Promise<DocumentationArticle[]>;
+  getDocumentationArticlesByCategory(category: string, includeUnpublished?: boolean): Promise<DocumentationArticle[]>;
+  updateDocumentationArticle(id: number, updates: Partial<InsertDocumentationArticle>): Promise<DocumentationArticle>;
+  publishDocumentationArticle(id: number): Promise<DocumentationArticle>;
+  deleteDocumentationArticle(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -387,6 +421,129 @@ export class DatabaseStorage implements IStorage {
 
   async getUserFeedback(userId: number): Promise<Feedback[]> {
     return await db.select().from(feedback).where(eq(feedback.userId, userId)).orderBy(desc(feedback.createdAt));
+  }
+
+  async createPasswordResetToken(insertToken: InsertPasswordResetToken): Promise<PasswordResetToken> {
+    const [token] = await db.insert(passwordResetTokens).values(insertToken).returning();
+    return token;
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(and(eq(passwordResetTokens.token, token), gt(passwordResetTokens.expiresAt, new Date())));
+    return resetToken || undefined;
+  }
+
+  async markPasswordResetTokenUsed(token: string): Promise<void> {
+    await db
+      .update(passwordResetTokens)
+      .set({ usedAt: new Date() })
+      .where(eq(passwordResetTokens.token, token));
+  }
+
+  async deleteExpiredPasswordResetTokens(): Promise<void> {
+    await db.delete(passwordResetTokens).where(lt(passwordResetTokens.expiresAt, new Date()));
+  }
+
+  async createBlogPost(insertPost: InsertBlogPost): Promise<BlogPost> {
+    const [post] = await db.insert(blogPosts).values(insertPost).returning();
+    return post;
+  }
+
+  async getBlogPost(id: number): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post || undefined;
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post || undefined;
+  }
+
+  async getAllBlogPosts(includeUnpublished = false): Promise<BlogPost[]> {
+    if (includeUnpublished) {
+      return await db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt));
+    }
+    return await db.select().from(blogPosts).where(eq(blogPosts.status, "published")).orderBy(desc(blogPosts.publishedAt));
+  }
+
+  async updateBlogPost(id: number, updates: Partial<InsertBlogPost>): Promise<BlogPost> {
+    const [post] = await db
+      .update(blogPosts)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return post;
+  }
+
+  async publishBlogPost(id: number): Promise<BlogPost> {
+    const [post] = await db
+      .update(blogPosts)
+      .set({ status: "published", publishedAt: new Date(), updatedAt: new Date() })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return post;
+  }
+
+  async deleteBlogPost(id: number): Promise<void> {
+    await db.delete(blogPosts).where(eq(blogPosts.id, id));
+  }
+
+  async createDocumentationArticle(insertArticle: InsertDocumentationArticle): Promise<DocumentationArticle> {
+    const [article] = await db.insert(documentationArticles).values(insertArticle).returning();
+    return article;
+  }
+
+  async getDocumentationArticle(id: number): Promise<DocumentationArticle | undefined> {
+    const [article] = await db.select().from(documentationArticles).where(eq(documentationArticles.id, id));
+    return article || undefined;
+  }
+
+  async getDocumentationArticleBySlug(slug: string): Promise<DocumentationArticle | undefined> {
+    const [article] = await db.select().from(documentationArticles).where(eq(documentationArticles.slug, slug));
+    return article || undefined;
+  }
+
+  async getAllDocumentationArticles(includeUnpublished = false): Promise<DocumentationArticle[]> {
+    if (includeUnpublished) {
+      return await db.select().from(documentationArticles).orderBy(documentationArticles.orderIndex);
+    }
+    return await db.select().from(documentationArticles).where(eq(documentationArticles.status, "published")).orderBy(documentationArticles.orderIndex);
+  }
+
+  async getDocumentationArticlesByCategory(category: string, includeUnpublished = false): Promise<DocumentationArticle[]> {
+    if (includeUnpublished) {
+      return await db.select().from(documentationArticles).where(eq(documentationArticles.category, category)).orderBy(documentationArticles.orderIndex);
+    }
+    return await db
+      .select()
+      .from(documentationArticles)
+      .where(and(eq(documentationArticles.category, category), eq(documentationArticles.status, "published")))
+      .orderBy(documentationArticles.orderIndex);
+  }
+
+  async updateDocumentationArticle(id: number, updates: Partial<InsertDocumentationArticle>): Promise<DocumentationArticle> {
+    const [article] = await db
+      .update(documentationArticles)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(documentationArticles.id, id))
+      .returning();
+    return article;
+  }
+
+  async publishDocumentationArticle(id: number): Promise<DocumentationArticle> {
+    const [article] = await db
+      .update(documentationArticles)
+      .set({ status: "published", publishedAt: new Date(), updatedAt: new Date() })
+      .where(eq(documentationArticles.id, id))
+      .returning();
+    return article;
+  }
+
+  async deleteDocumentationArticle(id: number): Promise<void> {
+    await db.delete(documentationArticles).where(eq(documentationArticles.id, id));
   }
 }
 

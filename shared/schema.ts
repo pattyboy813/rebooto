@@ -143,6 +143,47 @@ export const sentEmails = pgTable("sent_emails", {
   status: varchar("status").notNull().default("sent"), // "sent", "failed", "bounced"
 });
 
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(), // Markdown or HTML content
+  coverImageUrl: text("cover_image_url"),
+  authorId: integer("author_id").notNull().references(() => users.id),
+  status: varchar("status", { length: 20 }).notNull().default("draft"), // "draft", "published"
+  readTimeMinutes: integer("read_time_minutes").notNull().default(5),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const documentationArticles = pgTable("documentation_articles", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  content: text("content").notNull(), // Markdown or HTML content
+  category: varchar("category", { length: 100 }).notNull(), // "Getting Started", "Courses", "Progress & Achievements", "Account & Settings"
+  orderIndex: integer("order_index").notNull().default(0),
+  status: varchar("status", { length: 20 }).notNull().default("draft"), // "draft", "published"
+  authorId: integer("author_id").notNull().references(() => users.id),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  categoryIndex: index("idx_doc_category").on(table.category),
+  slugIndex: index("idx_doc_slug").on(table.slug),
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({
   progress: many(userProgress),
   feedback: many(feedback),
@@ -152,6 +193,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   usedInvite: many(adminInvites, { relationName: "usedInvite" }),
   createdTemplates: many(emailTemplates),
   sentEmails: many(sentEmails),
+  passwordResetTokens: many(passwordResetTokens),
+  blogPosts: many(blogPosts),
+  documentationArticles: many(documentationArticles),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -239,6 +283,27 @@ export const sentEmailsRelations = relations(sentEmails, ({ one }) => ({
   }),
   sender: one(users, {
     fields: [sentEmails.sentBy],
+    references: [users.id],
+  }),
+}));
+
+export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResetTokens.userId],
+    references: [users.id],
+  }),
+}));
+
+export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
+  author: one(users, {
+    fields: [blogPosts.authorId],
+    references: [users.id],
+  }),
+}));
+
+export const documentationArticlesRelations = relations(documentationArticles, ({ one }) => ({
+  author: one(users, {
+    fields: [documentationArticles.authorId],
     references: [users.id],
   }),
 }));
@@ -337,6 +402,36 @@ export const insertSentEmailSchema = createInsertSchema(sentEmails).omit({
   sentAt: true,
 });
 
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
+  id: true,
+  createdAt: true,
+  usedAt: true,
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+}).extend({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  slug: z.string().min(3, "Slug must be at least 3 characters").regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  excerpt: z.string().min(10, "Excerpt must be at least 10 characters"),
+  content: z.string().min(50, "Content must be at least 50 characters"),
+});
+
+export const insertDocumentationArticleSchema = createInsertSchema(documentationArticles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  publishedAt: true,
+}).extend({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  slug: z.string().min(3, "Slug must be at least 3 characters").regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  content: z.string().min(20, "Content must be at least 20 characters"),
+  category: z.enum(["Getting Started", "Courses", "Progress & Achievements", "Account & Settings", "Admin", "Technical", "FAQ"]),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type LocalSignup = z.infer<typeof localSignupSchema>;
@@ -364,3 +459,9 @@ export type InsertEmailTemplate = z.infer<typeof insertEmailTemplateSchema>;
 export type EmailTemplate = typeof emailTemplates.$inferSelect;
 export type InsertSentEmail = z.infer<typeof insertSentEmailSchema>;
 export type SentEmail = typeof sentEmails.$inferSelect;
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertDocumentationArticle = z.infer<typeof insertDocumentationArticleSchema>;
+export type DocumentationArticle = typeof documentationArticles.$inferSelect;
