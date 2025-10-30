@@ -32,107 +32,44 @@ function FlipCard({ value, label, testId }: FlipCardProps) {
   }, [value]);
 
   const displayValue = String(currentValue).padStart(2, "0");
-  const topDigit = displayValue[0];
-  const bottomDigit = displayValue[1];
 
   return (
-    <div className="flex flex-col items-center gap-2 md:gap-3" data-testid={testId}>
-      {/* Flip Display Container */}
-      <div className="relative flex gap-1 sm:gap-2">
-        {/* First Digit */}
-        <div className="relative w-10 h-14 sm:w-14 sm:h-20 md:w-20 md:h-28 lg:w-24 lg:h-32">
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-gray-800 to-gray-900 shadow-xl border-2 border-gray-700/50" />
-          
-          {/* Top Half */}
-          <div className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden rounded-t-lg">
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-gray-800 flex items-end justify-center pb-1">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={`top-${topDigit}-${isFlipping}`}
-                  initial={isFlipping ? { rotateX: 0 } : false}
-                  animate={isFlipping ? { rotateX: -90 } : { rotateX: 0 }}
-                  exit={{ rotateX: -90 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white font-mono origin-bottom"
-                  style={{ 
-                    transformStyle: "preserve-3d",
-                    backfaceVisibility: "hidden"
-                  }}
-                >
-                  {topDigit}
-                </motion.span>
-              </AnimatePresence>
-            </div>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-          </div>
-
-          {/* Middle Line */}
-          <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-950 z-10 shadow-md" />
-          <div className="absolute top-1/2 left-2 right-2 h-0.5 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 -translate-y-px z-10" />
-
-          {/* Bottom Half */}
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden rounded-b-lg">
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900 flex items-start justify-center pt-1">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={`bottom-${topDigit}-${isFlipping}`}
-                  initial={isFlipping ? { rotateX: 90 } : false}
-                  animate={{ rotateX: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut", delay: isFlipping ? 0.15 : 0 }}
-                  className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white font-mono origin-top"
-                  style={{ 
-                    transformStyle: "preserve-3d",
-                    backfaceVisibility: "hidden"
-                  }}
-                >
-                  {topDigit}
-                </motion.span>
-              </AnimatePresence>
-            </div>
-            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-          </div>
-
-          {/* Screws/Rivets for vintage look */}
-          <div className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-          <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-          <div className="absolute bottom-1 left-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-          <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
+    <div className="flex flex-col items-center gap-3 md:gap-4" data-testid={testId}>
+      {/* Single Unified Flip Display */}
+      <div className="relative w-20 h-24 sm:w-24 sm:h-32 md:w-32 md:h-40 lg:w-40 lg:h-48">
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-gray-800 to-gray-900 shadow-2xl border-3 border-gray-700/60" />
+        
+        {/* Display Area */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={displayValue}
+              initial={isFlipping ? { rotateX: -90, opacity: 0 } : false}
+              animate={{ rotateX: 0, opacity: 1 }}
+              exit={{ rotateX: 90, opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white font-mono"
+              style={{ 
+                transformStyle: "preserve-3d"
+              }}
+            >
+              {displayValue}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Second Digit */}
-        <div className="relative w-10 h-14 sm:w-14 sm:h-20 md:w-20 md:h-28 lg:w-24 lg:h-32">
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-gray-800 to-gray-900 shadow-xl border-2 border-gray-700/50" />
-          
-          <div className="absolute top-0 left-0 right-0 h-1/2 overflow-hidden rounded-t-lg">
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-900 to-gray-800 flex items-end justify-center pb-1">
-              <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white font-mono">
-                {bottomDigit}
-              </span>
-            </div>
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-          </div>
-
-          <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-950 z-10 shadow-md" />
-          <div className="absolute top-1/2 left-2 right-2 h-0.5 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 -translate-y-px z-10" />
-
-          <div className="absolute bottom-0 left-0 right-0 h-1/2 overflow-hidden rounded-b-lg">
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900 flex items-start justify-center pt-1">
-              <span className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white font-mono">
-                {bottomDigit}
-              </span>
-            </div>
-            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-          </div>
-
-          <div className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-          <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-          <div className="absolute bottom-1 left-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-          <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-gray-600 shadow-inner" />
-        </div>
+        {/* Middle Line for vintage look */}
+        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-950/50 z-10" />
+        
+        {/* Screws/Rivets for vintage look */}
+        <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-gray-600 shadow-inner" />
+        <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-gray-600 shadow-inner" />
+        <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-gray-600 shadow-inner" />
+        <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-gray-600 shadow-inner" />
       </div>
 
       {/* Label */}
-      <div className="text-xs md:text-sm uppercase tracking-wider font-semibold text-gray-700">
+      <div className="text-xs md:text-sm lg:text-base uppercase tracking-wider font-semibold text-gray-700">
         {label}
       </div>
     </div>
@@ -182,14 +119,11 @@ export function FlipTimer() {
 
   if (!mounted) {
     return (
-      <div className="flex justify-center items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 px-1 sm:px-4">
+      <div className="flex justify-center items-center gap-3 sm:gap-6 md:gap-8 lg:gap-10 px-4">
         {["Days", "Hours", "Mins", "Secs"].map((label) => (
-          <div key={label} className="flex flex-col items-center gap-2 md:gap-3">
-            <div className="flex gap-1 sm:gap-2">
-              <div className="w-10 h-14 sm:w-14 sm:h-20 md:w-20 md:h-28 lg:w-24 lg:h-32 rounded-lg bg-gray-800 animate-pulse" />
-              <div className="w-10 h-14 sm:w-14 sm:h-20 md:w-20 md:h-28 lg:w-24 lg:h-32 rounded-lg bg-gray-800 animate-pulse" />
-            </div>
-            <div className="text-xs md:text-sm uppercase tracking-wider text-gray-400">
+          <div key={label} className="flex flex-col items-center gap-3 md:gap-4">
+            <div className="w-20 h-24 sm:w-24 sm:h-32 md:w-32 md:h-40 lg:w-40 lg:h-48 rounded-xl bg-gray-800 animate-pulse" />
+            <div className="text-xs md:text-sm lg:text-base uppercase tracking-wider text-gray-400">
               {label}
             </div>
           </div>
@@ -219,7 +153,7 @@ export function FlipTimer() {
       <div className="absolute -inset-3 md:-inset-5 rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-200/80 to-gray-300/80" />
       
       {/* Main Timer Display */}
-      <div className="relative flex justify-center items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 px-1 sm:px-4 py-6 md:py-8">
+      <div className="relative flex justify-center items-center gap-3 sm:gap-6 md:gap-8 lg:gap-10 px-4 py-8 md:py-10">
         {timeUnits.map((unit) => (
           <FlipCard
             key={unit.label}
