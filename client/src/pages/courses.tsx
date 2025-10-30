@@ -4,13 +4,14 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Award, TrendingUp } from "lucide-react";
+import { BookOpen, Award, TrendingUp, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import type { Course, Enrollment } from "@shared/schema";
+import type { Course, Enrollment, UserProgress } from "@shared/schema";
 
 const CATEGORIES = [
   "All",
@@ -37,6 +38,11 @@ export default function Courses() {
 
   const { data: enrollments } = useQuery<Enrollment[]>({
     queryKey: ["/api/enrollments"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: userProgress } = useQuery<UserProgress[]>({
+    queryKey: ["/api/progress"],
     enabled: isAuthenticated,
   });
 
@@ -80,6 +86,47 @@ export default function Courses() {
 
   const isEnrolled = (courseId: number) => {
     return enrollments?.some((e) => e.courseId === courseId);
+  };
+
+  // Fetch detailed course data with lessons for enrolled courses
+  const enrolledCourseIds = enrollments?.map((e) => e.courseId) || [];
+  
+  const { data: enrolledCoursesWithLessons } = useQuery({
+    queryKey: ["/api/courses", "with-lessons", enrolledCourseIds],
+    queryFn: async () => {
+      if (enrolledCourseIds.length === 0) return [];
+      const promises = enrolledCourseIds.map((courseId) =>
+        fetch(`/api/courses/${courseId}`).then((res) => res.json())
+      );
+      return Promise.all(promises);
+    },
+    enabled: enrolledCourseIds.length > 0,
+  });
+
+  const getCourseProgress = (course: Course) => {
+    if (!userProgress || !isEnrolled(course.id)) {
+      return { completed: 0, total: 0, percentage: 0 };
+    }
+
+    const courseWithLessons = enrolledCoursesWithLessons?.find(
+      (c: any) => c.id === course.id
+    );
+    
+    if (!courseWithLessons || !courseWithLessons.lessons) {
+      return { completed: 0, total: course.lessonCount || 0, percentage: 0 };
+    }
+
+    const completedLessons = courseWithLessons.lessons.filter((lesson: any) =>
+      userProgress.some((p) => p.lessonId === lesson.id && p.completed)
+    );
+
+    const totalLessons = courseWithLessons.lessons.length;
+    
+    return {
+      completed: completedLessons.length,
+      total: totalLessons,
+      percentage: totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0,
+    };
   };
 
   return (
@@ -190,18 +237,37 @@ export default function Courses() {
                     {course.description}
                   </p>
 
-                  <div className="flex items-center gap-4 mb-6 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Award className="w-4 h-4" />
-                      <span data-testid={`text-xp-${course.id}`}>
-                        {course.xpTotal} XP
-                      </span>
+                  {isEnrolled(course.id) ? (
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600 flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          Enrolled
+                        </span>
+                        <span className="text-gray-900 font-medium" data-testid={`text-progress-${course.id}`}>
+                          {getCourseProgress(course).completed} / {getCourseProgress(course).total} lessons
+                        </span>
+                      </div>
+                      <Progress 
+                        value={getCourseProgress(course).percentage} 
+                        className="h-2" 
+                        data-testid={`progress-${course.id}`}
+                      />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4" />
-                      <span>Level Up</span>
+                  ) : (
+                    <div className="flex items-center gap-4 mb-6 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Award className="w-4 h-4" />
+                        <span data-testid={`text-xp-${course.id}`}>
+                          {course.xpTotal} XP
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className="w-4 h-4" />
+                        <span>{course.lessonCount || 0} lessons</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <Button
                     className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
