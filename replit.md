@@ -54,14 +54,15 @@ TryRebooto is a modern pre-launch landing page for an interactive IT support lea
 - Parallax effects on scroll
 - Large responsive typography (5xl to 8xl)
 - Gradient text effects on headline
-- **Vintage flip timer countdown** with split-flap display aesthetic:
-  - Mechanical/industrial design (dark gray panels, white text)
+- **Vintage flip timer countdown** with simplified single-display design:
+  - Single unified flip card per time unit (Days, Hours, Mins, Secs)
+  - Each card displays complete two-digit number (e.g., "59" not "5" "9" separately)
+  - Mechanical/industrial design (dark gray gradient panels, large white text)
   - 3D flip animations using Framer Motion rotateX transforms
-  - Responsive sizing (mobile 40px tiles → desktop 96px tiles)
-  - Two-digit displays for days, hours, mins, secs
-  - Metallic rivets/screws in corners
+  - Responsive sizing: mobile 80×96px → small 96×128px → medium 128×160px → large 160×192px
+  - Vintage aesthetic: middle line separator, metallic rivets/screws in corners
   - "LAUNCH COUNTDOWN" branding
-  - Fits 375px+ viewports with px-1 mobile padding
+  - Counts down to December 31, 2025 with real-time updates every second
 - Dual CTAs with gradient buttons
 
 ### 4. Premium Value Proposition
@@ -293,6 +294,7 @@ npm run dev
 - Passwords should be properly hashed (bcrypt)
 
 ## Recent Changes
+- 2025-10-30: **Flip timer simplification** - Redesigned countdown from complex two-digit split display to simplified single unified display per time unit. Each flip card now shows complete two-digit number (e.g., "59" instead of separate "5" and "9" tiles). Larger, more readable displays (80×96px mobile to 160×192px large). Maintained vintage aesthetic with dark gradient backgrounds, white text, middle line separator, and corner rivets. Fixed countdown functionality with proper real-time updates every second.
 - 2025-10-29: **Vintage flip timer implementation** - Replaced standard countdown with authentic split-flap display (old train station/airport aesthetic) featuring 3D flip animations, mechanical styling, dark gradient panels, white text, metallic rivets. Fully responsive with mobile-first sizing (fits 375px+ viewports). Fixed navigation with logo scroll-to-top button and proper test IDs. Fixed dashboard signups bug - added GET /api/signups endpoint and dialog UI to display full signups list with emails and timestamps.
 - 2025-10-29: **Complete premium redesign** - Implemented Lenis smooth scrolling, floating glassmorphic navigation, premium sections with 3D effects, Konami code easter egg (↑↑↓↓←→←→BA), admin login panel, and protected dashboard with signup analytics. Changed from dark theme to premium/minimalist white aesthetic with glassmorphism throughout. All animations migrated to Framer Motion with scroll triggers.
 - 2025-10-29: Enhanced landing page with modern design, advanced GSAP animations, improved mobile responsiveness, glassmorphism effects, hover interactions, and polished visual hierarchy
