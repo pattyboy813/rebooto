@@ -55,7 +55,7 @@ export function StickyCountdown() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || !isVisible) return null;
 
   const timeUnits = [
     { value: timeLeft.days },
@@ -67,13 +67,10 @@ export function StickyCountdown() {
   return (
     <motion.div
       initial={{ y: -100, opacity: 0 }}
-      animate={{ 
-        y: isVisible ? 0 : -100, 
-        opacity: isVisible ? 1 : 0 
-      }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: -100, opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       className="fixed top-[72px] left-0 right-0 z-30 bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-2 shadow-lg"
-      style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
       data-testid="sticky-countdown"
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-center gap-6">
