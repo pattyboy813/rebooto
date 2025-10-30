@@ -32,12 +32,18 @@ The entire site features a modern, clean SaaS-inspired design with a consistent 
 - **Dashboard**: Teal/emerald themed dashboard with sticky header, Level/XP badges, progress tracking, course cards with teal gradients, achievements system with unlocked/locked states, admin portal access card
 - **Authentication**: Multi-step animated auth flows at /auth with tabs for login and signup. Login: email → password (2 steps). Signup: name → email → password+DOB (3 steps). Features slide transitions, step validation, and back navigation. Collects firstName, lastName, email, password, and dateOfBirth.
 
+**Admin Portal:** (Protected with requireAdmin middleware)
+- **Admin Dashboard** (/admin/dashboard): Real-time statistics dashboard showing Total Users, Active Courses, Email Signups, and Completion Rate. Data fetched via /api/admin/stats endpoint.
+- **Course Creator** (/admin/courses): AI-powered course generation tool using OpenAI GPT-4o. Two-step workflow: (1) Generate draft with AI - creates 3-5 lessons with detailed IT support scenarios, stored temporarily in React state. (2) Publish course - permanently saves course and lessons to database. Features include course title/description/difficulty inputs, AI generation button, lesson editing capabilities, and publish functionality. Redirects to admin dashboard after successful publish.
+- **Admin Sidebar**: Gradient-themed sidebar navigation with links to Dashboard, Course Creator, Users, Email Campaigns, and Settings pages. Includes logout functionality.
+- **Admin Credentials**: admin@rebooto.com / A5dzPbRmggEe (for testing)
+
 ### System Design Choices
 - **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), modern landing sections (`modern-nav.tsx`, `modern-hero.tsx`, `modern-features.tsx`, `modern-stats.tsx`, `modern-cta.tsx`, `modern-footer.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components. All animations use Framer Motion with scroll-triggered reveals (useInView), parallax effects (useTransform), and smooth transitions.
 - **Backend Structure**: Includes API routes (`routes.ts`), database storage (`storage.ts`), session-based auth (`auth.ts`), database connection (`db.ts`), and shared Drizzle schema definitions (`schema.ts`).
 - **Data Model**: Comprehensive schema includes `users`, `courses`, `lessons`, `achievements`, `enrollments`, `userProgress`, `userAchievements`, and `emailSignups` tables for a gamified learning experience.
-- **API Endpoints**: Public endpoints for email signups and count; local auth endpoints for signup, login, logout, and user info; protected endpoints for courses, progress, and achievements.
-- **Security**: Protected routes use `requireAuth` middleware. Sessions are PostgreSQL-backed with secure cookies. Passwords hashed with bcrypt. User data sanitized before sending to client (removes hashedPassword).
+- **API Endpoints**: Public endpoints for email signups and count; local auth endpoints for signup, login, logout, and user info; protected endpoints for courses, progress, and achievements; admin-protected endpoints for stats, course generation, and course management.
+- **Security**: Protected routes use `requireAuth` middleware. Admin routes use stronger `requireAdmin` middleware that verifies isAdmin flag in session. Sessions are PostgreSQL-backed with secure cookies. Passwords hashed with bcrypt. User data sanitized before sending to client (removes hashedPassword).
 
 ## External Dependencies
 - **Frontend Libraries**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis, GSAP (ScrollTrigger).
