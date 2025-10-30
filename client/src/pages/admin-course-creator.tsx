@@ -112,7 +112,7 @@ export default function AdminCourseCreator() {
         title: "Course Published!",
         description: "Your course has been successfully created.",
       });
-      setLocation("/dashboard");
+      setLocation("/admin/dashboard");
     },
     onError: (error: any) => {
       toast({
@@ -195,7 +195,7 @@ export default function AdminCourseCreator() {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                onClick={() => setLocation("/dashboard")}
+                onClick={() => setLocation("/admin/dashboard")}
                 data-testid="button-back"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
