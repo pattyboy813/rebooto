@@ -31,6 +31,9 @@ The entire site features a modern, clean SaaS-inspired design with a consistent 
 **User Portal:**
 - **Dashboard**: Teal/emerald themed dashboard with sticky header, Level/XP badges, progress tracking, course cards with teal gradients, achievements system with unlocked/locked states, admin portal access card
 - **Authentication**: Multi-step animated auth flows at /auth with tabs for login and signup. Login: email → password (2 steps). Signup: name → email → password+DOB (3 steps). Features slide transitions, step validation, and back navigation. Collects firstName, lastName, email, password, and dateOfBirth.
+- **Courses Page** (/app/courses): Browse all available courses with teal/emerald gradient cards showing title, description, difficulty, XP reward, and lesson count. Includes enrollment functionality.
+- **Course Detail** (/app/courses/:id): View course overview with lesson list, progress tracking, and start/continue lesson buttons. Maintains consistent teal/emerald theme.
+- **Lesson Player** (/app/courses/:courseId/lessons/:lessonId): Interactive lesson player supporting scenario-based content (problem/steps/solution format). Features step navigation, progress bar, XP rewards on completion, and automatic navigation to next lesson. Uses memoized content transformation for optimal performance.
 
 **Admin Portal:** (Protected with requireAdmin middleware)
 - **Admin Dashboard** (/admin/dashboard): Real-time statistics dashboard showing Total Users, Active Courses, Email Signups, and Completion Rate. Data fetched via /api/admin/stats endpoint.
@@ -39,10 +42,11 @@ The entire site features a modern, clean SaaS-inspired design with a consistent 
 - **Admin Credentials**: admin@rebooto.com / A5dzPbRmggEe (for testing)
 
 ### System Design Choices
-- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), modern landing sections (`modern-nav.tsx`, `modern-hero.tsx`, `modern-features.tsx`, `modern-stats.tsx`, `modern-cta.tsx`, `modern-footer.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components. All animations use Framer Motion with scroll-triggered reveals (useInView), parallax effects (useTransform), and smooth transitions.
+- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`, `courses.tsx`, `course-detail.tsx`, `lesson-player.tsx`), modern landing sections (`modern-nav.tsx`, `modern-hero.tsx`, `modern-features.tsx`, `modern-stats.tsx`, `modern-cta.tsx`, `modern-footer.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components. All animations use Framer Motion with scroll-triggered reveals (useInView), parallax effects (useTransform), and smooth transitions. All course-related pages maintain consistent teal/emerald gradient theme.
 - **Backend Structure**: Includes API routes (`routes.ts`), database storage (`storage.ts`), session-based auth (`auth.ts`), database connection (`db.ts`), and shared Drizzle schema definitions (`schema.ts`).
-- **Data Model**: Comprehensive schema includes `users`, `courses`, `lessons`, `achievements`, `enrollments`, `userProgress`, `userAchievements`, and `emailSignups` tables for a gamified learning experience.
-- **API Endpoints**: Public endpoints for email signups and count; local auth endpoints for signup, login, logout, and user info; protected endpoints for courses, progress, and achievements; admin-protected endpoints for stats, course generation, and course management.
+- **Data Model**: Comprehensive schema includes `users`, `courses`, `lessons`, `achievements`, `enrollments`, `userProgress`, `userAchievements`, and `emailSignups` tables for a gamified learning experience. Course schema includes `lessonCount` field (default 0) for efficient lesson counting.
+- **Lesson Content Format**: Lessons support flexible content formats including scenario-based lessons (problem/steps/solution) and array-based lessons. Content is transformed via useMemo in the lesson player for optimal performance.
+- **API Endpoints**: Public endpoints for email signups and count; local auth endpoints for signup, login, logout, and user info; protected endpoints for courses, progress, achievements, and lesson completion; admin-protected endpoints for stats, course generation, and course management.
 - **Security**: Protected routes use `requireAuth` middleware. Admin routes use stronger `requireAdmin` middleware that verifies isAdmin flag in session. Sessions are PostgreSQL-backed with secure cookies. Passwords hashed with bcrypt. User data sanitized before sending to client (removes hashedPassword).
 
 ## External Dependencies
