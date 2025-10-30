@@ -9,7 +9,7 @@ I prefer detailed explanations, especially for complex architectural decisions. 
 ## System Architecture
 
 ### UI/UX Decisions
-The landing page features a modern, clean SaaS-inspired design with a teal-to-emerald gradient color scheme and coral accents. Typography uses Sora for headlines and Inter for body text. The design emphasizes white space, subtle animations via Framer Motion (fade-ups, gentle hovers), and a structured layout with clear sections: hero with email capture, feature cards, social proof stats, final CTA, and footer. Background includes animated gradient orbs and a subtle grid pattern. All elements use rounded corners, clean borders, and smooth transitions.
+The entire site features a modern, clean SaaS-inspired design with a consistent teal-to-emerald gradient color scheme and coral accents. Typography uses Sora for headlines and Inter for body text. The design emphasizes white space, enhanced animations via Framer Motion (parallax scrolling, scroll-triggered reveals, fade-ups, smooth transitions), and premium aesthetics. Background includes animated gradient orbs and subtle grid patterns. All elements use rounded corners, clean borders, and smooth hover effects. The navigation header is sticky with backdrop blur and prominent Login/Signup CTAs.
 
 ### Technical Implementations
 **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis for smooth scrolling, GSAP for advanced animations.  
@@ -17,16 +17,22 @@ The landing page features a modern, clean SaaS-inspired design with a teal-to-em
 **Authentication**: Session-based email/password authentication with bcrypt password hashing. Sessions stored in PostgreSQL for persistence.
 
 ### Feature Specifications
-- **Modern Hero Section**: Full-viewport hero with animated gradient orbs, grid pattern background, headline with teal gradient text, email signup form inline, and trust indicator showing signup count.
-- **Feature Cards Section**: 4-column grid showcasing Real-World Scenarios, Gamified Learning, AI-Powered Guidance, and Job-Ready Skills. Each card has gradient icon, title, and description with hover lift effect.
-- **Stats Section**: 4-column stats display (1,200+ Learners, 500+ Scenarios, 95% Completion, 24/7 Access) with gradient numbers on teal-emerald background.
+
+**Landing Page:**
+- **Sticky Navigation Header**: Backdrop-blur navigation with Rebooto logo, smooth scroll navigation to sections, prominent Login and "Sign Up Free" buttons
+- **Modern Hero Section**: Full-viewport hero with parallax-scrolling gradient orbs, animated grid pattern background, headline with teal gradient text, email signup form inline, trust indicator showing signup count. Content fades out on scroll for depth effect.
+- **Feature Cards Section**: 4-column grid with scroll-triggered staggered reveals, whileHover lift animations (y: -8), gradient icons, enhanced shadows on hover. Features: Real-World Scenarios, Gamified Learning, AI-Powered Guidance, Job-Ready Skills.
+- **Stats Section**: 4-column stats with scale-up animations from 0.5 to 1.0, gradient numbers on teal-emerald background, smooth easing transitions.
 - **Final CTA Section**: Full-width gradient background (teal to emerald) with centered white text, headline, and inline email signup form.
 - **Email Signup**: Inline forms in hero and CTA sections with white rounded-full container, email input, and gradient button. Toast notifications on success/error.
 - **Footer**: Clean 4-column layout with product/resources/company/connect sections, social icons, and copyright info.
-- **Authentication**: Separate auth page accessible at /auth with email/password signup and login tabs (removed all Replit Auth/OAuth providers).
+
+**User Portal:**
+- **Dashboard**: Teal/emerald themed dashboard with sticky header, Level/XP badges, progress tracking, course cards with teal gradients, achievements system with unlocked/locked states, admin portal access card
+- **Authentication**: Separate auth page accessible at /auth with email/password signup and login tabs (local authentication only, no OAuth providers)
 
 ### System Design Choices
-- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), modern landing sections (`modern-*.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components.
+- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), modern landing sections (`modern-nav.tsx`, `modern-hero.tsx`, `modern-features.tsx`, `modern-stats.tsx`, `modern-cta.tsx`, `modern-footer.tsx`), auth components (`premium-auth.tsx`), and reusable Shadcn UI components. All animations use Framer Motion with scroll-triggered reveals (useInView), parallax effects (useTransform), and smooth transitions.
 - **Backend Structure**: Includes API routes (`routes.ts`), database storage (`storage.ts`), session-based auth (`auth.ts`), database connection (`db.ts`), and shared Drizzle schema definitions (`schema.ts`).
 - **Data Model**: Comprehensive schema includes `users`, `courses`, `lessons`, `achievements`, `enrollments`, `userProgress`, `userAchievements`, and `emailSignups` tables for a gamified learning experience.
 - **API Endpoints**: Public endpoints for email signups and count; local auth endpoints for signup, login, logout, and user info; protected endpoints for courses, progress, and achievements.
@@ -36,5 +42,5 @@ The landing page features a modern, clean SaaS-inspired design with a teal-to-em
 - **Frontend Libraries**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis, GSAP (ScrollTrigger).
 - **Backend Framework**: Express.js, Node.js.
 - **Database**: PostgreSQL (Neon) with Drizzle ORM.
-- **Authentication**: Replit Auth (OpenID Connect) for Google, GitHub, X, Apple, and email/password support.
+- **Authentication**: Session-based local email/password authentication only (Replit Auth removed).
 - **Validation**: Zod for form validation.
