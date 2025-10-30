@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { randomBytes } from "crypto";
 import { storage } from "./storage";
 import { setupSession, requireAuth, requireAdmin, getCurrentUser, hashPassword, verifyPassword, sanitizeUser } from "./auth";
 import {
@@ -107,6 +108,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Logged out successfully" });
     });
+  });
+
+  // Password reset routes
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email || typeof email !== "string") {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      
+      // For security, don't reveal if email exists or not
+      // Always return success message
+      if (user && user.authProvider === "local") {
+        // Generate cryptographically secure reset token (64 characters hex)
+        // TODO: Security enhancement - hash token before storage (e.g., SHA-256) to prevent 
+        // account takeover if database is compromised. Current implementation uses secure 
+        // random generation with 1-hour expiry and single-use validation as MVP protection.
+        const token = randomBytes(32).toString('hex');
+        
+        // Token expires in 1 hour
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+        
+        await storage.createPasswordResetToken({
+          userId: user.id,
+          token,
+          expiresAt,
+        });
+
+        // TODO: Send email with reset link
+        // For now, log to console for development
+        console.log(`Password reset requested for ${email}`);
+        console.log(`Reset link: ${req.protocol}://${req.get('host')}/reset-password?token=${token}`);
+        
+        // In development, return the token in response
+        if (process.env.NODE_ENV !== 'production') {
+          return res.json({ 
+            message: "Password reset email sent. Check your inbox.",
+            devToken: token // Only for development
+          });
+        }
+      }
+      
+      res.json({ message: "If that email exists, a password reset link has been sent." });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = req.body;
+      
+      const resetPasswordSchema = z.object({
+        token: z.string().min(1, "Token is required"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+      });
+      
+      const validatedData = resetPasswordSchema.parse({ token, password });
+      
+      // Verify token exists and is not expired
+      const resetToken = await storage.getPasswordResetToken(validatedData.token);
+      
+      if (!resetToken || resetToken.usedAt) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+      
+      // Get user
+      const user = await storage.getUser(resetToken.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Hash new password
+      const hashedPassword = await hashPassword(validatedData.password);
+      
+      // Update user password
+      await storage.updateUser(user.id, { hashedPassword });
+      
+      // Mark token as used
+      await storage.markPasswordResetTokenUsed(validatedData.token);
+      
+      res.json({ message: "Password reset successfully. You can now log in with your new password." });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Validation error",
+          errors: error.errors 
+        });
+      }
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // User profile management routes (protected)
+  app.put("/api/user/profile", requireAuth, async (req, res) => {
+    try {
+      const user = await getCurrentUser(req);
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const updateProfileSchema = z.object({
+        firstName: z.string().min(1, "First name is required").optional(),
+        lastName: z.string().min(1, "Last name is required").optional(),
+        email: z.string().email("Invalid email address").optional(),
+        dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format").optional(),
+      });
+
+      const validatedData = updateProfileSchema.parse(req.body);
+
+      // If email is being changed, check if it's already taken
+      if (validatedData.email && validatedData.email !== user.email) {
+        const existingUser = await storage.getUserByEmail(validatedData.email);
+        if (existingUser) {
+          return res.status(409).json({ message: "Email already in use" });
+        }
+      }
+
+      const updatedUser = await storage.updateUser(user.id, validatedData);
+      res.json({ user: sanitizeUser(updatedUser) });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Validation error",
+          errors: error.errors 
+        });
+      }
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/user/password", requireAuth, async (req, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Get full user with hashedPassword
+      const fullUser = await storage.getUser(currentUser.id);
+      if (!fullUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only local auth users can change password
+      if (fullUser.authProvider !== "local" || !fullUser.hashedPassword) {
+        return res.status(400).json({ message: "Password change not available for this account type" });
+      }
+
+      const changePasswordSchema = z.object({
+        currentPassword: z.string().min(1, "Current password is required"),
+        newPassword: z.string().min(8, "New password must be at least 8 characters"),
+      });
+
+      const validatedData = changePasswordSchema.parse(req.body);
+
+      // Verify current password
+      const isValid = await verifyPassword(validatedData.currentPassword, fullUser.hashedPassword);
+      if (!isValid) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+
+      // Hash and update new password
+      const hashedPassword = await hashPassword(validatedData.newPassword);
+      await storage.updateUser(fullUser.id, { hashedPassword });
+
+      res.json({ message: "Password updated successfully" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Validation error",
+          errors: error.errors 
+        });
+      }
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/user/account", requireAuth, async (req, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { password } = req.body;
+
+      // Get full user with hashedPassword
+      const fullUser = await storage.getUser(currentUser.id);
+      if (!fullUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // For local auth users, require password confirmation
+      if (fullUser.authProvider === "local" && fullUser.hashedPassword) {
+        if (!password) {
+          return res.status(400).json({ message: "Password is required to delete account" });
+        }
+
+        const isValid = await verifyPassword(password, fullUser.hashedPassword);
+        if (!isValid) {
+          return res.status(401).json({ message: "Incorrect password" });
+        }
+      }
+
+      // Delete user account
+      await storage.deleteUser(fullUser.id);
+
+      // Destroy session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destruction error:", err);
+        }
+      });
+
+      res.json({ message: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
   });
 
   app.post("/api/signups", async (req, res) => {
@@ -736,6 +964,113 @@ Make every scenario feel like a real support ticket you'd actually encounter. In
         return res.status(404).json({ message: error.message });
       }
       res.status(500).json({ message: "Failed to delete course" });
+    }
+  });
+
+  // Blog Post Routes
+  app.get("/api/blog", async (_req, res) => {
+    try {
+      const posts = await storage.getPublishedBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/blog", requireAdmin, async (_req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching all blog posts:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/blog", requireAdmin, async (req, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const createBlogPostSchema = z.object({
+        title: z.string().min(1, "Title is required"),
+        slug: z.string().min(1, "Slug is required"),
+        excerpt: z.string().min(1, "Excerpt is required"),
+        content: z.string().min(1, "Content is required"),
+        featuredImage: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        published: z.boolean().default(false),
+      });
+
+      const validatedData = createBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost({
+        ...validatedData,
+        authorId: currentUser.id,
+        publishedAt: validatedData.published ? new Date() : null,
+      });
+
+      res.status(201).json(post);
+    } catch (error: any) {
+      console.error("Error creating blog post:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create blog post" });
+    }
+  });
+
+  app.put("/api/admin/blog/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const updateBlogPostSchema = z.object({
+        title: z.string().min(1).optional(),
+        slug: z.string().min(1).optional(),
+        excerpt: z.string().min(1).optional(),
+        content: z.string().min(1).optional(),
+        featuredImage: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        published: z.boolean().optional(),
+      });
+
+      const validatedData = updateBlogPostSchema.parse(req.body);
+      
+      // If publishing, set publishedAt
+      let updateData: any = { ...validatedData };
+      if (validatedData.published === true) {
+        updateData.publishedAt = new Date();
+      } else if (validatedData.published === false) {
+        updateData.publishedAt = null;
+      }
+
+      const post = await storage.updateBlogPost(id, updateData);
+      res.json(post);
+    } catch (error: any) {
+      console.error("Error updating blog post:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      if (error.message === "Blog post not found") {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Failed to update blog post" });
+    }
+  });
+
+  app.delete("/api/admin/blog/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteBlogPost(id);
+      res.json({ message: "Blog post deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting blog post:", error);
+      if (error.message === "Blog post not found") {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Failed to delete blog post" });
     }
   });
 

@@ -17,12 +17,16 @@ import AdminCourseCreator from "@/pages/admin-course-creator";
 import AdminUsersPage from "@/pages/admin-users";
 import AdminCampaignsPage from "@/pages/admin-campaigns";
 import AdminSettingsPage from "@/pages/admin-settings";
+import AdminBlogPage from "@/pages/admin-blog";
 import Documentation from "@/pages/documentation";
 import Blog from "@/pages/blog";
 import FAQ from "@/pages/faq";
 import Support from "@/pages/support";
 import About from "@/pages/about";
 import Pricing from "@/pages/pricing";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
+import UserSettings from "@/pages/user-settings";
 import NotFound from "@/pages/not-found";
 
 function UserDashboard() {
@@ -144,6 +148,8 @@ function Router() {
       {/* Public routes */}
       <Route path="/" component={Home} />
       <Route path="/auth" component={PremiumAuth} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/documentation" component={Documentation} />
       <Route path="/blog" component={Blog} />
       <Route path="/faq" component={FAQ} />
@@ -156,12 +162,14 @@ function Router() {
       <Route path="/app/courses" component={UserCourses} />
       <Route path="/app/courses/:id" component={UserCourseDetail} />
       <Route path="/app/courses/:courseId/lessons/:lessonId" component={UserLessonPlayer} />
+      <Route path="/app/settings" component={() => <UserLayout><UserSettings /></UserLayout>} />
       
       {/* Admin portal routes - protected by AdminLayout */}
       <Route path="/admin/login" component={AdminLoginPage} />
       <Route path="/admin/dashboard" component={AdminDashboardPage} />
       <Route path="/admin/courses" component={AdminCourseCreatorPage} />
       <Route path="/admin/users" component={AdminUsersPage} />
+      <Route path="/admin/blog" component={AdminBlogPage} />
       <Route path="/admin/campaigns" component={AdminCampaignsPage} />
       <Route path="/admin/settings" component={AdminSettingsPage} />
       

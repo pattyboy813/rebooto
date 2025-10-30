@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, BookOpen, Users, Mail, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, Mail, Settings, LogOut, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminLayoutProps {
@@ -24,6 +24,11 @@ const menuItems = [
     title: "Users",
     url: "/admin/users",
     icon: Users,
+  },
+  {
+    title: "Blog",
+    url: "/admin/blog",
+    icon: FileText,
   },
   {
     title: "Email Campaigns",

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, BarChart3, LogOut, Trophy, Award, BookOpen, Zap, Star, Lock, CheckCircle2, ArrowRight } from "lucide-react";
+import { Users, BarChart3, LogOut, Trophy, Award, BookOpen, Zap, Star, Lock, CheckCircle2, ArrowRight, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -159,6 +159,16 @@ export default function Dashboard() {
                   <p className="text-lg font-bold text-gray-900" data-testid="text-user-xp">{user?.xp || 0}</p>
                 </div>
               </div>
+              <Link href="/app/settings">
+                <Button
+                  variant="outline"
+                  className="rounded-full"
+                  data-testid="button-settings"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 onClick={handleLogout}

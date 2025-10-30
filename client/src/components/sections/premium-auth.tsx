@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { localLoginSchema, localSignupSchema, type LocalLogin, type LocalSignup } from "@shared/schema";
 
@@ -280,6 +280,13 @@ export function PremiumAuth() {
                                 {loginForm.formState.errors.password.message}
                               </p>
                             )}
+                            <div className="text-right mt-2">
+                              <Link href="/forgot-password">
+                                <a className="text-sm text-teal-600 hover:text-teal-700 hover:underline" data-testid="link-forgot-password">
+                                  Forgot password?
+                                </a>
+                              </Link>
+                            </div>
                           </div>
 
                           <div className="flex gap-2">
