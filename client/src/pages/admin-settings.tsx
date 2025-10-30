@@ -26,8 +26,9 @@ export default function AdminSettings() {
 
   const handleSave = () => {
     toast({
-      title: "Settings Saved!",
-      description: "Your changes have been saved successfully.",
+      title: "Backend Integration Required",
+      description: "Settings persistence will be available once backend API is implemented.",
+      variant: "default",
     });
   };
 
@@ -42,6 +43,21 @@ export default function AdminSettings() {
           Configure platform features and preferences
         </p>
       </div>
+
+      {/* Integration Notice */}
+      <Card className="p-6 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+            <Settings className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">Backend Integration Required</h3>
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              Settings persistence requires backend API implementation. Changes made here are currently stored in browser state only.
+            </p>
+          </div>
+        </div>
+      </Card>
 
       {/* General Settings */}
       <motion.div

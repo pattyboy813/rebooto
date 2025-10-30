@@ -27,33 +27,6 @@ const campaignSchema = z.object({
 
 type CampaignFormData = z.infer<typeof campaignSchema>;
 
-const campaignHistory = [
-  {
-    id: 1,
-    subject: "Welcome to Rebooto Beta!",
-    audience: "All Users",
-    sent: "2025-01-20",
-    recipients: 245,
-    status: "Sent",
-  },
-  {
-    id: 2,
-    subject: "New Hardware Course Available",
-    audience: "Active Users",
-    sent: "2025-01-15",
-    recipients: 180,
-    status: "Sent",
-  },
-  {
-    id: 3,
-    subject: "Beta Feedback Survey",
-    audience: "Beta Users",
-    sent: "2025-01-10",
-    recipients: 245,
-    status: "Sent",
-  },
-];
-
 export default function AdminCampaigns() {
   const { toast } = useToast();
   const [previewMode, setPreviewMode] = useState(false);
@@ -68,13 +41,11 @@ export default function AdminCampaigns() {
   });
 
   const onSubmit = (data: CampaignFormData) => {
-    console.log("Campaign data:", data);
     toast({
-      title: "Campaign Sent!",
-      description: `Email sent to ${data.audience.replace('_', ' ')}`,
+      title: "Email Feature Coming Soon",
+      description: "Email campaigns will be available once Microsoft Outlook integration is configured.",
+      variant: "default",
     });
-    form.reset();
-    setPreviewMode(false);
   };
 
   const watchedValues = form.watch();
@@ -91,58 +62,21 @@ export default function AdminCampaigns() {
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-admin/10 flex items-center justify-center">
-                <Mail className="w-6 h-6 text-teal-600" />
-              </div>
-              <Badge className="bg-gradient-admin text-white border-0">Total</Badge>
-            </div>
-            <h3 className="text-3xl font-bold mb-1" data-testid="stat-total-campaigns">3</h3>
-            <p className="text-sm text-muted-foreground">Campaigns Sent</p>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-admin/10 flex items-center justify-center">
-                <Users className="w-6 h-6 text-teal-600" />
-              </div>
-              <Badge variant="secondary">Reach</Badge>
-            </div>
-            <h3 className="text-3xl font-bold mb-1" data-testid="stat-total-recipients">670</h3>
-            <p className="text-sm text-muted-foreground">Total Recipients</p>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-admin/10 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-teal-600" />
-              </div>
-              <Badge variant="secondary">Rate</Badge>
-            </div>
-            <h3 className="text-3xl font-bold mb-1" data-testid="stat-success-rate">98.5%</h3>
-            <p className="text-sm text-muted-foreground">Delivery Rate</p>
-          </Card>
-        </motion.div>
-      </div>
+      {/* Integration Notice */}
+      <Card className="p-6 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
+            <Mail className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">Email Integration Required</h3>
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              Configure your Microsoft Outlook integration to start sending email campaigns to your users. 
+              Once set up, you'll be able to send announcements, updates, and notifications directly from this page.
+            </p>
+          </div>
+        </div>
+      </Card>
 
       {/* Campaign Composer */}
       <Card className="p-8">
@@ -172,10 +106,10 @@ export default function AdminCampaigns() {
                   <SelectValue placeholder="Select audience" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all_users">All Users (245)</SelectItem>
-                  <SelectItem value="admins">Admins Only (5)</SelectItem>
-                  <SelectItem value="beta_users">Beta Users (245)</SelectItem>
-                  <SelectItem value="active_users">Active Users (180)</SelectItem>
+                  <SelectItem value="all_users">All Users</SelectItem>
+                  <SelectItem value="admins">Admins Only</SelectItem>
+                  <SelectItem value="beta_users">Beta Users</SelectItem>
+                  <SelectItem value="active_users">Active Users</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -244,39 +178,17 @@ export default function AdminCampaigns() {
         )}
       </Card>
 
-      {/* Campaign History */}
+      {/* Campaign History - Will populate once email integration is active */}
       <Card className="p-8">
         <h2 className="text-2xl font-bold mb-6">Campaign History</h2>
-        <div className="space-y-4">
-          {campaignHistory.map((campaign, idx) => (
-            <motion.div
-              key={campaign.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-            >
-              <Card className="p-6 hover-elevate" data-testid={`campaign-${campaign.id}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-lg">{campaign.subject}</h3>
-                      <Badge className="bg-gradient-admin text-white border-0">{campaign.status}</Badge>
-                    </div>
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4" />
-                        <span>{campaign.audience} ({campaign.recipients})</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{campaign.sent}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+        <div className="text-center py-12">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-admin/10 flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-8 h-8 text-teal-600" />
+          </div>
+          <p className="text-muted-foreground text-lg mb-2">No campaigns sent yet</p>
+          <p className="text-sm text-muted-foreground">
+            Campaign history will appear here once you configure email integration and send your first campaign.
+          </p>
         </div>
       </Card>
     </div>
