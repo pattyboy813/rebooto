@@ -40,6 +40,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserXP(userId: number, xpGained: number): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  getTotalUsersCount(): Promise<number>;
   
   // Email signup methods
   createEmailSignup(signup: InsertEmailSignup): Promise<EmailSignup>;
@@ -59,6 +60,7 @@ export interface IStorage {
   createLesson(lesson: InsertLesson): Promise<Lesson>;
   getLesson(id: number): Promise<Lesson | undefined>;
   getLessonsByCourse(courseId: number): Promise<Lesson[]>;
+  getAllLessons(): Promise<Lesson[]>;
   updateLesson(id: number, updates: Partial<InsertLesson>): Promise<Lesson>;
   deleteLesson(id: number): Promise<void>;
   
@@ -73,6 +75,7 @@ export interface IStorage {
   getUserProgress(userId: number, lessonId: number): Promise<UserProgress | undefined>;
   updateUserProgress(id: number, updates: Partial<InsertUserProgress>): Promise<UserProgress>;
   getUserProgressList(userId: number): Promise<UserProgress[]>;
+  getAllUserProgress(): Promise<UserProgress[]>;
   getUserCompletedCount(userId: number): Promise<number>;
   
   // Achievement methods
@@ -160,6 +163,11 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
 
+  async getTotalUsersCount(): Promise<number> {
+    const result = await db.select().from(users);
+    return result.length;
+  }
+
   async createEmailSignup(insertSignup: InsertEmailSignup): Promise<EmailSignup> {
     const existing = await this.getEmailSignupByEmail(insertSignup.email);
     if (existing) {
@@ -231,6 +239,10 @@ export class DatabaseStorage implements IStorage {
 
   async getLessonsByCourse(courseId: number): Promise<Lesson[]> {
     return await db.select().from(lessons).where(eq(lessons.courseId, courseId));
+  }
+
+  async getAllLessons(): Promise<Lesson[]> {
+    return await db.select().from(lessons);
   }
 
   async updateLesson(id: number, updates: Partial<InsertLesson>): Promise<Lesson> {
@@ -339,6 +351,10 @@ export class DatabaseStorage implements IStorage {
       .from(userProgress)
       .where(eq(userProgress.userId, userId))
       .orderBy(desc(userProgress.createdAt));
+  }
+
+  async getAllUserProgress(): Promise<UserProgress[]> {
+    return await db.select().from(userProgress);
   }
 
   async getUserCompletedCount(userId: number): Promise<number> {

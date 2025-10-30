@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupSession, requireAuth, getCurrentUser, hashPassword, verifyPassword, sanitizeUser } from "./auth";
+import { setupSession, requireAuth, requireAdmin, getCurrentUser, hashPassword, verifyPassword, sanitizeUser } from "./auth";
 import {
   insertEmailSignupSchema,
   insertUserProgressSchema,
@@ -443,8 +443,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Stats Routes
+  app.get("/api/admin/stats", requireAdmin, async (_req, res) => {
+    try {
+      const totalUsers = await storage.getTotalUsersCount();
+      const activeCourses = await storage.getAllCourses();
+      const emailSignups = await storage.getEmailSignupsCount();
+      const allProgress = await storage.getAllUserProgress();
+      const allLessons = await storage.getAllLessons();
+      
+      // Calculate completion rate
+      const totalLessons = allLessons.length;
+      const completedLessons = allProgress.filter(p => p.completed).length;
+      const completionRate = totalLessons > 0 
+        ? Math.round((completedLessons / totalLessons) * 100) 
+        : 0;
+      
+      res.json({
+        totalUsers,
+        activeCourses: activeCourses.length,
+        emailSignups,
+        completionRate,
+      });
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Admin Course Management Routes
-  app.post("/api/admin/courses/generate", requireAuth, async (req, res) => {
+  app.post("/api/admin/courses/generate", requireAdmin, async (req, res) => {
     try {
       const { title, description, category, difficulty, lessonCount } = req.body;
 
@@ -525,7 +553,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
     }
   });
 
-  app.post("/api/admin/courses", requireAuth, async (req, res) => {
+  app.post("/api/admin/courses", requireAdmin, async (req, res) => {
     try {
       const { course, lessons } = req.body;
 
@@ -562,7 +590,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
     }
   });
 
-  app.get("/api/admin/courses", requireAuth, async (_req, res) => {
+  app.get("/api/admin/courses", requireAdmin, async (_req, res) => {
     try {
       const courses = await storage.getAllCourses();
       const coursesWithLessonCount = await Promise.all(
@@ -578,7 +606,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
     }
   });
 
-  app.delete("/api/admin/courses/:id", requireAuth, async (req, res) => {
+  app.delete("/api/admin/courses/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       await storage.deleteCourse(id);

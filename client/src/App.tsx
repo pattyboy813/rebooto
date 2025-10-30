@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserLayout } from "@/components/layouts/user-layout";
@@ -13,6 +13,7 @@ import Dashboard from "@/pages/dashboard";
 import Courses from "@/pages/courses";
 import CourseDetail from "@/pages/course-detail";
 import LessonPlayer from "@/pages/lesson-player";
+import AdminCourseCreator from "@/pages/admin-course-creator";
 import NotFound from "@/pages/not-found";
 
 function UserDashboard() {
@@ -48,6 +49,15 @@ function UserLessonPlayer() {
 }
 
 function AdminDashboardPage() {
+  const { data: stats, isLoading } = useQuery<{
+    totalUsers: number;
+    activeCourses: number;
+    emailSignups: number;
+    completionRate: number;
+  }>({
+    queryKey: ["/api/admin/stats"],
+  });
+
   return (
     <AdminLayout>
       <div className="space-y-8">
@@ -62,19 +72,27 @@ function AdminDashboardPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card className="p-6 hover-elevate" data-testid="card-total-users">
             <h3 className="text-sm font-medium text-muted-foreground">Total Users</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-total-users">
+              {isLoading ? "..." : stats?.totalUsers || 0}
+            </p>
           </Card>
           <Card className="p-6 hover-elevate" data-testid="card-active-courses">
             <h3 className="text-sm font-medium text-muted-foreground">Active Courses</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-active-courses">
+              {isLoading ? "..." : stats?.activeCourses || 0}
+            </p>
           </Card>
           <Card className="p-6 hover-elevate" data-testid="card-email-signups">
             <h3 className="text-sm font-medium text-muted-foreground">Email Signups</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-email-signups">
+              {isLoading ? "..." : stats?.emailSignups || 0}
+            </p>
           </Card>
           <Card className="p-6 hover-elevate" data-testid="card-completion-rate">
             <h3 className="text-sm font-medium text-muted-foreground">Completion Rate</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin">Coming soon</p>
+            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-completion-rate">
+              {isLoading ? "..." : `${stats?.completionRate || 0}%`}
+            </p>
           </Card>
         </div>
       </div>
@@ -142,6 +160,14 @@ function AdminSettingsPage() {
   );
 }
 
+function AdminCourseCreatorPage() {
+  return (
+    <AdminLayout>
+      <AdminCourseCreator />
+    </AdminLayout>
+  );
+}
+
 function AdminLoginPage() {
   const [, setLocation] = useLocation();
   
@@ -179,6 +205,7 @@ function Router() {
       {/* Admin portal routes - protected by AdminLayout */}
       <Route path="/admin/login" component={AdminLoginPage} />
       <Route path="/admin/dashboard" component={AdminDashboardPage} />
+      <Route path="/admin/courses" component={AdminCourseCreatorPage} />
       <Route path="/admin/users" component={AdminUsersPage} />
       <Route path="/admin/campaigns" component={AdminCampaignsPage} />
       <Route path="/admin/settings" component={AdminSettingsPage} />
