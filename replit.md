@@ -1,7 +1,7 @@
 # Rebooto
 
-## Overview
-Rebooto is a modern, interactive IT support learning platform designed to validate interest, collect user emails, and build brand anticipation. The MVP features a premium minimalist design with playful 3D elements, smooth scrolling, and a hidden Konami code easter egg that reveals an admin dashboard. The platform aims to provide an engaging user experience while demonstrating the concept of interactive IT support learning.
+## Overview  
+Rebooto is a gamified IT support learning platform with email/password authentication, separate user and admin portals, and a modern, smooth-animated interface. The platform features AI-generated courses (OpenAI GPT-4o), progress tracking with XP/levels/achievements, and comprehensive admin management tools.
 
 ## User Preferences
 I prefer detailed explanations, especially for complex architectural decisions. I want iterative development, with clear communication before major changes are made to the codebase. Ensure the design maintains a premium/minimalist aesthetic with playful elements.
@@ -12,7 +12,9 @@ I prefer detailed explanations, especially for complex architectural decisions. 
 The platform adopts a premium minimalist design using a white background, glassmorphism effects, and blue-purple gradients. Typography features Space Grotesk for headlines and Inter for body text, with a responsive hierarchy. Animations utilize Lenis for smooth scrolling, Framer Motion for entrance and interaction effects, and GSAP for scroll-triggered animations and 3D orb parallax effects. Key components like the floating navigation and various content cards incorporate glassmorphic styling, rounded corners, and soft shadows. A vintage flip timer countdown, simplified to a single unified display per time unit, maintains a mechanical/industrial aesthetic.
 
 ### Technical Implementations
-The frontend is built with React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, and Lenis. The backend uses Express.js and Node.js. Authentication is handled via Replit Auth (OpenID Connect), supporting Google, GitHub, X, Apple, and email/password. Data persistence is managed with PostgreSQL (Neon) and Drizzle ORM.
+**Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis for smooth scrolling, GSAP for advanced animations.  
+**Backend**: Express.js, Node.js, PostgreSQL (Neon), Drizzle ORM.  
+**Authentication**: Session-based email/password authentication with bcrypt password hashing. Sessions stored in PostgreSQL for persistence.
 
 ### Feature Specifications
 - **Lenis Smooth Scrolling**: Buttery smooth scroll performance integrated with GSAP ScrollTrigger for animations.

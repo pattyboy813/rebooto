@@ -1,8 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated, getCurrentUser } from "./replitAuth";
-import { hashPassword, verifyPassword, sanitizeUser } from "./auth";
+import { setupSession, requireAuth, getCurrentUser, hashPassword, verifyPassword, sanitizeUser } from "./auth";
 import {
   insertEmailSignupSchema,
   insertUserProgressSchema,
@@ -16,7 +15,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  await setupAuth(app);
+  setupSession(app);
 
   // Local email/password authentication
   app.post("/api/auth/signup", async (req, res) => {
@@ -45,7 +44,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Set session
       req.session.userId = user.id;
-      req.session.authProvider = "local";
 
       res.status(201).json({
         user: sanitizeUser(user),
@@ -85,7 +83,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Set session
       req.session.userId = user.id;
-      req.session.authProvider = "local";
 
       res.json({
         user: sanitizeUser(user),
@@ -130,7 +127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/signups", isAuthenticated, async (_req, res) => {
+  app.get("/api/signups", requireAuth, async (_req, res) => {
     try {
       const signups = await storage.getAllEmailSignups();
       res.json(signups);
@@ -148,20 +145,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
+  app.get("/api/auth/user", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
-      res.json(sanitizeUser(user));
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  app.get("/api/auth/me", isAuthenticated, async (req: any, res) => {
+  app.get("/api/auth/me", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
-      res.json(sanitizeUser(user));
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -169,7 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
-  app.get("/api/progress", isAuthenticated, async (req: any, res) => {
+  app.get("/api/progress", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -182,7 +185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/progress", isAuthenticated, async (req: any, res) => {
+  app.post("/api/progress", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -202,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/progress/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/progress/:id", requireAuth, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const user = await getCurrentUser(req);
@@ -240,7 +243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/dashboard/stats", isAuthenticated, async (req: any, res) => {
+  app.get("/api/dashboard/stats", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -261,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/feedback", isAuthenticated, async (req: any, res) => {
+  app.post("/api/feedback", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -305,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/courses/:id/enroll", isAuthenticated, async (req: any, res) => {
+  app.post("/api/courses/:id/enroll", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -323,7 +326,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/enrollments", isAuthenticated, async (req: any, res) => {
+  app.get("/api/enrollments", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -350,7 +353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/lessons/:id/complete", isAuthenticated, async (req: any, res) => {
+  app.post("/api/lessons/:id/complete", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -426,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/user/achievements", isAuthenticated, async (req: any, res) => {
+  app.get("/api/user/achievements", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
       if (!user) {
@@ -440,7 +443,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin Course Management Routes
-  app.post("/api/admin/courses/generate", isAuthenticated, async (req, res) => {
+  app.post("/api/admin/courses/generate", requireAuth, async (req, res) => {
     try {
       const { title, description, category, difficulty, lessonCount } = req.body;
 
@@ -521,7 +524,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
     }
   });
 
-  app.post("/api/admin/courses", isAuthenticated, async (req, res) => {
+  app.post("/api/admin/courses", requireAuth, async (req, res) => {
     try {
       const { course, lessons } = req.body;
 
@@ -558,7 +561,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
     }
   });
 
-  app.get("/api/admin/courses", isAuthenticated, async (_req, res) => {
+  app.get("/api/admin/courses", requireAuth, async (_req, res) => {
     try {
       const courses = await storage.getAllCourses();
       const coursesWithLessonCount = await Promise.all(
@@ -574,7 +577,7 @@ Make the scenarios realistic, educational, and engaging for IT support trainees.
     }
   });
 
-  app.delete("/api/admin/courses/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/admin/courses/:id", requireAuth, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       await storage.deleteCourse(id);

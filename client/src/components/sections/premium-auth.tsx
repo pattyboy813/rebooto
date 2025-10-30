@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogIn, UserPlus, Mail, Lock } from "lucide-react";
-import { SiGoogle, SiGithub, SiApple, SiX } from "react-icons/si";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -100,9 +99,6 @@ export function PremiumAuth() {
     }
   };
 
-  const handleReplitAuth = () => {
-    window.location.href = "/api/replit-auth/login";
-  };
 
   const isPending = loginMutation.isPending || signupMutation.isPending;
 
@@ -254,80 +250,6 @@ export function PremiumAuth() {
               </TabsContent>
             </Tabs>
 
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white/60 text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                onClick={handleReplitAuth}
-                disabled={isPending}
-                className="w-full rounded-xl border-2 bg-white/80 backdrop-blur-sm hover:bg-white"
-                data-testid="button-replit-auth"
-              >
-                <img 
-                  src="https://replit.com/public/images/logo-small.png" 
-                  alt="Replit" 
-                  className="w-5 h-5 mr-2"
-                />
-                Continue with Replit
-              </Button>
-
-              <div className="grid grid-cols-4 gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleReplitAuth}
-                  disabled={isPending}
-                  className="rounded-xl bg-white/80 backdrop-blur-sm hover:bg-white"
-                  data-testid="button-google"
-                >
-                  <SiGoogle className="w-5 h-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleReplitAuth}
-                  disabled={isPending}
-                  className="rounded-xl bg-white/80 backdrop-blur-sm hover:bg-white"
-                  data-testid="button-github"
-                >
-                  <SiGithub className="w-5 h-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleReplitAuth}
-                  disabled={isPending}
-                  className="rounded-xl bg-white/80 backdrop-blur-sm hover:bg-white"
-                  data-testid="button-apple"
-                >
-                  <SiApple className="w-5 h-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleReplitAuth}
-                  disabled={isPending}
-                  className="rounded-xl bg-white/80 backdrop-blur-sm hover:bg-white"
-                  data-testid="button-x"
-                >
-                  <SiX className="w-5 h-5" />
-                </Button>
-              </div>
-            </div>
           </Card>
         </motion.div>
       </div>
