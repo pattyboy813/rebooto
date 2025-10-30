@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEmailSignupSchema, type InsertEmailSignup } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { CountdownTimer } from "@/components/countdown-timer";
 
 export function ModernHero() {
   const { toast } = useToast();
@@ -118,6 +119,11 @@ export function ModernHero() {
             Learn IT support skills through gamified, AI-powered scenarios.
             Earn XP, unlock achievements, and become job-ready.
           </motion.p>
+
+          {/* Countdown Timer */}
+          <div className="mb-12">
+            <CountdownTimer />
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

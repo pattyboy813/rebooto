@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 interface TimeLeft {
   days: number;
@@ -9,6 +10,7 @@ interface TimeLeft {
 
 export function CountdownTimer() {
   const [mounted, setMounted] = useState(false);
+  // Beta launch date - adjust this as needed
   const launchDate = new Date("2025-12-31T23:59:59").getTime();
 
   const calculateTimeLeft = (): TimeLeft => {
@@ -38,30 +40,16 @@ export function CountdownTimer() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (mounted && typeof window !== "undefined" && window.gsap) {
-      const boxes = document.querySelectorAll(".countdown-box");
-      window.gsap.from(boxes, {
-        opacity: 0,
-        y: 20,
-        scale: 0.9,
-        duration: 0.6,
-        stagger: 0.08,
-        ease: "back.out(1.7)",
-      });
-    }
-  }, [mounted]);
-
   if (!mounted) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl mx-auto px-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl mx-auto">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="countdown-box flex flex-col items-center justify-center p-4 md:p-6 rounded-xl md:rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-card-border backdrop-blur-md"
+            className="flex flex-col items-center justify-center p-4 md:p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-teal-200/50 shadow-lg"
           >
-            <div className="text-3xl md:text-5xl lg:text-6xl font-bold mb-1 md:mb-2">--</div>
-            <div className="text-xs md:text-sm uppercase tracking-wider text-muted-foreground">
+            <div className="text-3xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-teal-500 to-emerald-500 bg-clip-text text-transparent">--</div>
+            <div className="text-xs md:text-sm uppercase tracking-wider text-gray-600">
               {["Days", "Hours", "Mins", "Secs"][i]}
             </div>
           </div>
@@ -78,25 +66,46 @@ export function CountdownTimer() {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 max-w-3xl mx-auto px-4" role="timer" aria-live="polite">
-      {timeUnits.map((unit) => (
-        <div
-          key={unit.label}
-          className="countdown-box group flex flex-col items-center justify-center p-4 md:p-6 rounded-xl md:rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-card-border backdrop-blur-md hover-elevate transition-all duration-300 hover:scale-105 hover:border-primary/30"
-          data-testid={`countdown-${unit.label.toLowerCase()}`}
-        >
-          <div className="relative">
-            <div className="text-3xl md:text-5xl lg:text-6xl font-bold text-gradient-brand mb-1 md:mb-2 transition-all duration-300">
+    <div className="w-full max-w-3xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="text-center mb-6"
+      >
+        <p className="text-sm md:text-base font-semibold text-teal-600 uppercase tracking-wider" data-testid="countdown-label">
+          Beta Launches In
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4" role="timer" aria-live="polite">
+        {timeUnits.map((unit, index) => (
+          <motion.div
+            key={unit.label}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+            whileHover={{ scale: 1.05, y: -4 }}
+            className="group flex flex-col items-center justify-center p-4 md:p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-teal-200/50 shadow-lg hover:shadow-xl transition-all"
+            data-testid={`countdown-${unit.label.toLowerCase()}`}
+          >
+            <motion.div
+              key={unit.value}
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-teal-500 to-emerald-500 bg-clip-text text-transparent mb-2"
+              data-testid={`countdown-value-${unit.label.toLowerCase()}`}
+            >
               {String(unit.value).padStart(2, "0")}
+            </motion.div>
+            <div className="text-xs md:text-sm uppercase tracking-wide text-gray-600 font-medium">
+              <span className="hidden md:inline">{unit.label}</span>
+              <span className="md:hidden">{unit.shortLabel}</span>
             </div>
-            <div className="absolute inset-0 bg-gradient-brand opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300" />
-          </div>
-          <div className="text-xs md:text-sm uppercase tracking-wider text-muted-foreground">
-            <span className="hidden md:inline">{unit.label}</span>
-            <span className="md:hidden">{unit.shortLabel}</span>
-          </div>
-        </div>
-      ))}
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
