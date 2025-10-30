@@ -47,8 +47,8 @@ export function StickyCountdown() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show sticky countdown when scrolled past 600px
-      setIsVisible(window.scrollY > 600);
+      // Show sticky countdown when scrolled past 350px (sooner)
+      setIsVisible(window.scrollY > 350);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -72,7 +72,7 @@ export function StickyCountdown() {
         opacity: isVisible ? 1 : 0 
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-2 shadow-lg"
+      className="fixed top-[72px] left-0 right-0 z-30 bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-2 shadow-lg"
       style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
       data-testid="sticky-countdown"
     >
