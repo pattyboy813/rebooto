@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -12,6 +12,10 @@ import { apiRequest } from "@/lib/queryClient";
 
 export function ModernHero() {
   const { toast } = useToast();
+  const { scrollY } = useScroll();
+  
+  const y = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   const form = useForm<InsertEmailSignup>({
     resolver: zodResolver(insertEmailSignupSchema),
@@ -51,16 +55,31 @@ export function ModernHero() {
   const count = signupCount?.count || 1200;
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50 pt-20">
+      {/* Background pattern with parallax */}
+      <motion.div 
+        className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:64px_64px]"
+        style={{ y: useTransform(scrollY, [0, 500], [0, -100]) }}
+      />
       
-      {/* Gradient orbs */}
-      <div className="absolute top-20 left-20 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute top-40 right-20 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-20 left-1/2 w-96 h-96 bg-coral-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      {/* Gradient orbs with parallax */}
+      <motion.div 
+        className="absolute top-20 left-20 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
+        style={{ y: useTransform(scrollY, [0, 500], [0, 80]) }}
+      />
+      <motion.div 
+        className="absolute top-40 right-20 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+        style={{ y: useTransform(scrollY, [0, 500], [0, 120]) }}
+      />
+      <motion.div 
+        className="absolute -bottom-20 left-1/2 w-96 h-96 bg-coral-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"
+        style={{ y: useTransform(scrollY, [0, 500], [0, 60]) }}
+      />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 lg:px-12 py-20">
+      <motion.div 
+        className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 lg:px-12 py-20"
+        style={{ y, opacity }}
+      >
         <div className="text-center max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -152,7 +171,7 @@ export function ModernHero() {
             Join {count.toLocaleString()}+ IT professionals preparing for 2025
           </motion.p>
         </div>
-      </div>
+      </motion.div>
 
       <style>{`
         @keyframes blob {
