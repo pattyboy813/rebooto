@@ -158,20 +158,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           </div>
         `;
 
-        try {
-          await sendEmail(user.email, "Reset Your Rebooto Password", emailBody);
-          console.log(`Password reset email sent to ${email}`);
-        } catch (emailError) {
-          console.error("Failed to send password reset email:", emailError);
-          // Log the reset link for development fallback
-          console.log(`Reset link (email failed): ${resetUrl}`);
+        const emailResult = await sendEmail(user.email, "Reset Your Rebooto Password", emailBody);
+        
+        if (emailResult.success) {
+          console.log(`Password reset email sent successfully to ${email}`);
+        } else {
+          console.error("Failed to send password reset email:", emailResult.error);
+          // Security: Do not log the actual token/reset URL as it would expose credentials in logs
+          console.log(`Password reset requested for user: ${user.id} (email send failed - check Outlook integration)`);
+          // Note: Token remains valid in database for 1 hour even if email fails
         }
         
-        // In development, also return the token in response for easier testing
-        if (process.env.NODE_ENV !== 'production') {
+        // DEVELOPMENT ONLY: Return token in response for testing purposes
+        // WARNING: This should NEVER be exposed in production deployments
+        if (process.env.NODE_ENV === 'development') {
           return res.json({ 
             message: "Password reset email sent. Check your inbox.",
-            devToken: token
+            devToken: token // Only for local development/testing
           });
         }
       }
