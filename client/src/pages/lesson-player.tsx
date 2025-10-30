@@ -126,10 +126,10 @@ export default function LessonPlayer() {
       courseData?.lessons[currentLessonIndex + 1]
     ) {
       setLocation(
-        `/courses/${parsedCourseId}/lessons/${courseData.lessons[currentLessonIndex + 1].id}`
+        `/app/courses/${parsedCourseId}/lessons/${courseData.lessons[currentLessonIndex + 1].id}`
       );
     } else {
-      setLocation(`/courses/${parsedCourseId}`);
+      setLocation(`/app/courses/${parsedCourseId}`);
     }
   };
 
@@ -152,7 +152,7 @@ export default function LessonPlayer() {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => setLocation(`/courses/${parsedCourseId}`)}
+            onClick={() => setLocation(`/app/courses/${parsedCourseId}`)}
             data-testid="button-back-to-course"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -173,7 +173,7 @@ export default function LessonPlayer() {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => setLocation(`/courses/${parsedCourseId}`)}
+            onClick={() => setLocation(`/app/courses/${parsedCourseId}`)}
             data-testid="button-back-to-course"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -193,7 +193,7 @@ export default function LessonPlayer() {
         <Button
           variant="ghost"
           className="mb-8 hover-elevate rounded-xl"
-          onClick={() => setLocation(`/courses/${parsedCourseId}`)}
+          onClick={() => setLocation(`/app/courses/${parsedCourseId}`)}
           data-testid="button-back"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

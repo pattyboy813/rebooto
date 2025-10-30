@@ -87,7 +87,7 @@ export default function CourseDetail() {
         (lesson) => !isLessonCompleted(lesson.id)
       );
       const targetLesson = firstIncompleteLesson || courseData.lessons[0];
-      setLocation(`/courses/${courseId}/lessons/${targetLesson.id}`);
+      setLocation(`/app/courses/${courseId}/lessons/${targetLesson.id}`);
     }
   };
 
@@ -111,7 +111,7 @@ export default function CourseDetail() {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => setLocation("/courses")}
+            onClick={() => setLocation("/app/courses")}
             data-testid="button-back-to-courses"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -128,7 +128,7 @@ export default function CourseDetail() {
         <Button
           variant="ghost"
           className="mb-8 hover-elevate rounded-xl"
-          onClick={() => setLocation("/courses")}
+          onClick={() => setLocation("/app/courses")}
           data-testid="button-back"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -230,7 +230,7 @@ export default function CourseDetail() {
                     }`}
                     onClick={() => {
                       if (isAccessible) {
-                        setLocation(`/courses/${courseId}/lessons/${lesson.id}`);
+                        setLocation(`/app/courses/${courseId}/lessons/${lesson.id}`);
                       }
                     }}
                     data-testid={`card-lesson-${lesson.id}`}

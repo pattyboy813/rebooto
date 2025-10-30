@@ -55,7 +55,7 @@ export default function Courses() {
         title: "Enrolled Successfully!",
         description: "You've been enrolled in the course. Start learning now!",
       });
-      setLocation(`/courses/${courseId}`);
+      setLocation(`/app/courses/${courseId}`);
     },
     onError: (error: any) => {
       if (error.message.includes("Already enrolled")) {
@@ -152,7 +152,7 @@ export default function Courses() {
               >
                 <Card
                   className="p-8 backdrop-blur-lg bg-white/60 border border-gray-200/50 rounded-3xl shadow-lg hover-elevate group cursor-pointer transition-all"
-                  onClick={() => setLocation(`/courses/${course.id}`)}
+                  onClick={() => setLocation(`/app/courses/${course.id}`)}
                   data-testid={`card-course-${course.id}`}
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -208,7 +208,7 @@ export default function Courses() {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (isEnrolled(course.id)) {
-                        setLocation(`/courses/${course.id}`);
+                        setLocation(`/app/courses/${course.id}`);
                       } else {
                         enrollMutation.mutate(course.id);
                       }
