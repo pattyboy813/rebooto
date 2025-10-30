@@ -1,7 +1,7 @@
-# TryRebooto
+# Rebooto
 
 ## Overview
-TryRebooto is a modern pre-launch landing page for an interactive IT support learning platform. The MVP features a premium minimalist design with playful 3D elements, smooth scrolling, and a secret Konami code easter egg that reveals an admin dashboard. The platform validates user interest through email signups while building anticipation for launch.
+Rebooto is a modern interactive IT support learning platform. The MVP features a premium minimalist design with playful 3D elements, smooth scrolling, and a secret Konami code easter egg that reveals an admin dashboard. The platform validates user interest through email signups while building anticipation for launch.
 
 ## Purpose
 - Validate interest in learning IT support through interactive experiences

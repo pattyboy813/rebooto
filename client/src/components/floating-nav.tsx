@@ -67,10 +67,10 @@ export function FloatingNav() {
               data-testid="button-scroll-top"
             >
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-shadow">
-                <span className="text-white font-bold text-sm sm:text-base">TR</span>
+                <span className="text-white font-bold text-sm sm:text-base">R</span>
               </div>
               <span className="font-bold text-lg sm:text-xl hidden sm:inline bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                TryRebooto
+                Rebooto
               </span>
             </button>
 

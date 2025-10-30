@@ -84,7 +84,7 @@ export function ValueProposition() {
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="section-header text-center mb-12 md:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 md:mb-4">
-            Why Choose TryRebooto?
+            Why Choose Rebooto?
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Traditional IT training is boring. We made it interactive, practical, and fun.

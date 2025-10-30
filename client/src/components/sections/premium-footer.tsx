@@ -22,9 +22,9 @@ export function PremiumFooter() {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <span className="text-white font-bold text-lg">TR</span>
+                <span className="text-white font-bold text-lg">R</span>
               </div>
-              <span className="text-2xl md:text-3xl font-bold text-gray-900">TryRebooto</span>
+              <span className="text-2xl md:text-3xl font-bold text-gray-900">Rebooto</span>
             </div>
             <p className="text-base md:text-lg text-gray-600 max-w-md leading-relaxed">
               Master IT support through interactive scenarios. Build real-world troubleshooting skills in a safe learning environment.
@@ -71,7 +71,7 @@ export function PremiumFooter() {
         
         <div className="pt-8 border-t border-gray-200/50 text-center">
           <p className="text-sm md:text-base text-gray-500">
-            &copy; {new Date().getFullYear()} TryRebooto. All rights reserved.
+            &copy; {new Date().getFullYear()} Rebooto. All rights reserved.
           </p>
         </div>
       </div>

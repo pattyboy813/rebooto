@@ -1,4 +1,4 @@
-# TryRebooto Design Guidelines
+# Rebooto Design Guidelines
 
 ## Design Approach
 **Reference-Based Approach** drawing from premium EdTech and modern SaaS:
@@ -75,7 +75,7 @@
 ### 2. Value Proposition Section
 **Layout**: Three-column grid of benefit cards
 **Components**:
-- Section header: "Why TryRebooto?"
+- Section header: "Why Rebooto?"
 - Three glassmorphic cards with 3D tilt effect on hover
 - Each card: Icon (3D-style), headline, description
 - Subtle shadow and border treatment

@@ -20,7 +20,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-8 md:mb-12">
           <div className="space-y-3 md:space-y-4">
             <h3 className="text-2xl md:text-3xl font-bold bg-gradient-brand bg-clip-text text-transparent">
-              TryRebooto
+              Rebooto
             </h3>
             <p className="text-sm md:text-base text-muted-foreground max-w-md">
               Master IT support through interactive scenarios. Build real-world troubleshooting skills in a safe learning environment.
@@ -67,7 +67,7 @@ export function Footer() {
         </div>
         
         <div className="pt-6 md:pt-8 border-t border-border/50 text-center text-xs md:text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} TryRebooto. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Rebooto. All rights reserved.</p>
         </div>
       </div>
     </footer>
