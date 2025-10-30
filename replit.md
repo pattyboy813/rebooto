@@ -1,301 +1,40 @@
 # Rebooto
 
 ## Overview
-Rebooto is a modern interactive IT support learning platform. The MVP features a premium minimalist design with playful 3D elements, smooth scrolling, and a secret Konami code easter egg that reveals an admin dashboard. The platform validates user interest through email signups while building anticipation for launch.
+Rebooto is a modern, interactive IT support learning platform designed to validate interest, collect user emails, and build brand anticipation. The MVP features a premium minimalist design with playful 3D elements, smooth scrolling, and a hidden Konami code easter egg that reveals an admin dashboard. The platform aims to provide an engaging user experience while demonstrating the concept of interactive IT support learning.
 
-## Purpose
-- Validate interest in learning IT support through interactive experiences
-- Collect user emails for launch notifications
-- Build early brand trust with a polished, premium web presence
-- Demonstrate the platform's concept and build anticipation
-- Provide secret admin access via Konami code easter egg
+## User Preferences
+I prefer detailed explanations, especially for complex architectural decisions. I want iterative development, with clear communication before major changes are made to the codebase. Ensure the design maintains a premium/minimalist aesthetic with playful elements.
 
-## Tech Stack
-- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis
-- **Backend**: Express.js, Node.js
-- **Storage**: In-memory storage (MemStorage)
-- **Animations**: GSAP (ScrollTrigger), Framer Motion, Lenis smooth scroll
-- **Design**: Premium/minimalist with playful elements - white backgrounds, glassmorphism, blue-purple gradients, Space Grotesk + Inter fonts
+## System Architecture
 
-## Project Architecture
+### UI/UX Decisions
+The platform adopts a premium minimalist design using a white background, glassmorphism effects, and blue-purple gradients. Typography features Space Grotesk for headlines and Inter for body text, with a responsive hierarchy. Animations utilize Lenis for smooth scrolling, Framer Motion for entrance and interaction effects, and GSAP for scroll-triggered animations and 3D orb parallax effects. Key components like the floating navigation and various content cards incorporate glassmorphic styling, rounded corners, and soft shadows. A vintage flip timer countdown, simplified to a single unified display per time unit, maintains a mechanical/industrial aesthetic.
 
-### Frontend Structure
-- `/client/src/pages/home.tsx` - Premium landing page
-- `/client/src/pages/dashboard.tsx` - Protected admin dashboard
-- `/client/src/components/sections/premium-*.tsx` - Premium sections (Hero, Value, How, Skills, Signup, Footer)
-- `/client/src/components/smooth-scroll.tsx` - Lenis smooth scroll wrapper
-- `/client/src/components/floating-nav.tsx` - Floating glassmorphic navigation
-- `/client/src/components/admin-panel.tsx` - Sliding admin login panel
-- `/client/src/hooks/use-konami.tsx` - Konami code detection hook
-- `/client/src/components/ui/` - Shadcn UI components
+### Technical Implementations
+The frontend is built with React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, and Lenis. The backend uses Express.js and Node.js. Authentication is handled via Replit Auth (OpenID Connect), supporting Google, GitHub, X, Apple, and email/password. Data persistence is managed with PostgreSQL (Neon) and Drizzle ORM.
 
-### Backend Structure
-- `/server/routes.ts` - API routes for email signups
-- `/server/storage.ts` - In-memory storage implementation
-- `/shared/schema.ts` - Data models and validation schemas
+### Feature Specifications
+- **Lenis Smooth Scrolling**: Buttery smooth scroll performance integrated with GSAP ScrollTrigger for animations.
+- **Floating Glassmorphic Navigation**: Auto-hiding, responsive navigation with smooth Framer Motion transitions.
+- **Premium Hero Section**: Features animated 3D gradient orbs, parallax effects, large responsive typography, and a vintage flip timer countdown to December 31, 2025.
+- **Premium Content Sections**: Value proposition, "How It Works," and "Skills" sections utilize glassmorphic cards with gradient accents and hover effects.
+- **Premium Email Signup**: Glassmorphic form with Zod validation, real-time signup counter, and confetti-style success message.
+- **Konami Code Easter Egg**: Secret sequence (↑↑↓↓←→←→BA) triggers a sliding admin login panel.
+- **Admin Login Panel**: Slides in with a spring animation, featuring a "Login with Replit" button for authentication.
+- **Protected Admin Dashboard**: Authenticated users can view user profiles, signup statistics, and a detailed list of all email signups via a scrollable dialog. Includes logout functionality.
+- **Premium Footer**: Contains social media links, navigation, and copyright information with a glassmorphic design.
 
-## Key Features
+### System Design Choices
+- **Frontend Structure**: Organized into pages (`home.tsx`, `dashboard.tsx`), sections (`premium-*.tsx`), and reusable components (`smooth-scroll.tsx`, `floating-nav.tsx`, `admin-panel.tsx`, `ui/`).
+- **Backend Structure**: Includes API routes (`routes.ts`), database storage (`storage.ts`), Replit Auth integration (`replitAuth.ts`), database connection (`db.ts`), and shared Drizzle schema definitions (`schema.ts`).
+- **Data Model**: Comprehensive schema includes `users`, `courses`, `lessons`, `achievements`, `enrollments`, `userProgress`, `userAchievements`, and `emailSignups` tables for a gamified learning experience.
+- **API Endpoints**: Public endpoints for email signups and count; Replit Auth endpoints for login, callback, logout, and user info; protected endpoints for retrieving all signups.
+- **Security**: Admin dashboard protected by Replit Auth session authentication. Sessions are PostgreSQL-backed with secure cookies. OAuth 2.0 with PKCE is used.
 
-### 1. Lenis Smooth Scrolling
-- Buttery smooth scroll performance throughout site
-- Integrated with GSAP ScrollTrigger for animations
-- Configurable duration and easing
-- Enhanced user experience
-
-### 2. Floating Glassmorphic Navigation
-- Auto-hides on scroll down, shows on scroll up
-- Rounded-full design with backdrop-blur-xl
-- Mobile responsive with hamburger menu
-- Contains logo, nav links, and CTA button
-- Smooth transitions with Framer Motion
-
-### 3. Premium Hero Section
-- Animated 3D gradient orbs following cursor movement
-- Parallax effects on scroll
-- Large responsive typography (5xl to 8xl)
-- Gradient text effects on headline
-- **Vintage flip timer countdown** with simplified single-display design:
-  - Single unified flip card per time unit (Days, Hours, Mins, Secs)
-  - Each card displays complete two-digit number (e.g., "59" not "5" "9" separately)
-  - Mechanical/industrial design (dark gray gradient panels, large white text)
-  - 3D flip animations using Framer Motion rotateX transforms
-  - Responsive sizing: mobile 80×96px → small 96×128px → medium 128×160px → large 160×192px
-  - Vintage aesthetic: middle line separator, metallic rivets/screws in corners
-  - "LAUNCH COUNTDOWN" branding
-  - Counts down to December 31, 2025 with real-time updates every second
-- Dual CTAs with gradient buttons
-
-### 4. Premium Value Proposition
-- Three benefit cards with glassmorphic design
-- Gradient icon backgrounds (blue/purple/green)
-- Hover scale effects and shadows
-- Scroll-triggered Framer Motion animations
-
-### 5. Premium How It Works
-- Three numbered step cards
-- Gradient numbered badges
-- Icon illustrations for each step
-- Glassmorphic card design with hover effects
-
-### 6. Premium Skills Section
-- Three category cards (Hardware, Network, Software)
-- Checkmark lists for each category
-- Glassmorphic design with gradient accents
-- Responsive grid layout
-
-### 7. Premium Email Signup
-- Glassmorphic form design
-- Form validation with Zod
-- Real-time signup counter display
-- Success state with confetti-style message
-- Privacy reassurance
-
-### 8. Konami Code Easter Egg
-- Secret sequence: ↑↑↓↓←→←→BA
-- Triggers admin panel to slide in from right
-- Visual feedback with animations
-- Fun discovery mechanism for admin access
-
-### 9. Admin Login Panel
-- Slides in from right with spring animation
-- Username and password form
-- Connects to auth backend
-- Success message about finding easter egg
-- Close button to dismiss
-
-### 10. Protected Admin Dashboard
-- Authentication check via /api/auth/me
-- Redirects to home if not authenticated
-- Displays signup statistics (Total Signups count)
-- Quick action buttons:
-  - Manage Scenarios
-  - **View All Signups** (opens dialog with full signups list)
-  - Analytics Dashboard
-  - Settings
-- **Signups List Dialog**:
-  - Fetches all signups via GET /api/signups
-  - Displays email and timestamp for each signup
-  - Scrollable list with proper test IDs
-  - Glassmorphic design with gradient icons
-- Logout functionality
-- Premium glassmorphic design matching landing page
-
-### 11. Premium Footer
-- Social media links (X/Twitter, LinkedIn, GitHub)
-- Navigation links
-- Copyright information
-- Glassmorphic design
-
-## Design System
-
-### Colors
-- **Primary**: Blue gradient (HSL 217 91% 60%)
-- **Secondary**: Purple accent (HSL 271 91% 65%)
-- **Background**: White/Light gray (HSL 0 0% 100%)
-- **Gradients**: Blue-to-purple brand gradient
-- **Glassmorphism**: backdrop-blur-lg/xl with bg-white/60 semi-transparent backgrounds
-- **Text**: Dark gray (900) for headlines, gray (600-700) for body
-
-### Typography
-- **Display Font**: Space Grotesk (headlines, section titles)
-- **Body Font**: Inter (UI elements, body text)
-- **Responsive Hierarchy**: 
-  - Mobile: 4xl-5xl headlines → Desktop: 6xl-8xl headlines
-  - Mobile: base-lg body → Desktop: lg-xl body
-  - Smart scaling with sm:, md:, lg: breakpoints
-
-### Glassmorphism Style
-- **Navigation**: backdrop-blur-xl bg-white/70 border-white/20
-- **Cards**: backdrop-blur-lg bg-white/60 border-gray-200/50
-- **Accents**: rounded-3xl corners throughout
-- **Shadows**: Soft shadows with color hints (shadow-blue-500/30)
-- **3D Depth**: Layered glass effects with subtle borders
-
-### Spacing
-- **Mobile-first approach**: 
-  - Mobile: px-4-6, py-16-20, gap-4-6
-  - Desktop: px-6-8, py-24-32, gap-8-12
-- **Sections**: py-20 md:py-32 lg:py-40 for vertical spacing
-- **Cards**: p-6 md:p-10 for glassmorphic cards
-- **Max widths**: max-w-7xl for content containers
-
-### Animations
-
-#### Lenis Smooth Scroll
-- Duration: 1.2s
-- Easing: ease-in-out
-- Integrated with GSAP ScrollTrigger
-- Smooth momentum scrolling
-
-#### Framer Motion
-- **Entrance animations**: 
-  - Initial: opacity 0, y 20-40
-  - Animate: opacity 1, y 0
-  - Duration: 0.5-0.8s with delays
-- **Scroll triggers**: whileInView with once: true
-- **Hover effects**: 
-  - Scale: 1.02-1.05
-  - Transition: spring physics
-- **Admin panel**: 
-  - Slide in: x from 100% to 0
-  - Spring: type "spring", stiffness 300, damping 30
-
-#### GSAP Effects
-- **3D Orbs**: 
-  - Parallax following cursor movement
-  - Smooth transforms with GSAP
-  - Gradient animations
-- **ScrollTrigger**: 
-  - Integrated with Lenis
-  - Trigger points at 80% viewport
-
-#### Hover Interactions
-- **Cards**: scale-105 + shadow enhancement
-- **Buttons**: Gradient shifts, glow effects
-- **Icons**: Subtle rotations, scale-110
-
-## Data Model
-
-### EmailSignup
-```typescript
-{
-  id: string;           // UUID
-  email: string;        // Email address
-  createdAt: Date;      // Signup timestamp
-}
-```
-
-## API Endpoints
-
-### Public Endpoints
-
-#### POST /api/signups
-Create a new email signup
-- **Body**: `{ email: string }`
-- **Validation**: Email format validation with Zod
-- **Response**: Created signup object
-- **Errors**: 400 (validation), 409 (duplicate email)
-
-#### GET /api/signups/count
-Get total signup count
-- **Response**: `{ count: number }`
-
-### Admin Endpoints (Protected - requireAuth)
-
-#### GET /api/signups
-Get all email signups (sorted by newest first)
-- **Response**: `EmailSignup[]`
-- **Auth**: Requires admin session
-
-#### POST /api/auth/login
-Admin authentication (for Konami easter egg)
-- **Body**: `{ username: string, password: string }`
-- **Response**: Session created, user object returned
-- **Errors**: 401 (invalid credentials)
-
-#### GET /api/auth/me
-Check current authentication status
-- **Response**: Current user object or 401 if not authenticated
-- **Used by**: Dashboard page for protection
-
-#### POST /api/auth/logout
-Logout current admin session
-- **Response**: Success message
-
-## Running the Application
-```bash
-npm run dev
-```
-- Vite dev server for frontend
-- Express server for backend
-- Both served on same port (default: 5000)
-
-## Next Phase Features
-- Simple login and registration system
-- Interactive troubleshooting scenarios (e.g., Wi-Fi diagnostics)
-- XP and progress tracking system
-- Lesson completion dashboard
-- User feedback collection
-
-## Routes
-
-### Public Routes
-- `/` - Premium landing page with all sections
-- `/dashboard` - Protected admin dashboard (requires auth)
-
-### Protected Route Behavior
-- Dashboard checks authentication via /api/auth/me
-- Redirects to home if not authenticated
-- Shows loading state during auth check
-
-## Development Notes
-- **Lenis**: Smooth scroll library integrated with GSAP
-- **GSAP**: ScrollTrigger for scroll-based animations
-- **Framer Motion**: All entrance and interaction animations
-- **Responsive**: Mobile-first design with md/lg breakpoints
-- **Theme**: Light mode only (premium/minimalist aesthetic)
-- **Data-testid**: All interactive elements have test identifiers
-- **Email validation**: Prevents duplicate signups
-- **Storage**: In-memory, resets on server restart
-- **Easter egg**: Konami code (↑↑↓↓←→←→BA) reveals admin panel
-- **Glassmorphism**: backdrop-blur effects throughout
-
-## Performance Considerations
-- Lenis smooth scroll adds ~5KB
-- GSAP + ScrollTrigger included for animations
-- Framer Motion for React animations
-- CSS 3D transforms for hero orbs (no Three.js dependency)
-- Consider motion-reduction media query for accessibility
-
-## Security Notes
-- Admin dashboard protected by session authentication
-- Easter egg provides alternative admin access
-- Session managed server-side with express-session
-- Passwords should be properly hashed (bcrypt)
-
-## Recent Changes
-- 2025-10-30: **Flip timer simplification** - Redesigned countdown from complex two-digit split display to simplified single unified display per time unit. Each flip card now shows complete two-digit number (e.g., "59" instead of separate "5" and "9" tiles). Larger, more readable displays (80×96px mobile to 160×192px large). Maintained vintage aesthetic with dark gradient backgrounds, white text, middle line separator, and corner rivets. Fixed countdown functionality with proper real-time updates every second.
-- 2025-10-29: **Vintage flip timer implementation** - Replaced standard countdown with authentic split-flap display (old train station/airport aesthetic) featuring 3D flip animations, mechanical styling, dark gradient panels, white text, metallic rivets. Fully responsive with mobile-first sizing (fits 375px+ viewports). Fixed navigation with logo scroll-to-top button and proper test IDs. Fixed dashboard signups bug - added GET /api/signups endpoint and dialog UI to display full signups list with emails and timestamps.
-- 2025-10-29: **Complete premium redesign** - Implemented Lenis smooth scrolling, floating glassmorphic navigation, premium sections with 3D effects, Konami code easter egg (↑↑↓↓←→←→BA), admin login panel, and protected dashboard with signup analytics. Changed from dark theme to premium/minimalist white aesthetic with glassmorphism throughout. All animations migrated to Framer Motion with scroll triggers.
-- 2025-10-29: Enhanced landing page with modern design, advanced GSAP animations, improved mobile responsiveness, glassmorphism effects, hover interactions, and polished visual hierarchy
-- 2025-10-29: Initial MVP implementation with complete landing page, countdown timer, and email signup functionality
+## External Dependencies
+- **Frontend Libraries**: React, TypeScript, Tailwind CSS, Shadcn UI, Framer Motion, Lenis, GSAP (ScrollTrigger).
+- **Backend Framework**: Express.js, Node.js.
+- **Database**: PostgreSQL (Neon) with Drizzle ORM.
+- **Authentication**: Replit Auth (OpenID Connect) for Google, GitHub, X, Apple, and email/password support.
+- **Validation**: Zod for form validation.
