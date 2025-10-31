@@ -542,12 +542,21 @@ function LessonCard({
 
       <div className="bg-gray-50 rounded-lg p-4 space-y-2">
         <p className="text-xs font-semibold text-gray-700 uppercase">Content Preview</p>
-        <p className="text-sm text-gray-600">
-          <strong>Problem:</strong> {lesson.content.problem.substring(0, 100)}...
-        </p>
-        <p className="text-sm text-gray-600">
-          <strong>Steps:</strong> {lesson.content.steps.length} troubleshooting steps
-        </p>
+        {Array.isArray(lesson.content) ? (
+          <div className="space-y-1">
+            <p className="text-sm text-gray-600">
+              <strong>Content Blocks:</strong> {lesson.content.length} blocks
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Quiz Questions:</strong> {lesson.content.filter((block: any) => block.type === 'quiz').length}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Text/Scenarios:</strong> {lesson.content.filter((block: any) => block.type === 'text' || block.type === 'scenario').length}
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm text-gray-600 italic">Legacy content format</p>
+        )}
       </div>
     </Card>
   );

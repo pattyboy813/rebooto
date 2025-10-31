@@ -608,6 +608,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to check and mark enrollment complete
+  async function checkEnrollmentCompletion(userId: number, courseId: number) {
+    const courseLessons = await storage.getLessonsByCourse(courseId);
+    console.log(`[Enrollment Check] Course ${courseId} has ${courseLessons.length} lessons`);
+    
+    const allCompleted = await Promise.all(
+      courseLessons.map(async (l: Lesson) => {
+        const p = await storage.getUserProgress(userId, l.id);
+        console.log(`[Enrollment Check] Lesson ${l.id}: progress=${p?.id}, completed=${p?.completed}`);
+        return p?.completed || false;
+      })
+    );
+    
+    console.log(`[Enrollment Check] All completed status:`, allCompleted);
+    console.log(`[Enrollment Check] Every completed?`, allCompleted.every((c: boolean) => c === true));
+    
+    if (allCompleted.every((c: boolean) => c === true)) {
+      console.log(`[Enrollment Check] All lessons complete! Looking for enrollment...`);
+      const userEnrollments = await storage.getUserEnrollments(userId);
+      const enrollment = userEnrollments.find((e: any) => e.courseId === courseId);
+      console.log(`[Enrollment Check] Found enrollment:`, enrollment?.id, 'completedAt:', enrollment?.completedAt);
+      if (enrollment && !enrollment.completedAt) {
+        console.log(`[Enrollment Check] Marking enrollment ${enrollment.id} as complete`);
+        await storage.completeEnrollment(enrollment.id);
+      }
+    }
+  }
+
   app.post("/api/lessons/:id/complete", requireAuth, async (req: any, res) => {
     try {
       const user = await getCurrentUser(req);
@@ -642,6 +670,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
+        // Check if all lessons in the course are now completed
+        await checkEnrollmentCompletion(user.id, lesson.courseId);
+        
         return res.json({ progress, xpAwarded: lesson.xpReward });
       }
 
@@ -668,25 +699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if all lessons in the course are now completed
-      const course = await storage.getCourse(lesson.courseId);
-      if (course) {
-        const courseLessons = await storage.getLessonsByCourse(lesson.courseId);
-        const allCompleted = await Promise.all(
-          courseLessons.map(async (l: Lesson) => {
-            const p = await storage.getUserProgress(user.id, l.id);
-            return p?.completed || false;
-          })
-        );
-        
-        if (allCompleted.every((c: boolean) => c === true)) {
-          // All lessons completed - mark course enrollment as complete
-          const userEnrollments = await storage.getUserEnrollments(user.id);
-          const enrollment = userEnrollments.find((e: any) => e.courseId === lesson.courseId);
-          if (enrollment && !enrollment.completedAt) {
-            await storage.completeEnrollment(enrollment.id);
-          }
-        }
-      }
+      await checkEnrollmentCompletion(user.id, lesson.courseId);
       
       res.json({ progress: updatedProgress, xpAwarded: lesson.xpReward });
     } catch (error) {
