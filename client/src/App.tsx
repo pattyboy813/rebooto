@@ -8,6 +8,8 @@ import { UserLayout } from "@/components/layouts/user-layout";
 import { AdminLayout } from "@/components/layouts/admin-layout";
 import { PremiumAuth } from "@/components/sections/premium-auth";
 import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Users, BookOpen, Mail, TrendingUp, Sparkles, UserPlus, FileText } from "lucide-react";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import Courses from "@/pages/courses";
@@ -74,40 +76,125 @@ function AdminDashboardPage() {
   return (
     <AdminLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin" data-testid="heading-admin-dashboard">
+        {/* Header with Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient-admin mb-2" data-testid="heading-admin-dashboard">
             Admin Dashboard
           </h1>
-          <p className="text-muted-foreground mt-2 text-lg" data-testid="text-admin-welcome">
-            Welcome to the Rebooto admin portal
+          <p className="text-muted-foreground text-lg" data-testid="text-admin-welcome">
+            Monitor your platform's performance and user activity
           </p>
-        </div>
+        </motion.div>
+
+        {/* Stats Grid with Staggered Animation */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="p-6 hover-elevate" data-testid="card-total-users">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Users</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-total-users">
-              {isLoading ? "..." : stats?.totalUsers || 0}
-            </p>
-          </Card>
-          <Card className="p-6 hover-elevate" data-testid="card-active-courses">
-            <h3 className="text-sm font-medium text-muted-foreground">Active Courses</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-active-courses">
-              {isLoading ? "..." : stats?.activeCourses || 0}
-            </p>
-          </Card>
-          <Card className="p-6 hover-elevate" data-testid="card-email-signups">
-            <h3 className="text-sm font-medium text-muted-foreground">Email Signups</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-email-signups">
-              {isLoading ? "..." : stats?.emailSignups || 0}
-            </p>
-          </Card>
-          <Card className="p-6 hover-elevate" data-testid="card-completion-rate">
-            <h3 className="text-sm font-medium text-muted-foreground">Completion Rate</h3>
-            <p className="text-3xl font-bold mt-2 text-gradient-admin" data-testid="stat-completion-rate">
-              {isLoading ? "..." : `${stats?.completionRate || 0}%`}
-            </p>
-          </Card>
+          {[
+            {
+              title: "Total Users",
+              value: isLoading ? "..." : stats?.totalUsers || 0,
+              Icon: Users,
+              testId: "card-total-users",
+              statTestId: "stat-total-users"
+            },
+            {
+              title: "Active Courses",
+              value: isLoading ? "..." : stats?.activeCourses || 0,
+              Icon: BookOpen,
+              testId: "card-active-courses",
+              statTestId: "stat-active-courses"
+            },
+            {
+              title: "Email Signups",
+              value: isLoading ? "..." : stats?.emailSignups || 0,
+              Icon: Mail,
+              testId: "card-email-signups",
+              statTestId: "stat-email-signups"
+            },
+            {
+              title: "Completion Rate",
+              value: isLoading ? "..." : `${stats?.completionRate || 0}%`,
+              Icon: TrendingUp,
+              testId: "card-completion-rate",
+              statTestId: "stat-completion-rate"
+            }
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card className="relative overflow-hidden hover-elevate group" data-testid={stat.testId}>
+                {/* Gradient Background Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-emerald-500 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+                
+                <div className="p-6 relative">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30">
+                      <stat.Icon className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+                    </div>
+                  </div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                    {stat.title}
+                  </h3>
+                  <p className="text-4xl font-bold text-gradient-admin" data-testid={stat.statTestId}>
+                    {stat.value}
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
         </div>
+
+        {/* Quick Actions Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <Card className="p-6">
+            <h2 className="text-2xl font-bold text-gradient-admin mb-4">Quick Actions</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              <a
+                href="/admin/courses"
+                className="block p-4 rounded-lg border border-border hover-elevate active-elevate-2 transition-all"
+                data-testid="link-create-course"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30 flex items-center justify-center mb-3">
+                  <Sparkles className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                </div>
+                <h3 className="font-semibold mb-1">Create Course</h3>
+                <p className="text-sm text-muted-foreground">Generate AI-powered courses</p>
+              </a>
+              <a
+                href="/admin/users"
+                className="block p-4 rounded-lg border border-border hover-elevate active-elevate-2 transition-all"
+                data-testid="link-manage-users"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30 flex items-center justify-center mb-3">
+                  <UserPlus className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                </div>
+                <h3 className="font-semibold mb-1">Manage Users</h3>
+                <p className="text-sm text-muted-foreground">View and edit user accounts</p>
+              </a>
+              <a
+                href="/admin/blog"
+                className="block p-4 rounded-lg border border-border hover-elevate active-elevate-2 transition-all"
+                data-testid="link-write-post"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-100 to-emerald-100 dark:from-teal-900/30 dark:to-emerald-900/30 flex items-center justify-center mb-3">
+                  <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                </div>
+                <h3 className="font-semibold mb-1">Write Post</h3>
+                <p className="text-sm text-muted-foreground">Create blog content</p>
+              </a>
+            </div>
+          </Card>
+        </motion.div>
       </div>
     </AdminLayout>
   );
