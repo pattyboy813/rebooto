@@ -16,6 +16,7 @@ import Courses from "@/pages/courses";
 import CourseDetail from "@/pages/course-detail";
 import LessonPlayer from "@/pages/lesson-player";
 import AdminCourseCreator from "@/pages/admin-course-creator";
+import AdminManualCourseCreator from "@/pages/admin-manual-course-creator";
 import AdminUsersPage from "@/pages/admin-users";
 import AdminCampaignsPage from "@/pages/admin-campaigns";
 import AdminSettingsPage from "@/pages/admin-settings";
@@ -265,6 +266,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLoginPage} />
       <Route path="/admin/dashboard" component={() => <ModernAdminLayout><AdminDashboardModern /></ModernAdminLayout>} />
       <Route path="/admin/courses" component={() => <ModernAdminLayout><AdminCourseCreator /></ModernAdminLayout>} />
+      <Route path="/admin/courses/manual" component={() => <ModernAdminLayout><AdminManualCourseCreator /></ModernAdminLayout>} />
       <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
       <Route path="/admin/blog" component={() => <ModernAdminLayout><AdminBlogModern /></ModernAdminLayout>} />
       <Route path="/admin/email" component={() => <ModernAdminLayout><AdminEmail /></ModernAdminLayout>} />

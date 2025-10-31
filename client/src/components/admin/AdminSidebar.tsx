@@ -42,7 +42,7 @@ const menuSections = [
     label: "Content",
     items: [
       { title: "Blog Admin", icon: FileText, url: "/admin/blog" },
-      { title: "Manual Course Creator", icon: Edit3, url: "/admin/course-builder" },
+      { title: "Manual Course Creator", icon: Edit3, url: "/admin/courses/manual" },
       { title: "Course Editor", icon: BookOpen, url: "/admin/course-editor" },
       { title: "AI Course Creator", icon: Wand2, url: "/admin/courses" },
     ],

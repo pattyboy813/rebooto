@@ -998,6 +998,75 @@ Make questions challenging but fair. Ensure explanations teach WHY answers are c
     }
   });
 
+  app.post("/api/admin/courses/manual", requireAdmin, async (req, res) => {
+    try {
+      const { title, description, category, difficulty, lessons } = req.body;
+
+      if (!title || !description || !category || !difficulty || !lessons || !Array.isArray(lessons)) {
+        return res.status(400).json({ message: "Invalid request format" });
+      }
+
+      // Validate course data
+      const validatedCourse = insertCourseSchema.parse({
+        title,
+        description,
+        category,
+        difficulty,
+      });
+
+      // Calculate total XP from lessons
+      const totalXP = lessons.reduce((sum: number, lesson: any) => sum + (lesson.xpReward || 0), 0);
+
+      // Create the course
+      const createdCourse = await storage.createCourse({
+        ...validatedCourse,
+        xpTotal: totalXP,
+        lessonCount: lessons.length,
+      });
+
+      // Create lessons
+      const createdLessons = [];
+      for (let i = 0; i < lessons.length; i++) {
+        const lessonData = lessons[i];
+
+        // Validate content structure
+        if (lessonData.content && Array.isArray(lessonData.content)) {
+          const { lessonContentArraySchema } = await import("@shared/schema");
+          try {
+            lessonContentArraySchema.parse(lessonData.content);
+          } catch (validationError: any) {
+            return res.status(400).json({
+              message: `Lesson ${i + 1} has invalid content structure`,
+              lessonIndex: i,
+              lessonTitle: lessonData.title,
+              errors: validationError.errors || [validationError.message]
+            });
+          }
+        }
+
+        const validatedLesson = insertLessonSchema.parse({
+          title: lessonData.title,
+          description: lessonData.description,
+          xpReward: lessonData.xpReward || 100,
+          content: lessonData.content,
+          courseId: createdCourse.id,
+          orderIndex: i,
+        });
+
+        const lesson = await storage.createLesson(validatedLesson);
+        createdLessons.push(lesson);
+      }
+
+      res.status(201).json({ ...createdCourse, lessons: createdLessons });
+    } catch (error: any) {
+      console.error("Error creating manual course:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create course" });
+    }
+  });
+
   app.post("/api/admin/courses", requireAdmin, async (req, res) => {
     try {
       const { course, lessons } = req.body;
