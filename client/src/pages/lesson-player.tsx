@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useParams } from "wouter";
 import { Card } from "@/components/ui/card";
@@ -36,6 +36,12 @@ export default function LessonPlayer() {
 
   const parsedCourseId = parseInt(courseId || "0");
   const parsedLessonId = parseInt(lessonId || "0");
+
+  // Reset currentStep when lessonId changes
+  useEffect(() => {
+    setCurrentStep(0);
+    setUserChoices([]);
+  }, [parsedLessonId]);
 
   const { data: lesson, isLoading: lessonLoading } = useQuery<Lesson>({
     queryKey: ["/api/lessons", parsedLessonId],
@@ -293,7 +299,7 @@ export default function LessonPlayer() {
                       {currentContent.question}
                     </h3>
                     <div className="space-y-3">
-                      {currentContent.options?.map((option, index) => (
+                      {currentContent.options?.map((option: string, index: number) => (
                         <Card
                           key={index}
                           className={`p-4 cursor-pointer transition-all hover-elevate ${

@@ -805,50 +805,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         Advanced: 200,
       };
 
-      const prompt = `Generate ${lessonCount} PRACTICAL, hands-on IT support lessons for a course titled "${title}".
+      const prompt = `Generate ${lessonCount} comprehensive IT support theory lessons for a course titled "${title}".
 Description: ${description}
 Category: ${category}
 Difficulty: ${difficulty}
 
-CRITICAL: These must be REAL-WORLD, PRACTICAL scenarios, not theoretical knowledge. Each lesson should simulate an actual help desk ticket.
+CRITICAL: Create TEXT-BASED educational content. NO references to audio, video, podcasts, or multimedia. Focus on written theory, concepts, and step-by-step explanations.
 
 For each lesson, create:
-1. **Title**: Specific problem (e.g., "Computer Won't Boot - 3 Beep Code Error" not "Understanding Boot Processes")
+1. **Title**: Clear, educational topic (e.g., "Understanding Boot Processes and POST Codes" or "Network Troubleshooting Methodology")
 
-2. **Description**: Brief 1-2 sentence summary of the practical scenario
+2. **Description**: Brief 1-2 sentence overview of what the lesson teaches
 
-3. **Content** (THIS IS THE MOST IMPORTANT PART - Make it detailed and hands-on):
+3. **Content** (THIS IS THE MOST IMPORTANT PART - Make it detailed and educational):
    
-   **Problem**: Write like a real help desk ticket. Include:
-   - User's complaint/symptoms (exactly as a user would describe it)
-   - Specific error messages, codes, or beep codes if applicable
-   - What the user was doing when the problem occurred
-   - Any troubleshooting they've already attempted
-   Example: "User reports laptop won't turn on. When pressing power button, they hear 3 short beeps repeatedly. Screen remains black. User states it was working fine yesterday but laptop was dropped. Battery indicator light blinks amber 3 times."
+   **Problem**: Present a realistic IT scenario or concept to learn. Include:
+   - Context and background information
+   - Key concepts or technical terms explained
+   - Real-world application or scenario description
+   - Learning objectives for this lesson
+   Example: "Understanding BIOS POST (Power-On Self-Test) codes is essential for hardware diagnostics. When a computer starts, the BIOS performs system checks and communicates issues through beep codes and LED patterns. This lesson covers how to interpret these diagnostic signals and troubleshoot hardware failures effectively."
 
-   **Steps**: Detailed, actionable troubleshooting steps (${difficulty === 'Beginner' ? '7-12' : difficulty === 'Intermediate' ? '10-15' : '12-18'} steps). Each step should:
-   - Be specific and actionable ("Press F2 during boot" not "Access BIOS")
-   - Include exact commands, buttons, or tools to use
-   - Mention what to look for or expect
-   - Build logically from diagnosis to solution
+   **Steps**: Detailed educational content broken into ${difficulty === 'Beginner' ? '7-12' : difficulty === 'Intermediate' ? '10-15' : '12-18'} learning points. Each step should:
+   - Explain a specific concept, process, or technique
+   - Include technical details and terminology
+   - Provide examples and practical applications
+   - Build understanding progressively from basics to advanced
    Example steps:
-   - "Power off the laptop completely and disconnect the power adapter"
-   - "Locate the RAM access panel on the bottom of the laptop (usually marked with a memory icon)"
-   - "Use a Phillips #0 screwdriver to remove the 2 screws securing the panel"
-   - "Carefully press the retention clips outward on both sides of the RAM module"
-   - "Remove the RAM stick and inspect for visible damage or debris"
-   - "Clean the gold contacts with a soft, dry cloth or pencil eraser"
-   - "Firmly reseat the RAM module at a 30-degree angle, then press down until clips lock"
-   - "Replace the access panel and secure with screws"
-   - "Reconnect power adapter and press the power button"
-   - "Listen for the normal single beep and check if system boots to BIOS/OS"
+   - "POST (Power-On Self-Test) is a diagnostic process that runs automatically when you power on a computer, checking hardware components before loading the operating system"
+   - "The BIOS firmware stores a table of beep codes, where different patterns indicate specific hardware failures - manufacturers like Dell, HP, and AMI each have their own code systems"
+   - "A single short beep typically indicates successful POST completion and normal system startup"
+   - "Three short beeps in most systems signal a RAM (Random Access Memory) error, suggesting the memory modules are not properly seated or have failed"
+   - "Continuous beeping usually points to a power supply issue or motherboard problem requiring immediate attention"
+   - "LED diagnostic lights on modern computers provide visual feedback: amber/orange typically indicates power/battery issues, while white/blue shows normal operation"
+   - "When troubleshooting beep codes, always consult the manufacturer's documentation as patterns vary between BIOS vendors (AMI, Award, Phoenix)"
+   - "Common RAM-related beep codes: 3 beeps (base memory failure), 2 beeps (parity error), 5 beeps (processor failure)"
+   - "Document the exact beep pattern: count the number of beeps, note any pauses, and observe if the pattern repeats"
+   - "Modern UEFI systems often display error codes on-screen or use QR codes that link to troubleshooting guides, supplementing traditional beep codes"
 
-   **Solution**: Comprehensive resolution with:
-   - Root cause explanation (what actually caused the problem)
-   - Why the fix works (technical reasoning)
-   - Prevention tips for the future
-   - When to escalate (if fix doesn't work)
-   Example: "The 3-beep POST code indicates a RAM failure. In this case, the laptop drop likely caused the RAM module to become unseated. Reseating the RAM allows proper contact with the motherboard, resolving the boot failure. The amber light pattern confirms Dell's RAM diagnostic code. If reseating doesn't work, the RAM module itself may be damaged and need replacement. Always document the beep code pattern as it provides crucial diagnostic information."
+   **Solution**: Comprehensive summary and key takeaways:
+   - Summary of core concepts covered
+   - Best practices and professional standards
+   - Common mistakes to avoid
+   - Real-world applications and scenarios
+   - Further reading or advanced topics to explore
+   Example: "Understanding POST codes is fundamental to hardware troubleshooting. Key takeaways: (1) POST codes are manufacturer-specific diagnostic signals, (2) beep patterns indicate specific hardware failures before OS load, (3) LED indicators provide supplementary diagnostic information, (4) modern UEFI systems offer more detailed error reporting than legacy BIOS. Best practices: Always document beep patterns exactly, consult official manufacturer documentation, and use diagnostic LEDs in conjunction with audio codes for accurate diagnosis. This knowledge enables efficient hardware troubleshooting and reduces diagnostic time in real-world support scenarios."
 
 4. **XP Reward**: ${xpRewards[difficulty as keyof typeof xpRewards]}
 
@@ -888,14 +889,14 @@ Return ONLY a valid JSON array with NO additional text:
   }
 ]
 
-Make every scenario feel like a real support ticket you'd actually encounter. Include specific details, real tools, actual commands, and practical troubleshooting logic.`;
+Make every lesson educational and theory-focused. Explain concepts clearly with examples, but NEVER mention audio, video, or multimedia content. Keep everything text-based.`;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are a senior IT support specialist and training instructor with 15+ years of hands-on help desk experience. You create PRACTICAL, realistic training scenarios based on actual support tickets you've handled. Your scenarios include specific error messages, exact commands, real tools, and detailed troubleshooting steps - NOT theoretical knowledge. Every scenario should feel like a real ticket from a real user. Always respond with valid JSON only, no additional text or markdown.",
+            content: "You are a senior IT support training instructor with 15+ years of experience creating educational content. You create comprehensive, TEXT-BASED theory lessons that explain IT concepts clearly. NEVER reference audio, video, podcasts, or any multimedia content. Focus entirely on written educational material with detailed explanations, technical concepts, and step-by-step learning points. Every lesson should be informative, well-structured, and teach core IT support knowledge. Always respond with valid JSON only, no additional text or markdown.",
           },
           {
             role: "user",

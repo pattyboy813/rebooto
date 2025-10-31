@@ -312,23 +312,22 @@ export default function UserSettings() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription className="space-y-4">
-              <p>This action cannot be undone. This will permanently delete your account and remove all your data from our servers.</p>
-              {userData?.authProvider === "local" && (
-                <div>
-                  <label className="text-sm font-medium">Enter your password to confirm</label>
-                  <Input
-                    type="password"
-                    value={deletePassword}
-                    onChange={(e) => setDeletePassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="mt-2"
-                    data-testid="input-delete-password"
-                  />
-                </div>
-              )}
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your account and remove all your data from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {userData?.authProvider === "local" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Enter your password to confirm</label>
+              <Input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Enter password"
+                data-testid="input-delete-password"
+              />
+            </div>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
             <AlertDialogAction
