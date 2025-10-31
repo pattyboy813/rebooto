@@ -465,3 +465,38 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertDocumentationArticle = z.infer<typeof insertDocumentationArticleSchema>;
 export type DocumentationArticle = typeof documentationArticles.$inferSelect;
+
+// Lesson Content Block Types
+export const textBlockSchema = z.object({
+  type: z.literal("text"),
+  content: z.string().min(1, "Text content cannot be empty"),
+});
+
+export const scenarioBlockSchema = z.object({
+  type: z.literal("scenario"),
+  content: z.string().min(1, "Scenario content cannot be empty"),
+  title: z.string().optional(),
+});
+
+export const quizBlockSchema = z.object({
+  type: z.literal("quiz"),
+  question: z.string().min(10, "Question must be at least 10 characters"),
+  options: z.array(z.string()).min(2).max(5, "Quiz must have 2-5 options"),
+  correctAnswer: z.number().min(0, "Correct answer must be a valid option index"),
+  explanation: z.string().min(10, "Explanation is required for learning"),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+});
+
+export const lessonContentBlockSchema = z.discriminatedUnion("type", [
+  textBlockSchema,
+  scenarioBlockSchema,
+  quizBlockSchema,
+]);
+
+export const lessonContentArraySchema = z.array(lessonContentBlockSchema).min(1, "Lesson must have at least one content block");
+
+export type TextBlock = z.infer<typeof textBlockSchema>;
+export type ScenarioBlock = z.infer<typeof scenarioBlockSchema>;
+export type QuizBlock = z.infer<typeof quizBlockSchema>;
+export type LessonContentBlock = z.infer<typeof lessonContentBlockSchema>;
+export type LessonContentArray = z.infer<typeof lessonContentArraySchema>;

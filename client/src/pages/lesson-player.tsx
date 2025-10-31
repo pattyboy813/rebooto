@@ -5,23 +5,32 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, Award, CheckCircle2, Sparkles } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, Award, CheckCircle2, Sparkles, XCircle, Clock, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import type { Lesson, Course } from "@shared/schema";
+import type { Lesson, Course, QuizBlock } from "@shared/schema";
 
 interface LessonContent {
   type: "text" | "scenario" | "quiz";
-  content: string;
+  content?: string;
+  title?: string;
   question?: string;
   options?: string[];
   correctAnswer?: number;
+  explanation?: string;
 }
 
 interface CourseWithLessons extends Course {
   lessons: Lesson[];
+}
+
+interface QuizAnswer {
+  selected: number;
+  isCorrect: boolean;
+  shown: boolean;
 }
 
 export default function LessonPlayer() {
@@ -33,6 +42,8 @@ export default function LessonPlayer() {
   const [userChoices, setUserChoices] = useState<number[]>([]);
   const [showXPDialog, setShowXPDialog] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Map<number, QuizAnswer>>(new Map());
+  const [autoAdvanceTimer, setAutoAdvanceTimer] = useState<number | null>(null);
 
   const parsedCourseId = parseInt(courseId || "0");
   const parsedLessonId = parseInt(lessonId || "0");
@@ -41,6 +52,8 @@ export default function LessonPlayer() {
   useEffect(() => {
     setCurrentStep(0);
     setUserChoices([]);
+    setQuizAnswers(new Map());
+    setAutoAdvanceTimer(null);
   }, [parsedLessonId]);
 
   const { data: lesson, isLoading: lessonLoading } = useQuery<Lesson>({
@@ -114,9 +127,56 @@ export default function LessonPlayer() {
     },
   });
 
+  // Auto-advance timer for non-interactive content
+  useEffect(() => {
+    if (!content || content.length === 0) return;
+    
+    const currentContent = content[currentStep];
+    const isLastStep = currentStep === content.length - 1;
+    
+    // Only auto-advance for text and scenario blocks (not quiz, not last step)
+    if (!isLastStep && (currentContent.type === "text" || currentContent.type === "scenario")) {
+      // Calculate reading time: ~200 words per minute, minimum 5 seconds
+      const wordCount = (currentContent.content || "").split(" ").length;
+      const readingTimeMs = Math.max(5000, (wordCount / 200) * 60 * 1000);
+      
+      const timer = window.setTimeout(() => {
+        setCurrentStep(currentStep + 1);
+        setAutoAdvanceTimer(null);
+      }, readingTimeMs);
+      
+      setAutoAdvanceTimer(readingTimeMs);
+      
+      return () => {
+        window.clearTimeout(timer);
+        setAutoAdvanceTimer(null);
+      };
+    } else {
+      setAutoAdvanceTimer(null);
+    }
+  }, [currentStep, content]);
+
   const handleChoice = (choiceIndex: number) => {
+    if (!content || !content[currentStep]) return;
+    
+    const currentContent = content[currentStep];
+    if (currentContent.type !== "quiz") return;
+    
+    const isCorrect = currentContent.correctAnswer === choiceIndex;
+    
+    // Store the quiz answer with feedback
+    const newAnswers = new Map(quizAnswers);
+    newAnswers.set(currentStep, {
+      selected: choiceIndex,
+      isCorrect,
+      shown: true,
+    });
+    setQuizAnswers(newAnswers);
+    
+    // Update user choices for score tracking
+    const quizIndex = content.slice(0, currentStep + 1).filter(c => c.type === "quiz").length - 1;
     const newChoices = [...userChoices];
-    newChoices[currentStep] = choiceIndex;
+    newChoices[quizIndex] = choiceIndex;
     setUserChoices(newChoices);
   };
 
@@ -134,6 +194,18 @@ export default function LessonPlayer() {
 
   const handleComplete = () => {
     completeMutation.mutate();
+  };
+
+  const canProceed = () => {
+    if (!content || !content[currentStep]) return true;
+    const currentContent = content[currentStep];
+    
+    // For quiz blocks, user must answer before proceeding
+    if (currentContent.type === "quiz") {
+      return quizAnswers.has(currentStep);
+    }
+    
+    return true;
   };
 
   const handleDialogClose = () => {
@@ -298,39 +370,112 @@ export default function LessonPlayer() {
                     >
                       {currentContent.question}
                     </h3>
-                    <div className="space-y-3">
-                      {currentContent.options?.map((option: string, index: number) => (
-                        <Card
-                          key={index}
-                          className={`p-4 cursor-pointer transition-all hover-elevate ${
-                            userChoices[currentStep] === index
-                              ? "border-teal-600 bg-teal-50"
-                              : "border-gray-200"
-                          }`}
-                          onClick={() => handleChoice(index)}
-                          data-testid={`option-${index}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                                userChoices[currentStep] === index
-                                  ? "border-teal-600 bg-teal-600"
-                                  : "border-gray-300"
-                              }`}
-                            >
-                              {userChoices[currentStep] === index && (
-                                <CheckCircle2 className="w-4 h-4 text-white" />
-                              )}
+                    <div className="space-y-3 mb-6">
+                      {currentContent.options?.map((option: string, index: number) => {
+                        const answer = quizAnswers.get(currentStep);
+                        const isSelected = answer?.selected === index;
+                        const isCorrect = currentContent.correctAnswer === index;
+                        const showFeedback = answer?.shown;
+                        
+                        return (
+                          <Card
+                            key={index}
+                            className={`p-4 transition-all ${
+                              !showFeedback ? "cursor-pointer hover-elevate" : ""
+                            } ${
+                              showFeedback && isCorrect
+                                ? "border-green-500 bg-green-50"
+                                : showFeedback && isSelected && !isCorrect
+                                ? "border-red-500 bg-red-50"
+                                : isSelected
+                                ? "border-teal-600 bg-teal-50"
+                                : "border-gray-200"
+                            }`}
+                            onClick={() => !showFeedback && handleChoice(index)}
+                            data-testid={`option-${index}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                  showFeedback && isCorrect
+                                    ? "border-green-600 bg-green-600"
+                                    : showFeedback && isSelected && !isCorrect
+                                    ? "border-red-600 bg-red-600"
+                                    : isSelected
+                                    ? "border-teal-600 bg-teal-600"
+                                    : "border-gray-300"
+                                }`}
+                              >
+                                {showFeedback && isCorrect && (
+                                  <Check className="w-4 h-4 text-white" />
+                                )}
+                                {showFeedback && isSelected && !isCorrect && (
+                                  <X className="w-4 h-4 text-white" />
+                                )}
+                                {!showFeedback && isSelected && (
+                                  <CheckCircle2 className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                              <p className={`text-gray-700 ${showFeedback && isCorrect ? "font-semibold" : ""}`}>
+                                {option}
+                              </p>
                             </div>
-                            <p className="text-gray-700">{option}</p>
-                          </div>
-                        </Card>
-                      ))}
+                          </Card>
+                        );
+                      })}
                     </div>
+                    
+                    {quizAnswers.has(currentStep) && (
+                      <Alert className={`${
+                        quizAnswers.get(currentStep)?.isCorrect
+                          ? "border-green-500 bg-green-50"
+                          : "border-orange-500 bg-orange-50"
+                      }`}>
+                        <div className="flex gap-3">
+                          {quizAnswers.get(currentStep)?.isCorrect ? (
+                            <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          ) : (
+                            <XCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                          )}
+                          <div>
+                            <p className={`font-semibold mb-2 ${
+                              quizAnswers.get(currentStep)?.isCorrect
+                                ? "text-green-900"
+                                : "text-orange-900"
+                            }`}>
+                              {quizAnswers.get(currentStep)?.isCorrect ? "Correct!" : "Not quite right"}
+                            </p>
+                            {currentContent.explanation ? (
+                              <AlertDescription className="text-gray-700">
+                                {currentContent.explanation}
+                              </AlertDescription>
+                            ) : (
+                              <AlertDescription className="text-gray-600 italic">
+                                {quizAnswers.get(currentStep)?.isCorrect 
+                                  ? "Great job! You selected the correct answer."
+                                  : "Review the lesson content to understand the correct answer."}
+                              </AlertDescription>
+                            )}
+                          </div>
+                        </div>
+                      </Alert>
+                    )}
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
+
+            {/* Auto-advance timer indicator */}
+            {autoAdvanceTimer && (currentContent.type === "text" || currentContent.type === "scenario") && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 flex items-center gap-2 text-sm text-gray-600"
+              >
+                <Clock className="w-4 h-4" />
+                <span>Auto-advancing in {Math.ceil(autoAdvanceTimer / 1000)}s... (or click Next)</span>
+              </motion.div>
+            )}
 
             <div className="flex items-center justify-between mt-8 gap-4">
               <Button
@@ -343,19 +488,35 @@ export default function LessonPlayer() {
                 Previous
               </Button>
               <div className="flex gap-2">
-                {content.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentStep ? "bg-teal-600" : "bg-gray-300"
-                    }`}
-                  />
-                ))}
+                {content.map((item, index) => {
+                  const isQuiz = item.type === "quiz";
+                  const isAnswered = quizAnswers.has(index);
+                  const isCorrect = quizAnswers.get(index)?.isCorrect;
+                  
+                  return (
+                    <div
+                      key={index}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === currentStep
+                          ? "bg-teal-600"
+                          : isQuiz && isAnswered
+                          ? isCorrect
+                            ? "bg-green-500"
+                            : "bg-orange-500"
+                          : index < currentStep
+                          ? "bg-gray-400"
+                          : "bg-gray-300"
+                      }`}
+                      data-testid={`progress-dot-${index}`}
+                    />
+                  );
+                })}
               </div>
               {!isLastStep ? (
                 <Button
                   className="rounded-xl bg-gradient-admin text-white"
                   onClick={handleNext}
+                  disabled={!canProceed()}
                   data-testid="button-next"
                 >
                   Next
@@ -364,7 +525,7 @@ export default function LessonPlayer() {
                 <Button
                   className="rounded-xl bg-gradient-admin text-white"
                   onClick={handleComplete}
-                  disabled={completeMutation.isPending}
+                  disabled={completeMutation.isPending || !canProceed()}
                   data-testid="button-complete"
                 >
                   {completeMutation.isPending ? "Completing..." : "Complete Lesson"}

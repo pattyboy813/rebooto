@@ -3,7 +3,13 @@
 ## Overview
 Rebooto is a gamified IT support learning platform designed to provide an engaging and effective learning experience. It features email/password authentication, distinct user and admin portals, and a modern, smoothly animated user interface. The platform's core capabilities include AI-generated courses (powered by OpenAI GPT-4o), comprehensive progress tracking with XP, levels, and achievements, and robust administrative tools for content and user management. Rebooto aims to provide job-ready skills through real-world scenarios and gamified learning.
 
-**Recent Updates (Oct 31, 2025)**: Code cleanup - archived 15 deprecated components to `/archived` folder. The codebase now uses a single, consistent Modern-prefixed design system. All lesson progression bugs fixed and AI course generator restructured for text-based theory content.
+**Recent Updates (Oct 31, 2025)**: 
+- **Interactive Learning**: Added interactive quiz questions with immediate feedback, answer validation, and detailed explanations. Lessons now include multiple-choice questions that test understanding with correct/incorrect indicators (green/red).
+- **Auto-Advance Timer**: Non-interactive content (text/scenario blocks) automatically advances after calculated reading time (~200 words/min, min 5s) with visible countdown.
+- **Course Completion Tracking**: Fixed bug where courses weren't recognized as completed. System now properly marks enrollments complete when all lessons are finished.
+- **Content Schema**: Implemented block-based lesson structure (TextBlock, ScenarioBlock, QuizBlock) with Zod validation ensuring AI generates proper quiz format with options, correctAnswer, and explanations.
+- **Visual Indicators**: Progress dots show quiz performance (green=correct, orange=incorrect), completed lessons display checkmarks.
+- **Code Cleanup**: Archived 15 deprecated components, fixed LSP errors in blog routes.
 
 ## User Preferences
 I prefer detailed explanations, especially for complex architectural decisions. I want iterative development, with clear communication before major changes are made to the codebase. Ensure the design maintains a premium/minimalist aesthetic with playful elements.

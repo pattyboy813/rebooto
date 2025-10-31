@@ -667,6 +667,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Check if all lessons in the course are now completed
+      const course = await storage.getCourse(lesson.courseId);
+      if (course) {
+        const courseLessons = await storage.getLessonsByCourse(lesson.courseId);
+        const allCompleted = await Promise.all(
+          courseLessons.map(async (l: Lesson) => {
+            const p = await storage.getUserProgress(user.id, l.id);
+            return p?.completed || false;
+          })
+        );
+        
+        if (allCompleted.every((c: boolean) => c === true)) {
+          // All lessons completed - mark course enrollment as complete
+          const userEnrollments = await storage.getUserEnrollments(user.id);
+          const enrollment = userEnrollments.find((e: any) => e.courseId === lesson.courseId);
+          if (enrollment && !enrollment.completedAt) {
+            await storage.completeEnrollment(enrollment.id);
+          }
+        }
+      }
+      
       res.json({ progress: updatedProgress, xpAwarded: lesson.xpReward });
     } catch (error) {
       console.error("Error completing lesson:", error);
@@ -810,93 +831,105 @@ Description: ${description}
 Category: ${category}
 Difficulty: ${difficulty}
 
-CRITICAL: Create TEXT-BASED educational content. NO references to audio, video, podcasts, or multimedia. Focus on written theory, concepts, and step-by-step explanations.
+CRITICAL: Create TEXT-BASED educational content. NO references to audio, video, podcasts, or multimedia. Focus on written theory, concepts, and interactive quiz questions.
 
-For each lesson, create:
-1. **Title**: Clear, educational topic (e.g., "Understanding Boot Processes and POST Codes" or "Network Troubleshooting Methodology")
+For each lesson, create a "content" array with blocks in this exact structure:
 
-2. **Description**: Brief 1-2 sentence overview of what the lesson teaches
+**BLOCK 1 - SCENARIO** (type: "scenario"):
+- Introduce the topic with context and real-world relevance
+- Explain why this knowledge is important for IT support
+- Set learning objectives
+Example: "Understanding BIOS POST codes is essential for hardware diagnostics. When a computer fails to boot, POST codes help identify the exact hardware component causing the issue. This lesson teaches you to interpret beep patterns, LED indicators, and troubleshoot boot failures effectively."
 
-3. **Content** (THIS IS THE MOST IMPORTANT PART - Make it detailed and educational):
-   
-   **Problem**: Present a realistic IT scenario or concept to learn. Include:
-   - Context and background information
-   - Key concepts or technical terms explained
-   - Real-world application or scenario description
-   - Learning objectives for this lesson
-   Example: "Understanding BIOS POST (Power-On Self-Test) codes is essential for hardware diagnostics. When a computer starts, the BIOS performs system checks and communicates issues through beep codes and LED patterns. This lesson covers how to interpret these diagnostic signals and troubleshoot hardware failures effectively."
+**BLOCKS 2-${difficulty === 'Beginner' ? '7' : difficulty === 'Intermediate' ? '9' : '11'} - TEXT** (type: "text"):
+- Each block teaches one specific concept or technique
+- Include technical details, terminology, and examples
+- Build knowledge progressively from basics to advanced
+- Use concrete examples and real-world applications
+Example blocks:
+- "POST (Power-On Self-Test) runs automatically when powering on a computer, checking all hardware components before loading the operating system. The BIOS executes this diagnostic to ensure system stability."
+- "Different manufacturers use unique beep code patterns. Dell systems use 1-3-2 (motherboard issue), while AMI BIOS uses 3 short beeps for memory errors. Always consult manufacturer documentation."
+- "LED diagnostic lights provide visual feedback: solid amber indicates power/battery problems, blinking amber suggests motherboard failure, and solid white shows normal operation."
 
-   **Steps**: Detailed educational content broken into ${difficulty === 'Beginner' ? '7-12' : difficulty === 'Intermediate' ? '10-15' : '12-18'} learning points. Each step should:
-   - Explain a specific concept, process, or technique
-   - Include technical details and terminology
-   - Provide examples and practical applications
-   - Build understanding progressively from basics to advanced
-   Example steps:
-   - "POST (Power-On Self-Test) is a diagnostic process that runs automatically when you power on a computer, checking hardware components before loading the operating system"
-   - "The BIOS firmware stores a table of beep codes, where different patterns indicate specific hardware failures - manufacturers like Dell, HP, and AMI each have their own code systems"
-   - "A single short beep typically indicates successful POST completion and normal system startup"
-   - "Three short beeps in most systems signal a RAM (Random Access Memory) error, suggesting the memory modules are not properly seated or have failed"
-   - "Continuous beeping usually points to a power supply issue or motherboard problem requiring immediate attention"
-   - "LED diagnostic lights on modern computers provide visual feedback: amber/orange typically indicates power/battery issues, while white/blue shows normal operation"
-   - "When troubleshooting beep codes, always consult the manufacturer's documentation as patterns vary between BIOS vendors (AMI, Award, Phoenix)"
-   - "Common RAM-related beep codes: 3 beeps (base memory failure), 2 beeps (parity error), 5 beeps (processor failure)"
-   - "Document the exact beep pattern: count the number of beeps, note any pauses, and observe if the pattern repeats"
-   - "Modern UEFI systems often display error codes on-screen or use QR codes that link to troubleshooting guides, supplementing traditional beep codes"
+**BLOCKS ${difficulty === 'Beginner' ? '8-10' : difficulty === 'Intermediate' ? '10-12' : '12-15'} - QUIZ** (type: "quiz"):
+Create ${difficulty === 'Beginner' ? '3' : difficulty === 'Intermediate' ? '3' : '4'} multiple-choice questions that TEST the concepts taught. Each quiz must have:
+- "question": Clear, specific question about the lesson content
+- "options": Array of ${difficulty === 'Beginner' ? '3' : '4'} plausible answers (one correct, others are realistic distractors)
+- "correctAnswer": Index (0-based) of the correct option
+- "explanation": Detailed explanation of WHY the answer is correct and why other options are wrong
 
-   **Solution**: Comprehensive summary and key takeaways:
-   - Summary of core concepts covered
-   - Best practices and professional standards
-   - Common mistakes to avoid
-   - Real-world applications and scenarios
-   - Further reading or advanced topics to explore
-   Example: "Understanding POST codes is fundamental to hardware troubleshooting. Key takeaways: (1) POST codes are manufacturer-specific diagnostic signals, (2) beep patterns indicate specific hardware failures before OS load, (3) LED indicators provide supplementary diagnostic information, (4) modern UEFI systems offer more detailed error reporting than legacy BIOS. Best practices: Always document beep patterns exactly, consult official manufacturer documentation, and use diagnostic LEDs in conjunction with audio codes for accurate diagnosis. This knowledge enables efficient hardware troubleshooting and reduces diagnostic time in real-world support scenarios."
-
-4. **XP Reward**: ${xpRewards[difficulty as keyof typeof xpRewards]}
+Example quiz block:
+{
+  "type": "quiz",
+  "question": "A computer emits three short beeps during startup and fails to display anything on screen. Based on standard AMI BIOS codes, what is the most likely cause?",
+  "options": [
+    "Hard drive failure",
+    "RAM (memory) error or improperly seated modules",
+    "Overheating CPU",
+    "Power supply malfunction"
+  ],
+  "correctAnswer": 1,
+  "explanation": "Three short beeps in AMI BIOS specifically indicate a base memory (RAM) error. This is one of the most common POST failure codes. The RAM modules may be improperly seated, incompatible, or faulty. Hard drive issues don't trigger POST beeps since POST occurs before drive detection. CPU overheating would cause shutdown, not beep codes. Power supply failure would prevent any beeps at all."
+}
 
 ${category === 'Hardware Headaches' ? `
-HARDWARE SCENARIOS should include:
-- Specific error codes (beep codes, LED patterns, BIOS codes)
-- Physical components to check (RAM, HDD, cables, power supply)
-- Diagnostic tools (POST cards, multimeters, hardware diagnostics)
-- Actual hardware models/brands when relevant
+HARDWARE TOPICS should include:
+- Specific diagnostic codes (POST beeps, LED patterns, BIOS error codes)
+- Physical components (RAM, motherboard, PSU, drives, cables)
+- Diagnostic tools and techniques
+- Real manufacturer examples (Dell, HP, Lenovo)
 ` : category === 'Network Nightmares' ? `
-NETWORK SCENARIOS should include:
-- Specific error messages ("Cannot obtain IP address", "DNS server not responding")
-- Exact commands (ipconfig /all, ping 8.8.8.8, tracert)
-- Tools to use (Network Diagnostics, Device Manager, router admin panel)
-- IP addresses, subnet masks, gateway configurations
-- Troubleshooting from Layer 1 (physical) up to Layer 7 (application)
+NETWORK TOPICS should include:
+- Network troubleshooting commands (ipconfig, ping, tracert, nslookup)
+- Common error messages and their meanings
+- OSI model layers and troubleshooting approach
+- IP addressing, DNS, DHCP concepts
 ` : `
-SOFTWARE SCENARIOS should include:
-- Actual error codes and messages (e.g., "Error 0x80070005", "Application has stopped working")
-- Specific applications and versions
-- Registry paths or config file locations if relevant
-- Command-line tools (sfc /scannow, DISM, event viewer)
-- Log file locations and what to look for
+SOFTWARE TOPICS should include:
+- Windows error codes and system tools
+- Application troubleshooting methods  
+- Registry, event logs, and diagnostic commands
+- Safe mode, system restore, and recovery options
 `}
 
-Return ONLY a valid JSON array with NO additional text:
+Return ONLY valid JSON array (NO markdown, NO backticks):
 [
   {
-    "title": "Specific problem title",
-    "description": "Brief scenario summary",
-    "content": {
-      "problem": "Detailed help desk ticket with symptoms, error messages, user actions",
-      "steps": ["Actionable step 1", "Actionable step 2", ...],
-      "solution": "Root cause + why fix works + prevention tips"
-    },
+    "title": "Clear lesson title",
+    "description": "1-2 sentence overview",
+    "content": [
+      {
+        "type": "scenario",
+        "content": "Introduction with context..."
+      },
+      {
+        "type": "text",
+        "content": "First concept explanation..."
+      },
+      {
+        "type": "text",
+        "content": "Second concept explanation..."
+      },
+      {
+        "type": "quiz",
+        "question": "Test question?",
+        "options": ["Option 1", "Option 2", "Option 3"],
+        "correctAnswer": 1,
+        "explanation": "Why option 2 is correct..."
+      }
+    ],
     "xpReward": ${xpRewards[difficulty as keyof typeof xpRewards]}
   }
 ]
 
-Make every lesson educational and theory-focused. Explain concepts clearly with examples, but NEVER mention audio, video, or multimedia content. Keep everything text-based.`;
+Make questions challenging but fair. Ensure explanations teach WHY answers are correct.`;
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
             role: "system",
-            content: "You are a senior IT support training instructor with 15+ years of experience creating educational content. You create comprehensive, TEXT-BASED theory lessons that explain IT concepts clearly. NEVER reference audio, video, podcasts, or any multimedia content. Focus entirely on written educational material with detailed explanations, technical concepts, and step-by-step learning points. Every lesson should be informative, well-structured, and teach core IT support knowledge. Always respond with valid JSON only, no additional text or markdown.",
+            content: "You are a senior IT support training instructor with 15+ years of experience creating interactive educational content. You create comprehensive, TEXT-BASED lessons with engaging multiple-choice quiz questions that test understanding. NEVER reference audio, video, podcasts, or any multimedia content. Focus entirely on written educational material with detailed explanations, technical concepts, and interactive learning assessments. Every quiz question must have plausible distractors and clear explanations that reinforce learning. Always respond with valid JSON only - no markdown formatting, no code blocks, no additional text.",
           },
           {
             role: "user",
@@ -914,6 +947,29 @@ Make every lesson educational and theory-focused. Explain concepts clearly with 
       let lessons;
       try {
         lessons = JSON.parse(responseText);
+        
+        // Validate lesson content structure
+        if (Array.isArray(lessons)) {
+          for (let i = 0; i < lessons.length; i++) {
+            const lesson = lessons[i];
+            if (lesson.content && Array.isArray(lesson.content)) {
+              // Validate each content block against our schema
+              const { lessonContentArraySchema } = await import("@shared/schema");
+              try {
+                lessonContentArraySchema.parse(lesson.content);
+              } catch (validationError: any) {
+                console.error("AI Content validation error:", validationError.errors || validationError.message);
+                console.error("Invalid content:", JSON.stringify(lesson.content, null, 2));
+                return res.status(400).json({ 
+                  message: "AI generated invalid lesson structure - please regenerate",
+                  lessonIndex: i,
+                  lessonTitle: lesson.title,
+                  errors: validationError.errors || [validationError.message]
+                });
+              }
+            }
+          }
+        }
       } catch (parseError) {
         console.error("Failed to parse OpenAI response:", responseText);
         return res.status(500).json({ message: "Invalid response format from AI" });
@@ -945,6 +1001,21 @@ Make every lesson educational and theory-focused. Explain concepts clearly with 
 
       const createdLessons = [];
       for (let i = 0; i < lessons.length; i++) {
+        // Validate content structure if using new block format
+        if (lessons[i].content && Array.isArray(lessons[i].content)) {
+          const { lessonContentArraySchema } = await import("@shared/schema");
+          try {
+            lessonContentArraySchema.parse(lessons[i].content);
+          } catch (validationError: any) {
+            return res.status(400).json({ 
+              message: `Lesson ${i + 1} has invalid content structure`,
+              lessonIndex: i,
+              lessonTitle: lessons[i].title,
+              errors: validationError.errors || [validationError.message]
+            });
+          }
+        }
+        
         const validatedLesson = insertLessonSchema.parse({
           ...lessons[i],
           courseId: createdCourse.id,
@@ -997,7 +1068,7 @@ Make every lesson educational and theory-focused. Explain concepts clearly with 
   // Blog Post Routes
   app.get("/api/blog", async (_req, res) => {
     try {
-      const posts = await storage.getPublishedBlogPosts();
+      const posts = await storage.getAllBlogPosts(false);
       res.json(posts);
     } catch (error) {
       console.error("Error fetching blog posts:", error);
@@ -1034,9 +1105,14 @@ Make every lesson educational and theory-focused. Explain concepts clearly with 
 
       const validatedData = createBlogPostSchema.parse(req.body);
       const post = await storage.createBlogPost({
-        ...validatedData,
+        title: validatedData.title,
+        slug: validatedData.slug,
+        excerpt: validatedData.excerpt,
+        content: validatedData.content,
+        coverImageUrl: validatedData.featuredImage || null,
         authorId: currentUser.id,
-        publishedAt: validatedData.published ? new Date() : null,
+        status: validatedData.published ? 'published' : 'draft',
+        readTimeMinutes: Math.ceil(validatedData.content.split(' ').length / 200),
       });
 
       res.status(201).json(post);
