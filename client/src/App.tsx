@@ -25,7 +25,13 @@ import AdminBlogModern from "@/pages/admin-blog-modern";
 import AdminNotices from "@/pages/admin-notices";
 import AdminSupportLogs from "@/pages/admin-support-logs";
 import AdminEmail from "@/pages/admin-email";
+import AdminDashboardModern from "@/pages/admin-dashboard-modern";
+import AdminCourseCreatorModern from "@/pages/admin-course-creator-modern";
 import { AdminLayout as ModernAdminLayout } from "@/layouts/AdminLayout";
+import { ModernUserLayout } from "@/layouts/ModernUserLayout";
+import LandingModern from "@/pages/landing-modern";
+import UserDashboardModern from "@/pages/user-dashboard-modern";
+import CoursesModern from "@/pages/courses-modern";
 import Documentation from "@/pages/documentation";
 import Blog from "@/pages/blog";
 import FAQ from "@/pages/faq";
@@ -39,33 +45,33 @@ import NotFound from "@/pages/not-found";
 
 function UserDashboard() {
   return (
-    <UserLayout>
-      <Dashboard />
-    </UserLayout>
+    <ModernUserLayout>
+      <UserDashboardModern />
+    </ModernUserLayout>
   );
 }
 
 function UserCourses() {
   return (
-    <UserLayout>
-      <Courses />
-    </UserLayout>
+    <ModernUserLayout>
+      <CoursesModern />
+    </ModernUserLayout>
   );
 }
 
 function UserCourseDetail() {
   return (
-    <UserLayout>
+    <ModernUserLayout>
       <CourseDetail />
-    </UserLayout>
+    </ModernUserLayout>
   );
 }
 
 function UserLessonPlayer() {
   return (
-    <UserLayout>
+    <ModernUserLayout>
       <LessonPlayer />
-    </UserLayout>
+    </ModernUserLayout>
   );
 }
 
@@ -239,7 +245,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
-      <Route path="/" component={Home} />
+      <Route path="/" component={LandingModern} />
       <Route path="/auth" component={PremiumAuth} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
@@ -255,12 +261,12 @@ function Router() {
       <Route path="/app/courses" component={UserCourses} />
       <Route path="/app/courses/:id" component={UserCourseDetail} />
       <Route path="/app/courses/:courseId/lessons/:lessonId" component={UserLessonPlayer} />
-      <Route path="/app/settings" component={() => <UserLayout><UserSettings /></UserLayout>} />
+      <Route path="/app/settings" component={() => <ModernUserLayout><UserSettings /></ModernUserLayout>} />
       
       {/* Admin portal routes - protected by AdminLayout */}
       <Route path="/admin/login" component={AdminLoginPage} />
-      <Route path="/admin/dashboard" component={AdminDashboardPage} />
-      <Route path="/admin/courses" component={AdminCourseCreatorPage} />
+      <Route path="/admin/dashboard" component={() => <ModernAdminLayout><AdminDashboardModern /></ModernAdminLayout>} />
+      <Route path="/admin/courses" component={() => <ModernAdminLayout><AdminCourseCreatorModern /></ModernAdminLayout>} />
       <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
       <Route path="/admin/blog" component={() => <ModernAdminLayout><AdminBlogModern /></ModernAdminLayout>} />
       <Route path="/admin/email" component={() => <ModernAdminLayout><AdminEmail /></ModernAdminLayout>} />
