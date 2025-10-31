@@ -25,6 +25,7 @@ import AdminBlogModern from "@/pages/admin-blog-modern";
 import AdminNotices from "@/pages/admin-notices";
 import AdminSupportLogs from "@/pages/admin-support-logs";
 import AdminEmail from "@/pages/admin-email";
+import AdminDashboardModern from "@/pages/admin-dashboard-modern";
 import { AdminLayout as ModernAdminLayout } from "@/layouts/AdminLayout";
 import Documentation from "@/pages/documentation";
 import Blog from "@/pages/blog";
@@ -259,7 +260,7 @@ function Router() {
       
       {/* Admin portal routes - protected by AdminLayout */}
       <Route path="/admin/login" component={AdminLoginPage} />
-      <Route path="/admin/dashboard" component={AdminDashboardPage} />
+      <Route path="/admin/dashboard" component={() => <ModernAdminLayout><AdminDashboardModern /></ModernAdminLayout>} />
       <Route path="/admin/courses" component={AdminCourseCreatorPage} />
       <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
       <Route path="/admin/blog" component={() => <ModernAdminLayout><AdminBlogModern /></ModernAdminLayout>} />
