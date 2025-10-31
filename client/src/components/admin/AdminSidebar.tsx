@@ -40,8 +40,10 @@ const menuSections = [
   {
     label: "Content",
     items: [
-      { title: "AI Course Creator", icon: Wand2, url: "/admin/courses" },
       { title: "Blog Admin", icon: FileText, url: "/admin/blog" },
+      { title: "Manual Course Creator", icon: Edit3, url: "/admin/course-builder" },
+      { title: "Course Editor", icon: BookOpen, url: "/admin/course-editor" },
+      { title: "AI Course Creator", icon: Wand2, url: "/admin/courses" },
     ],
   },
   {
@@ -120,12 +122,12 @@ export function AdminSidebar() {
 
       <SidebarFooter className="border-t border-gray-200 p-4">
         <div className="space-y-2">
-          <Button asChild variant="ghost" className="w-full justify-start gap-2" data-testid="button-back-to-site">
-            <Link href="/">
+          <Link href="/">
+            <Button variant="ghost" className="w-full justify-start gap-2" data-testid="button-back-to-site">
               <Home className="h-4 w-4" />
               Back to Site
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <Button
             variant="ghost"
             className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
