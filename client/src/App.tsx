@@ -261,7 +261,7 @@ function Router() {
       {/* Admin portal routes - protected by AdminLayout */}
       <Route path="/admin/login" component={AdminLoginPage} />
       <Route path="/admin/dashboard" component={() => <ModernAdminLayout><AdminDashboardModern /></ModernAdminLayout>} />
-      <Route path="/admin/courses" component={AdminCourseCreatorPage} />
+      <Route path="/admin/courses" component={() => <ModernAdminLayout><AdminCourseCreator /></ModernAdminLayout>} />
       <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
       <Route path="/admin/blog" component={() => <ModernAdminLayout><AdminBlogModern /></ModernAdminLayout>} />
       <Route path="/admin/email" component={() => <ModernAdminLayout><AdminEmail /></ModernAdminLayout>} />
