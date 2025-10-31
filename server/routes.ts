@@ -11,6 +11,9 @@ import {
   insertLessonSchema,
   localSignupSchema,
   localLoginSchema,
+  insertUserRoleSchema,
+  insertNoticeSchema,
+  insertSupportLogSchema,
 } from "@shared/schema";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -614,7 +617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log(`[Enrollment Check] Course ${courseId} has ${courseLessons.length} lessons`);
     
     const allCompleted = await Promise.all(
-      courseLessons.map(async (l: Lesson) => {
+      courseLessons.map(async (l: any) => {
         const p = await storage.getUserProgress(userId, l.id);
         console.log(`[Enrollment Check] Lesson ${l.id}: progress=${p?.id}, completed=${p?.completed}`);
         return p?.completed || false;
@@ -1187,6 +1190,308 @@ Make questions challenging but fair. Ensure explanations teach WHY answers are c
         return res.status(404).json({ message: error.message });
       }
       res.status(500).json({ message: "Failed to delete blog post" });
+    }
+  });
+
+  // ========== USER ROLE MANAGEMENT ROUTES ==========
+  app.post("/api/admin/roles", requireAdmin, async (req: any, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const validatedData = insertUserRoleSchema.parse(req.body);
+      const role = await storage.assignRole({
+        ...validatedData,
+        grantedBy: currentUser.id,
+      });
+      res.status(201).json(role);
+    } catch (error: any) {
+      console.error("Error assigning role:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to assign role" });
+    }
+  });
+
+  app.get("/api/admin/roles", requireAdmin, async (_req, res) => {
+    try {
+      const roles = await storage.getAllUserRoles();
+      res.json(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      res.status(500).json({ message: "Failed to fetch roles" });
+    }
+  });
+
+  app.get("/api/admin/roles/user/:userId", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const roles = await storage.getUserRoles(userId);
+      res.json(roles);
+    } catch (error) {
+      console.error("Error fetching user roles:", error);
+      res.status(500).json({ message: "Failed to fetch user roles" });
+    }
+  });
+
+  app.delete("/api/admin/roles/user/:userId/role/:roleName", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const roleName = req.params.roleName;
+      await storage.removeRole(userId, roleName);
+      res.json({ message: "Role removed successfully" });
+    } catch (error) {
+      console.error("Error removing role:", error);
+      res.status(500).json({ message: "Failed to remove role" });
+    }
+  });
+
+  // Admin password reset for any user
+  app.post("/api/admin/users/:id/reset-password", requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const { newPassword } = req.body;
+
+      if (!newPassword || newPassword.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const hashedPassword = await hashPassword(newPassword);
+      await storage.updateUser(userId, { hashedPassword });
+
+      res.json({ message: "Password reset successfully" });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
+  // ========== NOTICE MANAGEMENT ROUTES ==========
+  app.post("/api/admin/notices", requireAdmin, async (req: any, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const validatedData = insertNoticeSchema.parse(req.body);
+      const notice = await storage.createNotice({
+        ...validatedData,
+        createdBy: currentUser.id,
+      });
+      res.status(201).json(notice);
+    } catch (error: any) {
+      console.error("Error creating notice:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create notice" });
+    }
+  });
+
+  app.get("/api/admin/notices", requireAdmin, async (_req, res) => {
+    try {
+      const notices = await storage.getAllNotices();
+      res.json(notices);
+    } catch (error) {
+      console.error("Error fetching notices:", error);
+      res.status(500).json({ message: "Failed to fetch notices" });
+    }
+  });
+
+  app.get("/api/notices/active", async (_req, res) => {
+    try {
+      const notices = await storage.getActiveNotices();
+      res.json(notices);
+    } catch (error) {
+      console.error("Error fetching active notices:", error);
+      res.status(500).json({ message: "Failed to fetch active notices" });
+    }
+  });
+
+  app.put("/api/admin/notices/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertNoticeSchema.partial().parse(req.body);
+      const notice = await storage.updateNotice(id, validatedData);
+      res.json(notice);
+    } catch (error: any) {
+      console.error("Error updating notice:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update notice" });
+    }
+  });
+
+  app.post("/api/admin/notices/:id/deactivate", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const notice = await storage.deactivateNotice(id);
+      res.json(notice);
+    } catch (error) {
+      console.error("Error deactivating notice:", error);
+      res.status(500).json({ message: "Failed to deactivate notice" });
+    }
+  });
+
+  app.delete("/api/admin/notices/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteNotice(id);
+      res.json({ message: "Notice deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting notice:", error);
+      res.status(500).json({ message: "Failed to delete notice" });
+    }
+  });
+
+  // ========== SUPPORT LOG ROUTES ==========
+  app.post("/api/support", requireAuth, async (req: any, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const validatedData = insertSupportLogSchema.parse(req.body);
+      const supportLog = await storage.createSupportLog({
+        ...validatedData,
+        userId: currentUser.id,
+        userEmail: currentUser.email,
+      });
+      res.status(201).json(supportLog);
+    } catch (error: any) {
+      console.error("Error creating support log:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create support log" });
+    }
+  });
+
+  app.get("/api/admin/support", requireAdmin, async (_req, res) => {
+    try {
+      const logs = await storage.getAllSupportLogs();
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching support logs:", error);
+      res.status(500).json({ message: "Failed to fetch support logs" });
+    }
+  });
+
+  app.get("/api/admin/support/status/:status", requireAdmin, async (req, res) => {
+    try {
+      const status = req.params.status;
+      const logs = await storage.getSupportLogsByStatus(status);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching support logs by status:", error);
+      res.status(500).json({ message: "Failed to fetch support logs" });
+    }
+  });
+
+  app.get("/api/support/my-tickets", requireAuth, async (req: any, res) => {
+    try {
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const logs = await storage.getUserSupportLogs(currentUser.id);
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching user support logs:", error);
+      res.status(500).json({ message: "Failed to fetch support logs" });
+    }
+  });
+
+  app.put("/api/admin/support/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      const log = await storage.updateSupportLog(id, updates);
+      res.json(log);
+    } catch (error) {
+      console.error("Error updating support log:", error);
+      res.status(500).json({ message: "Failed to update support log" });
+    }
+  });
+
+  app.post("/api/admin/support/:id/resolve", requireAdmin, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const log = await storage.resolveSupportLog(id, currentUser.id);
+      res.json(log);
+    } catch (error) {
+      console.error("Error resolving support log:", error);
+      res.status(500).json({ message: "Failed to resolve support log" });
+    }
+  });
+
+  app.delete("/api/admin/support/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteSupportLog(id);
+      res.json({ message: "Support log deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting support log:", error);
+      res.status(500).json({ message: "Failed to delete support log" });
+    }
+  });
+
+  // ========== EMAIL SENDER ROUTES ==========
+  app.post("/api/admin/email/send", requireAdmin, async (req, res) => {
+    try {
+      const { recipients, subject, body } = req.body;
+
+      if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+        return res.status(400).json({ message: "Recipients array is required" });
+      }
+
+      if (!subject || !body) {
+        return res.status(400).json({ message: "Subject and body are required" });
+      }
+
+      const results = [];
+      for (const email of recipients) {
+        try {
+          await sendEmail(email, subject, body);
+          results.push({ email, status: "sent" });
+        } catch (error) {
+          console.error(`Failed to send email to ${email}:`, error);
+          results.push({ email, status: "failed", error: String(error) });
+        }
+      }
+
+      res.json({ message: "Email sending completed", results });
+    } catch (error) {
+      console.error("Error sending emails:", error);
+      res.status(500).json({ message: "Failed to send emails" });
+    }
+  });
+
+  app.get("/api/admin/email/users", requireAdmin, async (_req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const emails = users.map(u => ({ id: u.id, email: u.email, name: `${u.firstName} ${u.lastName}` }));
+      res.json(emails);
+    } catch (error) {
+      console.error("Error fetching user emails:", error);
+      res.status(500).json({ message: "Failed to fetch user emails" });
     }
   });
 

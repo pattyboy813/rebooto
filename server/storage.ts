@@ -11,6 +11,9 @@ import {
   passwordResetTokens,
   blogPosts,
   documentationArticles,
+  userRoles,
+  notices,
+  supportLogs,
   type User,
   type InsertUser,
   type UpsertUser,
@@ -36,6 +39,12 @@ import {
   type InsertBlogPost,
   type DocumentationArticle,
   type InsertDocumentationArticle,
+  type UserRole,
+  type InsertUserRole,
+  type Notice,
+  type InsertNotice,
+  type SupportLog,
+  type InsertSupportLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, gt, lt } from "drizzle-orm";
@@ -129,6 +138,32 @@ export interface IStorage {
   updateDocumentationArticle(id: number, updates: Partial<InsertDocumentationArticle>): Promise<DocumentationArticle>;
   publishDocumentationArticle(id: number): Promise<DocumentationArticle>;
   deleteDocumentationArticle(id: number): Promise<void>;
+  
+  // User role methods
+  assignRole(role: InsertUserRole): Promise<UserRole>;
+  getUserRoles(userId: number): Promise<UserRole[]>;
+  removeRole(userId: number, role: string): Promise<void>;
+  checkUserHasRole(userId: number, role: string): Promise<boolean>;
+  getAllUserRoles(): Promise<UserRole[]>;
+  
+  // Notice methods
+  createNotice(notice: InsertNotice): Promise<Notice>;
+  getNotice(id: number): Promise<Notice | undefined>;
+  getAllNotices(): Promise<Notice[]>;
+  getActiveNotices(): Promise<Notice[]>;
+  updateNotice(id: number, updates: Partial<InsertNotice>): Promise<Notice>;
+  deactivateNotice(id: number): Promise<Notice>;
+  deleteNotice(id: number): Promise<void>;
+  
+  // Support log methods
+  createSupportLog(log: InsertSupportLog): Promise<SupportLog>;
+  getSupportLog(id: number): Promise<SupportLog | undefined>;
+  getAllSupportLogs(): Promise<SupportLog[]>;
+  getUserSupportLogs(userId: number): Promise<SupportLog[]>;
+  getSupportLogsByStatus(status: string): Promise<SupportLog[]>;
+  updateSupportLog(id: number, updates: Partial<InsertSupportLog>): Promise<SupportLog>;
+  resolveSupportLog(id: number, resolvedById: number): Promise<SupportLog>;
+  deleteSupportLog(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -544,6 +579,127 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDocumentationArticle(id: number): Promise<void> {
     await db.delete(documentationArticles).where(eq(documentationArticles.id, id));
+  }
+
+  // User role methods
+  async assignRole(role: InsertUserRole): Promise<UserRole> {
+    const [userRole] = await db.insert(userRoles).values(role).returning();
+    return userRole;
+  }
+
+  async getUserRoles(userId: number): Promise<UserRole[]> {
+    return await db.select().from(userRoles).where(eq(userRoles.userId, userId));
+  }
+
+  async removeRole(userId: number, role: string): Promise<void> {
+    await db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
+  }
+
+  async checkUserHasRole(userId: number, role: string): Promise<boolean> {
+    const [userRole] = await db.select().from(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.role, role)));
+    return !!userRole;
+  }
+
+  async getAllUserRoles(): Promise<UserRole[]> {
+    return await db.select().from(userRoles).orderBy(userRoles.userId);
+  }
+
+  // Notice methods
+  async createNotice(notice: InsertNotice): Promise<Notice> {
+    const [newNotice] = await db.insert(notices).values(notice).returning();
+    return newNotice;
+  }
+
+  async getNotice(id: number): Promise<Notice | undefined> {
+    const [notice] = await db.select().from(notices).where(eq(notices.id, id));
+    return notice || undefined;
+  }
+
+  async getAllNotices(): Promise<Notice[]> {
+    return await db.select().from(notices).orderBy(desc(notices.createdAt));
+  }
+
+  async getActiveNotices(): Promise<Notice[]> {
+    const now = new Date();
+    const activeNotices = await db
+      .select()
+      .from(notices)
+      .where(eq(notices.isActive, true))
+      .orderBy(desc(notices.createdAt));
+    
+    // Filter by date range in-memory since some notices may not have start/end dates
+    return activeNotices.filter(notice => {
+      const afterStart = !notice.startDate || new Date(notice.startDate) <= now;
+      const beforeEnd = !notice.endDate || new Date(notice.endDate) >= now;
+      return afterStart && beforeEnd;
+    });
+  }
+
+  async updateNotice(id: number, updates: Partial<InsertNotice>): Promise<Notice> {
+    const [notice] = await db
+      .update(notices)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(notices.id, id))
+      .returning();
+    return notice;
+  }
+
+  async deactivateNotice(id: number): Promise<Notice> {
+    const [notice] = await db
+      .update(notices)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(notices.id, id))
+      .returning();
+    return notice;
+  }
+
+  async deleteNotice(id: number): Promise<void> {
+    await db.delete(notices).where(eq(notices.id, id));
+  }
+
+  // Support log methods
+  async createSupportLog(log: InsertSupportLog): Promise<SupportLog> {
+    const [supportLog] = await db.insert(supportLogs).values(log).returning();
+    return supportLog;
+  }
+
+  async getSupportLog(id: number): Promise<SupportLog | undefined> {
+    const [log] = await db.select().from(supportLogs).where(eq(supportLogs.id, id));
+    return log || undefined;
+  }
+
+  async getAllSupportLogs(): Promise<SupportLog[]> {
+    return await db.select().from(supportLogs).orderBy(desc(supportLogs.createdAt));
+  }
+
+  async getUserSupportLogs(userId: number): Promise<SupportLog[]> {
+    return await db.select().from(supportLogs).where(eq(supportLogs.userId, userId)).orderBy(desc(supportLogs.createdAt));
+  }
+
+  async getSupportLogsByStatus(status: string): Promise<SupportLog[]> {
+    return await db.select().from(supportLogs).where(eq(supportLogs.status, status)).orderBy(desc(supportLogs.createdAt));
+  }
+
+  async updateSupportLog(id: number, updates: Partial<InsertSupportLog>): Promise<SupportLog> {
+    const [log] = await db
+      .update(supportLogs)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(supportLogs.id, id))
+      .returning();
+    return log;
+  }
+
+  async resolveSupportLog(id: number, resolvedById: number): Promise<SupportLog> {
+    const [log] = await db
+      .update(supportLogs)
+      .set({ status: "resolved", resolvedBy: resolvedById, resolvedAt: new Date(), updatedAt: new Date() })
+      .where(eq(supportLogs.id, id))
+      .returning();
+    return log;
+  }
+
+  async deleteSupportLog(id: number): Promise<void> {
+    await db.delete(supportLogs).where(eq(supportLogs.id, id));
   }
 }
 

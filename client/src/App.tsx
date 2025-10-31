@@ -20,6 +20,8 @@ import AdminUsersPage from "@/pages/admin-users";
 import AdminCampaignsPage from "@/pages/admin-campaigns";
 import AdminSettingsPage from "@/pages/admin-settings";
 import AdminBlogPage from "@/pages/admin-blog";
+import AdminUserManagement from "@/pages/admin-user-management";
+import { AdminLayout as ModernAdminLayout } from "@/layouts/AdminLayout";
 import Documentation from "@/pages/documentation";
 import Blog from "@/pages/blog";
 import FAQ from "@/pages/faq";
@@ -255,7 +257,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLoginPage} />
       <Route path="/admin/dashboard" component={AdminDashboardPage} />
       <Route path="/admin/courses" component={AdminCourseCreatorPage} />
-      <Route path="/admin/users" component={AdminUsersPage} />
+      <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
       <Route path="/admin/blog" component={AdminBlogPage} />
       <Route path="/admin/campaigns" component={AdminCampaignsPage} />
       <Route path="/admin/settings" component={AdminSettingsPage} />

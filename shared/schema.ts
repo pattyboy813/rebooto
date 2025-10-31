@@ -184,6 +184,51 @@ export const documentationArticles = pgTable("documentation_articles", {
   slugIndex: index("idx_doc_slug").on(table.slug),
 }));
 
+// User Roles for Role-Based Access Control
+export const userRoles = pgTable("user_roles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  role: varchar("role", { length: 50 }).notNull(), // "admin", "blog", "course", "support"
+  grantedBy: integer("granted_by").notNull().references(() => users.id),
+  grantedAt: timestamp("granted_at").defaultNow().notNull(),
+}, (table) => ({
+  uniqueUserRole: unique().on(table.userId, table.role),
+  userIdIndex: index("idx_user_roles_user").on(table.userId),
+}));
+
+// Notices for Maintenance Announcements
+export const notices = pgTable("notices", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: varchar("type", { length: 20 }).notNull().default("info"), // "info", "warning", "maintenance", "success"
+  isActive: boolean("is_active").notNull().default(true),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdBy: integer("created_by").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Support Logs for Tracking Support Interactions
+export const supportLogs = pgTable("support_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: 'set null' }), // Nullable if user is deleted
+  userEmail: varchar("user_email", { length: 255 }), // Store email separately in case user is deleted
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("open"), // "open", "in_progress", "resolved", "closed"
+  priority: varchar("priority", { length: 20 }).notNull().default("medium"), // "low", "medium", "high", "urgent"
+  assignedTo: integer("assigned_to").references(() => users.id, { onDelete: 'set null' }),
+  resolvedBy: integer("resolved_by").references(() => users.id, { onDelete: 'set null' }),
+  resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  statusIndex: index("idx_support_logs_status").on(table.status),
+  userIdIndex: index("idx_support_logs_user").on(table.userId),
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({
   progress: many(userProgress),
   feedback: many(feedback),
@@ -196,6 +241,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   passwordResetTokens: many(passwordResetTokens),
   blogPosts: many(blogPosts),
   documentationArticles: many(documentationArticles),
+  roles: many(userRoles),
+  createdNotices: many(notices),
+  supportLogs: many(supportLogs),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -304,6 +352,39 @@ export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
 export const documentationArticlesRelations = relations(documentationArticles, ({ one }) => ({
   author: one(users, {
     fields: [documentationArticles.authorId],
+    references: [users.id],
+  }),
+}));
+
+export const userRolesRelations = relations(userRoles, ({ one }) => ({
+  user: one(users, {
+    fields: [userRoles.userId],
+    references: [users.id],
+  }),
+  grantor: one(users, {
+    fields: [userRoles.grantedBy],
+    references: [users.id],
+  }),
+}));
+
+export const noticesRelations = relations(notices, ({ one }) => ({
+  creator: one(users, {
+    fields: [notices.createdBy],
+    references: [users.id],
+  }),
+}));
+
+export const supportLogsRelations = relations(supportLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [supportLogs.userId],
+    references: [users.id],
+  }),
+  assignee: one(users, {
+    fields: [supportLogs.assignedTo],
+    references: [users.id],
+  }),
+  resolver: one(users, {
+    fields: [supportLogs.resolvedBy],
     references: [users.id],
   }),
 }));
@@ -432,6 +513,35 @@ export const insertDocumentationArticleSchema = createInsertSchema(documentation
   category: z.enum(["Getting Started", "Courses", "Progress & Achievements", "Account & Settings", "Admin", "Technical", "FAQ"]),
 });
 
+export const insertUserRoleSchema = createInsertSchema(userRoles).omit({
+  id: true,
+  grantedAt: true,
+}).extend({
+  role: z.enum(["admin", "blog", "course", "support"], { message: "Invalid role type" }),
+});
+
+export const insertNoticeSchema = createInsertSchema(notices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  type: z.enum(["info", "warning", "maintenance", "success"], { message: "Invalid notice type" }),
+});
+
+export const insertSupportLogSchema = createInsertSchema(supportLogs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  resolvedAt: true,
+}).extend({
+  subject: z.string().min(5, "Subject must be at least 5 characters"),
+  message: z.string().min(20, "Message must be at least 20 characters"),
+  status: z.enum(["open", "in_progress", "resolved", "closed"]).optional(),
+  priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type LocalSignup = z.infer<typeof localSignupSchema>;
@@ -465,6 +575,12 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertDocumentationArticle = z.infer<typeof insertDocumentationArticleSchema>;
 export type DocumentationArticle = typeof documentationArticles.$inferSelect;
+export type InsertUserRole = z.infer<typeof insertUserRoleSchema>;
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertNotice = z.infer<typeof insertNoticeSchema>;
+export type Notice = typeof notices.$inferSelect;
+export type InsertSupportLog = z.infer<typeof insertSupportLogSchema>;
+export type SupportLog = typeof supportLogs.$inferSelect;
 
 // Lesson Content Block Types
 export const textBlockSchema = z.object({
