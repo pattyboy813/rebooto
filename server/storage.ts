@@ -14,6 +14,7 @@ import {
   userRoles,
   notices,
   supportLogs,
+  supportTicketResponses,
   type User,
   type InsertUser,
   type UpsertUser,
@@ -45,6 +46,8 @@ import {
   type InsertNotice,
   type SupportLog,
   type InsertSupportLog,
+  type SupportTicketResponse,
+  type InsertSupportTicketResponse,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, gt, lt } from "drizzle-orm";
@@ -164,6 +167,11 @@ export interface IStorage {
   updateSupportLog(id: number, updates: Partial<InsertSupportLog>): Promise<SupportLog>;
   resolveSupportLog(id: number, resolvedById: number): Promise<SupportLog>;
   deleteSupportLog(id: number): Promise<void>;
+  
+  // Support ticket response methods
+  createTicketResponse(response: InsertSupportTicketResponse): Promise<SupportTicketResponse>;
+  getTicketResponses(ticketId: number): Promise<SupportTicketResponse[]>;
+  deleteTicketResponse(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -700,6 +708,24 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSupportLog(id: number): Promise<void> {
     await db.delete(supportLogs).where(eq(supportLogs.id, id));
+  }
+
+  // Support ticket response methods
+  async createTicketResponse(response: InsertSupportTicketResponse): Promise<SupportTicketResponse> {
+    const [ticketResponse] = await db.insert(supportTicketResponses).values(response).returning();
+    return ticketResponse;
+  }
+
+  async getTicketResponses(ticketId: number): Promise<SupportTicketResponse[]> {
+    return await db
+      .select()
+      .from(supportTicketResponses)
+      .where(eq(supportTicketResponses.ticketId, ticketId))
+      .orderBy(supportTicketResponses.createdAt);
+  }
+
+  async deleteTicketResponse(id: number): Promise<void> {
+    await db.delete(supportTicketResponses).where(eq(supportTicketResponses.id, id));
   }
 }
 

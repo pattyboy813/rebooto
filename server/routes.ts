@@ -1453,6 +1453,88 @@ Make questions challenging but fair. Ensure explanations teach WHY answers are c
     }
   });
 
+  // Get single ticket with responses
+  app.get("/api/support/:id", requireAuth, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const ticket = await storage.getSupportLog(id);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      // Users can only see their own tickets unless they're admin
+      if (ticket.userId !== currentUser.id && !currentUser.isAdmin) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const responses = await storage.getTicketResponses(id);
+      res.json({ ticket, responses });
+    } catch (error) {
+      console.error("Error fetching ticket:", error);
+      res.status(500).json({ message: "Failed to fetch ticket" });
+    }
+  });
+
+  // Add response to ticket
+  app.post("/api/support/:id/responses", requireAuth, async (req: any, res) => {
+    try {
+      const ticketId = parseInt(req.params.id);
+      const currentUser = await getCurrentUser(req);
+      if (!currentUser) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const ticket = await storage.getSupportLog(ticketId);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      // Users can only respond to their own tickets unless they're admin
+      if (ticket.userId !== currentUser.id && !currentUser.isAdmin) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { message } = req.body;
+      if (!message || message.trim().length === 0) {
+        return res.status(400).json({ message: "Response message is required" });
+      }
+
+      const response = await storage.createTicketResponse({
+        ticketId,
+        userId: currentUser.id,
+        message: message.trim(),
+        isAdminResponse: currentUser.isAdmin,
+      });
+
+      // Update ticket status if it was resolved and user is adding a response
+      if (ticket.status === "resolved" && !currentUser.isAdmin) {
+        await storage.updateSupportLog(ticketId, { status: "in_progress" });
+      }
+
+      res.status(201).json(response);
+    } catch (error) {
+      console.error("Error creating ticket response:", error);
+      res.status(500).json({ message: "Failed to create response" });
+    }
+  });
+
+  // Delete ticket response (admin only)
+  app.delete("/api/admin/support/:ticketId/responses/:responseId", requireAdmin, async (req, res) => {
+    try {
+      const responseId = parseInt(req.params.responseId);
+      await storage.deleteTicketResponse(responseId);
+      res.json({ message: "Response deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting ticket response:", error);
+      res.status(500).json({ message: "Failed to delete response" });
+    }
+  });
+
   // ========== EMAIL SENDER ROUTES ==========
   app.post("/api/admin/email/send", requireAdmin, async (req, res) => {
     try {

@@ -217,6 +217,7 @@ export const supportLogs = pgTable("support_logs", {
   userEmail: varchar("user_email", { length: 255 }), // Store email separately in case user is deleted
   subject: text("subject").notNull(),
   message: text("message").notNull(),
+  category: varchar("category", { length: 50 }).notNull().default("general"), // "general", "technical", "billing", "account"
   status: varchar("status", { length: 20 }).notNull().default("open"), // "open", "in_progress", "resolved", "closed"
   priority: varchar("priority", { length: 20 }).notNull().default("medium"), // "low", "medium", "high", "urgent"
   assignedTo: integer("assigned_to").references(() => users.id, { onDelete: 'set null' }),
@@ -227,6 +228,18 @@ export const supportLogs = pgTable("support_logs", {
 }, (table) => ({
   statusIndex: index("idx_support_logs_status").on(table.status),
   userIdIndex: index("idx_support_logs_user").on(table.userId),
+}));
+
+// Support Ticket Responses for Conversations
+export const supportTicketResponses = pgTable("support_ticket_responses", {
+  id: serial("id").primaryKey(),
+  ticketId: integer("ticket_id").notNull().references(() => supportLogs.id, { onDelete: 'cascade' }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  message: text("message").notNull(),
+  isAdminResponse: boolean("is_admin_response").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  ticketIdIndex: index("idx_ticket_responses_ticket").on(table.ticketId),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -244,6 +257,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   roles: many(userRoles),
   createdNotices: many(notices),
   supportLogs: many(supportLogs),
+  supportTicketResponses: many(supportTicketResponses),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
@@ -374,7 +388,7 @@ export const noticesRelations = relations(notices, ({ one }) => ({
   }),
 }));
 
-export const supportLogsRelations = relations(supportLogs, ({ one }) => ({
+export const supportLogsRelations = relations(supportLogs, ({ one, many }) => ({
   user: one(users, {
     fields: [supportLogs.userId],
     references: [users.id],
@@ -385,6 +399,18 @@ export const supportLogsRelations = relations(supportLogs, ({ one }) => ({
   }),
   resolver: one(users, {
     fields: [supportLogs.resolvedBy],
+    references: [users.id],
+  }),
+  responses: many(supportTicketResponses),
+}));
+
+export const supportTicketResponsesRelations = relations(supportTicketResponses, ({ one }) => ({
+  ticket: one(supportLogs, {
+    fields: [supportTicketResponses.ticketId],
+    references: [supportLogs.id],
+  }),
+  user: one(users, {
+    fields: [supportTicketResponses.userId],
     references: [users.id],
   }),
 }));
@@ -538,8 +564,16 @@ export const insertSupportLogSchema = createInsertSchema(supportLogs).omit({
 }).extend({
   subject: z.string().min(5, "Subject must be at least 5 characters"),
   message: z.string().min(20, "Message must be at least 20 characters"),
+  category: z.enum(["general", "technical", "billing", "account"]).optional(),
   status: z.enum(["open", "in_progress", "resolved", "closed"]).optional(),
   priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
+});
+
+export const insertSupportTicketResponseSchema = createInsertSchema(supportTicketResponses).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  message: z.string().min(1, "Response message cannot be empty"),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -581,6 +615,8 @@ export type InsertNotice = z.infer<typeof insertNoticeSchema>;
 export type Notice = typeof notices.$inferSelect;
 export type InsertSupportLog = z.infer<typeof insertSupportLogSchema>;
 export type SupportLog = typeof supportLogs.$inferSelect;
+export type InsertSupportTicketResponse = z.infer<typeof insertSupportTicketResponseSchema>;
+export type SupportTicketResponse = typeof supportTicketResponses.$inferSelect;
 
 // Lesson Content Block Types
 export const textBlockSchema = z.object({
