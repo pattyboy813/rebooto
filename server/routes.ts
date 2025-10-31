@@ -1136,6 +1136,118 @@ Make questions challenging but fair. Ensure explanations teach WHY answers are c
     }
   });
 
+  app.get("/api/admin/courses/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const course = await storage.getCourseById(id);
+      const lessons = await storage.getLessonsByCourse(id);
+      res.json({ ...course, lessons });
+    } catch (error: any) {
+      console.error("Error fetching course:", error);
+      if (error.message === "Course not found") {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Failed to fetch course" });
+    }
+  });
+
+  app.put("/api/admin/courses/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { title, description, category, difficulty, lessons } = req.body;
+
+      // Update course details
+      const courseUpdates: Partial<InsertCourse> = {};
+      if (title !== undefined) courseUpdates.title = title;
+      if (description !== undefined) courseUpdates.description = description;
+      if (category !== undefined) courseUpdates.category = category;
+      if (difficulty !== undefined) courseUpdates.difficulty = difficulty;
+
+      // Calculate new XP total if lessons provided
+      if (lessons && Array.isArray(lessons)) {
+        const totalXP = lessons.reduce((sum: number, lesson: any) => sum + (lesson.xpReward || 0), 0);
+        courseUpdates.xpTotal = totalXP;
+        courseUpdates.lessonCount = lessons.length;
+      }
+
+      const updatedCourse = await storage.updateCourse(id, courseUpdates);
+
+      // Handle lesson updates if provided
+      if (lessons && Array.isArray(lessons)) {
+        // Get existing lessons
+        const existingLessons = await storage.getLessonsByCourse(id);
+        const existingLessonIds = new Set(existingLessons.map(l => l.id));
+
+        // Track which lessons were processed
+        const processedLessonIds = new Set<number>();
+
+        // Update or create lessons
+        for (let i = 0; i < lessons.length; i++) {
+          const lessonData = lessons[i];
+
+          // Validate content structure
+          if (lessonData.content && Array.isArray(lessonData.content)) {
+            const { lessonContentArraySchema } = await import("@shared/schema");
+            try {
+              lessonContentArraySchema.parse(lessonData.content);
+            } catch (validationError: any) {
+              return res.status(400).json({
+                message: `Lesson ${i + 1} has invalid content structure`,
+                lessonIndex: i,
+                lessonTitle: lessonData.title,
+                errors: validationError.errors || [validationError.message]
+              });
+            }
+          }
+
+          if (lessonData.id && existingLessonIds.has(lessonData.id)) {
+            // Update existing lesson
+            await storage.updateLesson(lessonData.id, {
+              title: lessonData.title,
+              description: lessonData.description,
+              xpReward: lessonData.xpReward,
+              content: lessonData.content,
+              orderIndex: i,
+            });
+            processedLessonIds.add(lessonData.id);
+          } else {
+            // Create new lesson
+            const validatedLesson = insertLessonSchema.parse({
+              title: lessonData.title,
+              description: lessonData.description,
+              xpReward: lessonData.xpReward || 100,
+              content: lessonData.content,
+              courseId: id,
+              orderIndex: i,
+            });
+            const newLesson = await storage.createLesson(validatedLesson);
+            processedLessonIds.add(newLesson.id);
+          }
+        }
+
+        // Delete lessons that were removed
+        for (const existingLesson of existingLessons) {
+          if (!processedLessonIds.has(existingLesson.id)) {
+            await storage.deleteLesson(existingLesson.id);
+          }
+        }
+      }
+
+      // Fetch updated course with lessons
+      const finalLessons = await storage.getLessonsByCourse(id);
+      res.json({ ...updatedCourse, lessons: finalLessons });
+    } catch (error: any) {
+      console.error("Error updating course:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      if (error.message === "Course not found") {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Failed to update course" });
+    }
+  });
+
   app.delete("/api/admin/courses/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
