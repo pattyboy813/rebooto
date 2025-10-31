@@ -3,6 +3,8 @@
 ## Overview
 Rebooto is a gamified IT support learning platform designed to provide an engaging and effective learning experience. It features email/password authentication, distinct user and admin portals, and a modern, smoothly animated user interface. The platform's core capabilities include AI-generated courses (powered by OpenAI GPT-4o), comprehensive progress tracking with XP, levels, and achievements, and robust administrative tools for content and user management. Rebooto aims to provide job-ready skills through real-world scenarios and gamified learning.
 
+**Recent Updates (Oct 31, 2025)**: Code cleanup - archived 15 deprecated components to `/archived` folder. The codebase now uses a single, consistent Modern-prefixed design system. All lesson progression bugs fixed and AI course generator restructured for text-based theory content.
+
 ## User Preferences
 I prefer detailed explanations, especially for complex architectural decisions. I want iterative development, with clear communication before major changes are made to the codebase. Ensure the design maintains a premium/minimalist aesthetic with playful elements.
 
