@@ -25,6 +25,10 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Home } from "lucide-react";
 
 const menuSections = [
   {
@@ -37,9 +41,9 @@ const menuSections = [
     label: "Content",
     items: [
       { title: "Blog Admin", icon: FileText, url: "/admin/blog" },
-      { title: "Manual Course Creator", icon: Edit3, url: "/admin/courses/manual" },
-      { title: "Course Editor", icon: BookOpen, url: "/admin/courses/edit" },
-      { title: "AI Course Creator", icon: Wand2, url: "/admin/courses/create" },
+      { title: "Manual Course Creator", icon: Edit3, url: "/admin/course-builder" },
+      { title: "Course Editor", icon: BookOpen, url: "/admin/course-editor" },
+      { title: "AI Course Creator", icon: Wand2, url: "/admin/courses" },
     ],
   },
   {
@@ -47,7 +51,7 @@ const menuSections = [
     items: [
       { title: "User Management", icon: Users, url: "/admin/users" },
       { title: "Email Sender", icon: Mail, url: "/admin/email" },
-      { title: "Support Logs", icon: LifeBuoy, url: "/admin/support" },
+      { title: "Support Logs", icon: LifeBuoy, url: "/admin/support-logs" },
       { title: "Notices", icon: Bell, url: "/admin/notices" },
     ],
   },
@@ -55,6 +59,22 @@ const menuSections = [
 
 export function AdminSidebar() {
   const [location] = useLocation();
+  const { toast } = useToast();
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/logout", "POST", {});
+    },
+    onSuccess: () => {
+      window.location.href = "/";
+    },
+    onError: () => {
+      toast({
+        title: "Logout failed",
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <Sidebar>
@@ -101,12 +121,24 @@ export function AdminSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-gray-200 p-4">
-        <Link href="/app/dashboard">
-          <Button variant="ghost" className="w-full justify-start gap-2" data-testid="button-exit-admin">
+        <div className="space-y-2">
+          <Link href="/">
+            <Button variant="ghost" className="w-full justify-start gap-2" data-testid="button-back-to-site">
+              <Home className="h-4 w-4" />
+              Back to Site
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutation.isPending}
+            data-testid="button-admin-logout"
+          >
             <LogOut className="h-4 w-4" />
-            Exit Admin
+            {logoutMutation.isPending ? "Logging out..." : "Logout"}
           </Button>
-        </Link>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );

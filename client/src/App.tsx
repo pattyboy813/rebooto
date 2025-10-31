@@ -21,6 +21,10 @@ import AdminCampaignsPage from "@/pages/admin-campaigns";
 import AdminSettingsPage from "@/pages/admin-settings";
 import AdminBlogPage from "@/pages/admin-blog";
 import AdminUserManagement from "@/pages/admin-user-management";
+import AdminBlogModern from "@/pages/admin-blog-modern";
+import AdminNotices from "@/pages/admin-notices";
+import AdminSupportLogs from "@/pages/admin-support-logs";
+import AdminEmail from "@/pages/admin-email";
 import { AdminLayout as ModernAdminLayout } from "@/layouts/AdminLayout";
 import Documentation from "@/pages/documentation";
 import Blog from "@/pages/blog";
@@ -258,7 +262,10 @@ function Router() {
       <Route path="/admin/dashboard" component={AdminDashboardPage} />
       <Route path="/admin/courses" component={AdminCourseCreatorPage} />
       <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
-      <Route path="/admin/blog" component={AdminBlogPage} />
+      <Route path="/admin/blog" component={() => <ModernAdminLayout><AdminBlogModern /></ModernAdminLayout>} />
+      <Route path="/admin/email" component={() => <ModernAdminLayout><AdminEmail /></ModernAdminLayout>} />
+      <Route path="/admin/support-logs" component={() => <ModernAdminLayout><AdminSupportLogs /></ModernAdminLayout>} />
+      <Route path="/admin/notices" component={() => <ModernAdminLayout><AdminNotices /></ModernAdminLayout>} />
       <Route path="/admin/campaigns" component={AdminCampaignsPage} />
       <Route path="/admin/settings" component={AdminSettingsPage} />
       
