@@ -24,6 +24,7 @@ import AdminUserManagement from "@/pages/admin-user-management";
 import AdminBlogModern from "@/pages/admin-blog-modern";
 import AdminNotices from "@/pages/admin-notices";
 import AdminSupportLogs from "@/pages/admin-support-logs";
+import AdminSupportTickets from "@/pages/admin-support-tickets";
 import AdminEmail from "@/pages/admin-email";
 import AdminDashboardModern from "@/pages/admin-dashboard-modern";
 import { AdminLayout as ModernAdminLayout } from "@/layouts/AdminLayout";
@@ -36,6 +37,7 @@ import Pricing from "@/pages/pricing";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import UserSettings from "@/pages/user-settings";
+import UserSupportTickets from "@/pages/user-support-tickets";
 import NotFound from "@/pages/not-found";
 
 function UserDashboard() {
@@ -256,6 +258,7 @@ function Router() {
       <Route path="/app/courses" component={UserCourses} />
       <Route path="/app/courses/:id" component={UserCourseDetail} />
       <Route path="/app/courses/:courseId/lessons/:lessonId" component={UserLessonPlayer} />
+      <Route path="/app/support" component={() => <UserLayout><UserSupportTickets /></UserLayout>} />
       <Route path="/app/settings" component={() => <UserLayout><UserSettings /></UserLayout>} />
       
       {/* Admin portal routes - protected by AdminLayout */}
@@ -265,6 +268,7 @@ function Router() {
       <Route path="/admin/users" component={() => <ModernAdminLayout><AdminUserManagement /></ModernAdminLayout>} />
       <Route path="/admin/blog" component={() => <ModernAdminLayout><AdminBlogModern /></ModernAdminLayout>} />
       <Route path="/admin/email" component={() => <ModernAdminLayout><AdminEmail /></ModernAdminLayout>} />
+      <Route path="/admin/support-tickets" component={() => <ModernAdminLayout><AdminSupportTickets /></ModernAdminLayout>} />
       <Route path="/admin/support-logs" component={() => <ModernAdminLayout><AdminSupportLogs /></ModernAdminLayout>} />
       <Route path="/admin/notices" component={() => <ModernAdminLayout><AdminNotices /></ModernAdminLayout>} />
       <Route path="/admin/campaigns" component={AdminCampaignsPage} />

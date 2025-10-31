@@ -18,6 +18,7 @@ import {
   Users,
   Mail,
   LifeBuoy,
+  MessageSquare,
   Bell,
   Edit3,
   BookOpen,
@@ -51,7 +52,7 @@ const menuSections = [
     items: [
       { title: "User Management", icon: Users, url: "/admin/users" },
       { title: "Email Sender", icon: Mail, url: "/admin/email" },
-      { title: "Support Logs", icon: LifeBuoy, url: "/admin/support-logs" },
+      { title: "Support Tickets", icon: MessageSquare, url: "/admin/support-tickets" },
       { title: "Notices", icon: Bell, url: "/admin/notices" },
     ],
   },
