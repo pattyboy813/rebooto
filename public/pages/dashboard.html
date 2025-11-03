@@ -37,21 +37,21 @@
     <div class="gradient-orb orb-3"></div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="relative z-50 border-b border-border backdrop-blur-md bg-background/80 sticky top-0">
-    <div class="container mx-auto px-6 py-4">
+  <!-- Premium Navigation -->
+  <nav class="relative z-50 nav-glass sticky top-0" style="box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+    <div class="container mx-auto px-6 py-5">
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg"></div>
-          <span class="text-2xl font-bold gradient-text">Rebooto</span>
+        <div class="flex items-center space-x-3 hover-lift">
+          <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg"></div>
+          <span class="text-2xl font-bold gradient-text tracking-tight">Rebooto</span>
         </div>
-        <div class="hidden md:flex items-center space-x-6">
-          <a href="/pages/dashboard.html" class="text-primary font-medium">Dashboard</a>
-          <a href="/pages/courses.html" class="text-muted-foreground hover:text-foreground transition">Courses</a>
-          <a href="/pages/support.html" class="text-muted-foreground hover:text-foreground transition">Support</a>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="/pages/dashboard.html" class="text-primary font-semibold border-b-2 border-primary pb-1">Dashboard</a>
+          <a href="/pages/courses.html" class="text-foreground hover:text-primary transition-colors font-medium">Courses</a>
+          <a href="/pages/support.html" class="text-foreground hover:text-primary transition-colors font-medium">Support</a>
         </div>
         <div class="flex items-center space-x-4">
-          <span id="userName" class="text-sm text-muted-foreground"></span>
+          <span id="userName" class="text-sm font-medium text-foreground"></span>
           <button onclick="window.API.logout()" class="btn btn-outline btn-sm">Logout</button>
         </div>
       </div>
@@ -59,10 +59,10 @@
   </nav>
 
   <!-- Main Content -->
-  <div class="relative z-10 container mx-auto px-6 py-12">
-    <div class="mb-8" data-aos="fade-up">
-      <h1 class="text-4xl font-bold mb-2">Welcome back, <span id="userNameGreeting" class="gradient-text"></span></h1>
-      <p class="text-muted-foreground">Continue your IT support learning journey</p>
+  <div class="relative z-10 container mx-auto px-6" style="padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-2xl);">
+    <div class="mb-12" data-aos="fade-up">
+      <h1 class="text-4xl md:text-5xl font-bold mb-3">Welcome back, <span id="userNameGreeting" class="gradient-text"></span></h1>
+      <p class="text-lg text-secondary">Continue your IT support learning journey</p>
     </div>
 
     <div id="loading" class="text-center py-12">
@@ -71,29 +71,29 @@
     </div>
 
     <div id="content" class="hidden">
-      <!-- Stats Grid -->
-      <div class="grid md:grid-cols-4 gap-6 mb-8">
-        <div class="card" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-sm text-muted-foreground mb-1">Current Level</div>
-          <div class="text-3xl font-bold gradient-text" id="userLevel">1</div>
+      <!-- Premium Stats Grid -->
+      <div class="grid md:grid-cols-4 gap-6 mb-12">
+        <div class="card group hover-scale" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-sm font-semibold text-secondary mb-2">Current Level</div>
+          <div class="text-4xl font-black gradient-text" id="userLevel">1</div>
         </div>
-        <div class="card" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-sm text-muted-foreground mb-1">Total XP</div>
-          <div class="text-3xl font-bold" id="userXP">0</div>
+        <div class="card group hover-scale" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-sm font-semibold text-secondary mb-2">Total XP</div>
+          <div class="text-4xl font-black text-foreground" id="userXP">0</div>
         </div>
-        <div class="card" data-aos="fade-up" data-aos-delay="300">
-          <div class="text-sm text-muted-foreground mb-1">Courses Enrolled</div>
-          <div class="text-3xl font-bold" id="enrolledCount">0</div>
+        <div class="card group hover-scale" data-aos="fade-up" data-aos-delay="300">
+          <div class="text-sm font-semibold text-secondary mb-2">Courses Enrolled</div>
+          <div class="text-4xl font-black text-foreground" id="enrolledCount">0</div>
         </div>
-        <div class="card" data-aos="fade-up" data-aos-delay="400">
-          <div class="text-sm text-muted-foreground mb-1">Achievements</div>
-          <div class="text-3xl font-bold" id="achievementCount">0</div>
+        <div class="card group hover-scale" data-aos="fade-up" data-aos-delay="400">
+          <div class="text-sm font-semibold text-secondary mb-2">Achievements</div>
+          <div class="text-4xl font-black text-foreground" id="achievementCount">0</div>
         </div>
       </div>
 
       <!-- Continue Learning -->
-      <div class="mb-8" data-aos="fade-up" data-aos-delay="500">
-        <h2 class="text-2xl font-bold mb-4">Continue Learning</h2>
+      <div class="mb-12" data-aos="fade-up" data-aos-delay="500">
+        <h2 class="text-3xl font-bold mb-6">Continue Learning</h2>
         <div id="enrolledCourses" class="grid md:grid-cols-3 gap-6"></div>
         <div id="noEnrollments" class="hidden card text-center py-12">
           <p class="text-muted-foreground mb-4">You haven't enrolled in any courses yet</p>
@@ -103,7 +103,7 @@
 
       <!-- Recent Achievements -->
       <div data-aos="fade-up" data-aos-delay="600">
-        <h2 class="text-2xl font-bold mb-4">Recent Achievements</h2>
+        <h2 class="text-3xl font-bold mb-6">Recent Achievements</h2>
         <div id="achievements" class="grid md:grid-cols-3 gap-6"></div>
         <div id="noAchievements" class="hidden card text-center py-12">
           <p class="text-muted-foreground">Complete lessons to earn achievements!</p>

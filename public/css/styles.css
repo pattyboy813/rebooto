@@ -18,7 +18,7 @@
   /* Refined Text Hierarchy */
   --muted: 220 13% 60%;
   --muted-foreground: 220 9% 46%;
-  --accent: 24 95% 53%;
+  --accent: 347 77% 50%;
   --accent-foreground: 0 0% 100%;
   
   --destructive: 0 84% 60%;
@@ -127,7 +127,7 @@ p {
 .orb-3 {
   width: 500px;
   height: 500px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #fb7185, #f43f5e);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
