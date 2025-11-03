@@ -23,6 +23,11 @@
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- AOS - Animate On Scroll -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
   <link rel="stylesheet" href="/css/styles.css">
   <style>
     .slide-in {
@@ -60,7 +65,20 @@
     <div class="gradient-orb orb-3"></div>
   </div>
 
-  <div class="relative z-10 min-h-screen flex items-center justify-center px-6 py-12">
+  <!-- Sticky Countdown Bar -->
+  <div id="countdownBar" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-2 px-4">
+    <div class="container mx-auto flex items-center justify-center gap-6 text-sm font-medium">
+      <span>🚀 Beta Launch In:</span>
+      <div class="flex gap-4">
+        <div class="text-center"><div id="days" class="text-xl font-bold">00</div><div class="text-xs opacity-80">Days</div></div>
+        <div class="text-center"><div id="hours" class="text-xl font-bold">00</div><div class="text-xs opacity-80">Hours</div></div>
+        <div class="text-center"><div id="minutes" class="text-xl font-bold">00</div><div class="text-xs opacity-80">Min</div></div>
+        <div class="text-center"><div id="seconds" class="text-xl font-bold">00</div><div class="text-xs opacity-80">Sec</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 min-h-screen flex items-center justify-center px-6 py-12" style="padding-top: 100px;">
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <a href="/" class="inline-flex items-center space-x-2 mb-4">
@@ -162,8 +180,12 @@
     </div>
   </div>
 
+  <script src="/js/countdown.js"></script>
   <script src="/js/api.js"></script>
   <script>
+    // Initialize AOS
+    AOS.init({duration: 600, once: true});
+    
     let userEmail = '';
     const emailStep = document.getElementById('emailStep');
     const passwordStep = document.getElementById('passwordStep');
