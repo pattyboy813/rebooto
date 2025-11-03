@@ -8,7 +8,10 @@
   <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{background:'0 0% 100%',foreground:'222 47% 11%',card:'0 0% 100%',primary:'173 58% 39%',border:'214 32% 91%',muted:'215 16% 47%'}}}}</script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-</head>
+<!-- AOS - Animate On Scroll -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  </head>
 <body class="bg-background text-foreground">
   <div class="modern-background"><div class="gradient-orb orb-1"></div><div class="gradient-orb orb-2"></div><div class="gradient-orb orb-3"></div></div>
   <nav class="relative z-50 border-b border-border backdrop-blur-md bg-background/80 sticky top-0">
@@ -55,6 +58,10 @@
     </div>
   </div>
   <script src="/js/api.js"></script>
+  <script>
+    // Initialize AOS
+    AOS.init({duration: 600, once: true});
+  </script>
   <script>
     let generatedData = null;
     document.getElementById('courseForm').addEventListener('submit',async(e)=>{

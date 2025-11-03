@@ -23,6 +23,11 @@
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- AOS - Animate On Scroll -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="bg-background text-foreground">
@@ -55,7 +60,7 @@
 
   <!-- Main Content -->
   <div class="relative z-10 container mx-auto px-6 py-12">
-    <div class="mb-8">
+    <div class="mb-8" data-aos="fade-up">
       <h1 class="text-4xl font-bold mb-2">Welcome back, <span id="userNameGreeting" class="gradient-text"></span></h1>
       <p class="text-muted-foreground">Continue your IT support learning journey</p>
     </div>
@@ -68,26 +73,26 @@
     <div id="content" class="hidden">
       <!-- Stats Grid -->
       <div class="grid md:grid-cols-4 gap-6 mb-8">
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="100">
           <div class="text-sm text-muted-foreground mb-1">Current Level</div>
           <div class="text-3xl font-bold gradient-text" id="userLevel">1</div>
         </div>
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="200">
           <div class="text-sm text-muted-foreground mb-1">Total XP</div>
           <div class="text-3xl font-bold" id="userXP">0</div>
         </div>
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="300">
           <div class="text-sm text-muted-foreground mb-1">Courses Enrolled</div>
           <div class="text-3xl font-bold" id="enrolledCount">0</div>
         </div>
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="400">
           <div class="text-sm text-muted-foreground mb-1">Achievements</div>
           <div class="text-3xl font-bold" id="achievementCount">0</div>
         </div>
       </div>
 
       <!-- Continue Learning -->
-      <div class="mb-8">
+      <div class="mb-8" data-aos="fade-up" data-aos-delay="500">
         <h2 class="text-2xl font-bold mb-4">Continue Learning</h2>
         <div id="enrolledCourses" class="grid md:grid-cols-3 gap-6"></div>
         <div id="noEnrollments" class="hidden card text-center py-12">
@@ -97,7 +102,7 @@
       </div>
 
       <!-- Recent Achievements -->
-      <div>
+      <div data-aos="fade-up" data-aos-delay="600">
         <h2 class="text-2xl font-bold mb-4">Recent Achievements</h2>
         <div id="achievements" class="grid md:grid-cols-3 gap-6"></div>
         <div id="noAchievements" class="hidden card text-center py-12">
@@ -109,6 +114,9 @@
 
   <script src="/js/api.js"></script>
   <script>
+    // Initialize AOS
+    AOS.init({duration: 600, once: true});
+    
     async function loadDashboard() {
       try {
         const user = await window.API.checkAuth();
