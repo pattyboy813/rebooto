@@ -24,6 +24,34 @@
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .slide-in {
+      animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .slide-out {
+      animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+    }
+  </style>
 </head>
 <body class="bg-background text-foreground">
   <div class="modern-background">
@@ -44,58 +72,91 @@
       </div>
 
       <div class="card">
-        <form id="loginForm" class="space-y-4">
-          <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm"></div>
+        <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm mb-4"></div>
 
-          <div>
-            <label for="email" class="block text-sm font-medium mb-2">Email</label>
-            <input
-              type="email"
-              id="email"
-              class="input"
-              placeholder="you@example.com"
-              required
-              data-testid="input-email"
-            />
+        <!-- Step 1: Email -->
+        <div id="emailStep" class="slide-in">
+          <form id="emailForm" class="space-y-4">
+            <div>
+              <label for="email" class="block text-sm font-medium mb-2">Email</label>
+              <input
+                type="email"
+                id="email"
+                class="input"
+                placeholder="you@example.com"
+                required
+                autofocus
+                data-testid="input-email"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary w-full"
+              data-testid="button-continue"
+              id="emailContinueBtn"
+            >
+              Continue
+            </button>
+          </form>
+
+          <div class="mt-6 text-center text-sm">
+            <span class="text-muted-foreground">Don't have an account? </span>
+            <a href="/pages/signup.html" class="text-primary hover:underline">Sign up</a>
           </div>
 
-          <div>
-            <label for="password" class="block text-sm font-medium mb-2">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="input"
-              placeholder="••••••••"
-              required
-              data-testid="input-password"
-            />
+          <div class="mt-4 text-center text-sm">
+            <a href="/admin/login.html" class="text-muted-foreground hover:text-foreground">Admin Login →</a>
           </div>
-
-          <div class="flex items-center justify-between">
-            <label class="flex items-center">
-              <input type="checkbox" class="mr-2">
-              <span class="text-sm text-muted-foreground">Remember me</span>
-            </label>
-            <a href="/pages/forgot-password.html" class="text-sm text-primary hover:underline">Forgot password?</a>
-          </div>
-
-          <button
-            type="submit"
-            class="btn btn-primary w-full"
-            data-testid="button-submit"
-            id="submitBtn"
-          >
-            Sign In
-          </button>
-        </form>
-
-        <div class="mt-6 text-center text-sm">
-          <span class="text-muted-foreground">Don't have an account? </span>
-          <a href="/pages/signup.html" class="text-primary hover:underline">Sign up</a>
         </div>
 
-        <div class="mt-4 text-center text-sm">
-          <a href="/admin/login" class="text-muted-foreground hover:text-foreground">Admin Login →</a>
+        <!-- Step 2: Password -->
+        <div id="passwordStep" class="hidden">
+          <button 
+            onclick="goBackToEmail()" 
+            class="text-sm text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+
+          <div class="mb-4">
+            <p class="text-sm text-muted-foreground">Signing in as</p>
+            <p id="displayEmail" class="font-medium"></p>
+          </div>
+
+          <form id="passwordForm" class="space-y-4">
+            <div>
+              <label for="password" class="block text-sm font-medium mb-2">Password</label>
+              <input
+                type="password"
+                id="password"
+                class="input"
+                placeholder="••••••••"
+                required
+                data-testid="input-password"
+              />
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="flex items-center">
+                <input type="checkbox" class="mr-2">
+                <span class="text-sm text-muted-foreground">Remember me</span>
+              </label>
+              <a href="/pages/forgot-password.html" class="text-sm text-primary hover:underline">Forgot password?</a>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary w-full"
+              data-testid="button-submit"
+              id="submitBtn"
+            >
+              Sign In
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -103,28 +164,76 @@
 
   <script src="/js/api.js"></script>
   <script>
-    const form = document.getElementById('loginForm');
+    let userEmail = '';
+    const emailStep = document.getElementById('emailStep');
+    const passwordStep = document.getElementById('passwordStep');
     const errorMessage = document.getElementById('errorMessage');
-    const submitBtn = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', async (e) => {
+    // Step 1: Email submission
+    document.getElementById('emailForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      userEmail = document.getElementById('email').value;
+      
+      // Animate transition
+      emailStep.classList.add('slide-out');
+      setTimeout(() => {
+        emailStep.classList.add('hidden');
+        emailStep.classList.remove('slide-out');
+        
+        // Show password step
+        document.getElementById('displayEmail').textContent = userEmail;
+        passwordStep.classList.remove('hidden');
+        passwordStep.classList.add('slide-in');
+        
+        // Focus password field
+        setTimeout(() => {
+          document.getElementById('password').focus();
+        }, 100);
+      }, 300);
+    });
+
+    // Step 2: Password submission
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      const submitBtn = document.getElementById('submitBtn');
 
       errorMessage.classList.add('hidden');
       submitBtn.textContent = 'Signing in...';
       submitBtn.disabled = true;
 
       try {
-        await window.API.request('/api/login', 'POST', { email, password });
+        await window.API.request('/api/login', 'POST', { email: userEmail, password });
         window.location.href = '/pages/dashboard.html';
       } catch (error) {
         errorMessage.textContent = error.message || 'Invalid email or password';
         errorMessage.classList.remove('hidden');
         submitBtn.textContent = 'Sign In';
         submitBtn.disabled = false;
+      }
+    });
+
+    // Go back to email step
+    function goBackToEmail() {
+      passwordStep.classList.add('slide-out');
+      setTimeout(() => {
+        passwordStep.classList.add('hidden');
+        passwordStep.classList.remove('slide-out');
+        
+        emailStep.classList.remove('hidden');
+        emailStep.classList.add('slide-in');
+        
+        // Clear password
+        document.getElementById('password').value = '';
+        errorMessage.classList.add('hidden');
+      }, 300);
+    }
+
+    // Allow Enter key to submit email
+    document.getElementById('email').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('emailForm').dispatchEvent(new Event('submit'));
       }
     });
   </script>

@@ -53,8 +53,33 @@
     <div class="gradient-orb orb-3"></div>
   </div>
 
+  <!-- Sticky Countdown Bar -->
+  <div id="countdownBar" class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-teal-500 to-emerald-500 text-white py-2 px-4">
+    <div class="container mx-auto flex items-center justify-center gap-6 text-sm font-medium">
+      <span>🚀 Beta Launch In:</span>
+      <div class="flex gap-4">
+        <div class="text-center">
+          <div id="days" class="text-xl font-bold">00</div>
+          <div class="text-xs opacity-80">Days</div>
+        </div>
+        <div class="text-center">
+          <div id="hours" class="text-xl font-bold">00</div>
+          <div class="text-xs opacity-80">Hours</div>
+        </div>
+        <div class="text-center">
+          <div id="minutes" class="text-xl font-bold">00</div>
+          <div class="text-xs opacity-80">Min</div>
+        </div>
+        <div class="text-center">
+          <div id="seconds" class="text-xl font-bold">00</div>
+          <div class="text-xs opacity-80">Sec</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Navigation -->
-  <nav class="relative z-50 border-b border-border backdrop-blur-md bg-background/80 sticky top-0">
+  <nav class="relative z-40 border-b border-border backdrop-blur-md bg-background/80 sticky" style="top: 48px;">
     <div class="container mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -90,8 +115,46 @@
       </div>
       
       <!-- Beta Launch Countdown -->
-      <div class="mt-12 inline-block bg-card/50 backdrop-blur-sm border border-border rounded-lg px-6 py-3">
-        <p class="text-sm text-muted-foreground">🚀 Beta Launch: <span class="text-primary font-semibold">Coming Soon</span></p>
+      <div class="mt-12 inline-block bg-card/50 backdrop-blur-sm border border-border rounded-lg px-8 py-6">
+        <p class="text-sm text-muted-foreground mb-4">🚀 Beta Launch Countdown</p>
+        <div class="flex gap-6 text-center">
+          <div>
+            <div id="herodays" class="text-4xl font-bold gradient-text">00</div>
+            <div class="text-xs text-muted-foreground mt-1">Days</div>
+          </div>
+          <div class="text-4xl text-muted-foreground">:</div>
+          <div>
+            <div id="herohours" class="text-4xl font-bold gradient-text">00</div>
+            <div class="text-xs text-muted-foreground mt-1">Hours</div>
+          </div>
+          <div class="text-4xl text-muted-foreground">:</div>
+          <div>
+            <div id="herominutes" class="text-4xl font-bold gradient-text">00</div>
+            <div class="text-xs text-muted-foreground mt-1">Minutes</div>
+          </div>
+          <div class="text-4xl text-muted-foreground">:</div>
+          <div>
+            <div id="heroseconds" class="text-4xl font-bold gradient-text">00</div>
+            <div class="text-xs text-muted-foreground mt-1">Seconds</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Early Access Signup -->
+      <div class="mt-8 max-w-md mx-auto">
+        <form id="earlySignupForm" class="flex gap-2">
+          <input 
+            type="email" 
+            id="earlyEmail" 
+            placeholder="Enter your email for early access" 
+            class="input flex-1"
+            required
+          />
+          <button type="submit" class="btn btn-primary whitespace-nowrap" id="earlySubmitBtn">
+            Get Early Access
+          </button>
+        </form>
+        <p id="earlySuccess" class="hidden text-sm text-green-500 mt-2">✓ Thanks! We'll notify you when we launch!</p>
       </div>
     </div>
   </section>
@@ -209,8 +272,60 @@
 
   <!-- Scripts -->
   <script src="/js/api.js"></script>
-  <script src="/js/router.js"></script>
   <script>
+    // Beta Launch Countdown - Set to 30 days from now
+    const launchDate = new Date();
+    launchDate.setDate(launchDate.getDate() + 30);
+    
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = launchDate - now;
+      
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      // Update top bar
+      document.getElementById('days').textContent = String(days).padStart(2, '0');
+      document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+      
+      // Update hero section
+      document.getElementById('herodays').textContent = String(days).padStart(2, '0');
+      document.getElementById('herohours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('herominutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('heroseconds').textContent = String(seconds).padStart(2, '0');
+      
+      if (distance < 0) {
+        document.getElementById('countdownBar').innerHTML = '<div class="container mx-auto text-center">🎉 Beta is now LIVE!</div>';
+      }
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    
+    // Early Access Signup
+    document.getElementById('earlySignupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('earlyEmail').value;
+      const btn = document.getElementById('earlySubmitBtn');
+      
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+      
+      try {
+        await window.API.request('/api/email-signups', 'POST', { email });
+        document.getElementById('earlySignupForm').classList.add('hidden');
+        document.getElementById('earlySuccess').classList.remove('hidden');
+      } catch (error) {
+        alert(error.message || 'Failed to sign up');
+        btn.textContent = 'Get Early Access';
+        btn.disabled = false;
+      }
+    });
+    
     // Initialize GSAP animations
     gsap.registerPlugin(ScrollTrigger);
     

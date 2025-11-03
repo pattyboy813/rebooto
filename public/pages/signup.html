@@ -24,6 +24,34 @@
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .slide-in {
+      animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .slide-out {
+      animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+    }
+  </style>
 </head>
 <body class="bg-background text-foreground">
   <div class="modern-background">
@@ -44,71 +72,105 @@
       </div>
 
       <div class="card">
-        <form id="signupForm" class="space-y-4">
-          <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm"></div>
+        <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm mb-4"></div>
 
-          <div>
-            <label for="fullName" class="block text-sm font-medium mb-2">Full Name</label>
-            <input
-              type="text"
-              id="fullName"
-              class="input"
-              placeholder="John Doe"
-              required
-              data-testid="input-name"
-            />
+        <!-- Step 1: Name -->
+        <div id="nameStep" class="slide-in">
+          <form id="nameForm" class="space-y-4">
+            <div>
+              <label for="fullName" class="block text-sm font-medium mb-2">Full Name</label>
+              <input
+                type="text"
+                id="fullName"
+                class="input"
+                placeholder="John Doe"
+                required
+                autofocus
+                data-testid="input-name"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" data-testid="button-continue">
+              Continue
+            </button>
+          </form>
+
+          <div class="mt-6 text-center text-sm">
+            <span class="text-muted-foreground">Already have an account? </span>
+            <a href="/pages/login.html" class="text-primary hover:underline">Sign in</a>
           </div>
+        </div>
 
-          <div>
-            <label for="email" class="block text-sm font-medium mb-2">Email</label>
-            <input
-              type="email"
-              id="email"
-              class="input"
-              placeholder="you@example.com"
-              required
-              data-testid="input-email"
-            />
-          </div>
-
-          <div>
-            <label for="password" class="block text-sm font-medium mb-2">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="input"
-              placeholder="••••••••"
-              required
-              minlength="8"
-              data-testid="input-password"
-            />
-            <p class="text-xs text-muted-foreground mt-1">Must be at least 8 characters</p>
-          </div>
-
-          <div>
-            <label for="dob" class="block text-sm font-medium mb-2">Date of Birth</label>
-            <input
-              type="date"
-              id="dob"
-              class="input"
-              required
-              data-testid="input-dob"
-            />
-          </div>
-
-          <button
-            type="submit"
-            class="btn btn-primary w-full"
-            data-testid="button-submit"
-            id="submitBtn"
-          >
-            Create Account
+        <!-- Step 2: Email -->
+        <div id="emailStep" class="hidden">
+          <button onclick="goBackToStep(1)" class="text-sm text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
           </button>
-        </form>
 
-        <div class="mt-6 text-center text-sm">
-          <span class="text-muted-foreground">Already have an account? </span>
-          <a href="/pages/login.html" class="text-primary hover:underline">Sign in</a>
+          <form id="emailForm" class="space-y-4">
+            <div>
+              <label for="email" class="block text-sm font-medium mb-2">Email</label>
+              <input
+                type="email"
+                id="email"
+                class="input"
+                placeholder="you@example.com"
+                required
+                data-testid="input-email"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">Continue</button>
+          </form>
+        </div>
+
+        <!-- Step 3: Password & DOB -->
+        <div id="finalStep" class="hidden">
+          <button onclick="goBackToStep(2)" class="text-sm text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+
+          <form id="finalForm" class="space-y-4">
+            <div>
+              <label for="password" class="block text-sm font-medium mb-2">Password</label>
+              <input
+                type="password"
+                id="password"
+                class="input"
+                placeholder="••••••••"
+                required
+                minlength="8"
+                data-testid="input-password"
+              />
+              <p class="text-xs text-muted-foreground mt-1">Must be at least 8 characters</p>
+            </div>
+
+            <div>
+              <label for="dob" class="block text-sm font-medium mb-2">Date of Birth</label>
+              <input
+                type="date"
+                id="dob"
+                class="input"
+                required
+                data-testid="input-dob"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary w-full"
+              data-testid="button-submit"
+              id="submitBtn"
+            >
+              Create Account
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -116,29 +178,70 @@
 
   <script src="/js/api.js"></script>
   <script>
-    const form = document.getElementById('signupForm');
-    const errorMessage = document.getElementById('errorMessage');
-    const submitBtn = document.getElementById('submitBtn');
+    let formData = {};
+    let currentStep = 1;
 
-    form.addEventListener('submit', async (e) => {
+    const steps = {
+      1: document.getElementById('nameStep'),
+      2: document.getElementById('emailStep'),
+      3: document.getElementById('finalStep')
+    };
+
+    const errorMessage = document.getElementById('errorMessage');
+
+    function animateTransition(fromStep, toStep) {
+      steps[fromStep].classList.add('slide-out');
+      setTimeout(() => {
+        steps[fromStep].classList.add('hidden');
+        steps[fromStep].classList.remove('slide-out');
+        
+        steps[toStep].classList.remove('hidden');
+        steps[toStep].classList.add('slide-in');
+        
+        // Focus first input
+        setTimeout(() => {
+          const input = steps[toStep].querySelector('input');
+          if (input) input.focus();
+        }, 100);
+      }, 300);
+    }
+
+    function goBackToStep(step) {
+      animateTransition(currentStep, step);
+      currentStep = step;
+      errorMessage.classList.add('hidden');
+    }
+
+    // Step 1: Name
+    document.getElementById('nameForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      formData.fullName = document.getElementById('fullName').value;
+      animateTransition(1, 2);
+      currentStep = 2;
+    });
+
+    // Step 2: Email
+    document.getElementById('emailForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      formData.email = document.getElementById('email').value;
+      animateTransition(2, 3);
+      currentStep = 3;
+    });
+
+    // Step 3: Final submission
+    document.getElementById('finalForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const fullName = document.getElementById('fullName').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const dateOfBirth = document.getElementById('dob').value;
-
+      formData.password = document.getElementById('password').value;
+      formData.dateOfBirth = document.getElementById('dob').value;
+      
+      const submitBtn = document.getElementById('submitBtn');
       errorMessage.classList.add('hidden');
       submitBtn.textContent = 'Creating account...';
       submitBtn.disabled = true;
 
       try {
-        await window.API.request('/api/signup', 'POST', {
-          fullName,
-          email,
-          password,
-          dateOfBirth
-        });
+        await window.API.request('/api/signup', 'POST', formData);
         window.location.href = '/pages/dashboard.html';
       } catch (error) {
         errorMessage.textContent = error.message || 'Failed to create account';
