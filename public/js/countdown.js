@@ -1,7 +1,7 @@
 // Shared Beta Launch Countdown Timer
 function initCountdown() {
-  const launchDate = new Date();
-  launchDate.setDate(launchDate.getDate() + 30);
+  // Set actual beta launch date: December 15, 2025 at 12:00 PM EST
+  const launchDate = new Date('2025-12-15T12:00:00-05:00');
   
   function updateCountdown() {
     const now = new Date().getTime();
