@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - Rebooto</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{background:'hsl(222 47% 4%)',foreground:'hsl(210 40% 98%)',card:'hsl(222 47% 8%)',primary:'hsl(173 58% 39%)',border:'hsl(217 33% 17%)',muted:'hsl(215 20% 65%)'}}}}</script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{background:'0 0% 100%',foreground:'222 47% 11%',card:'0 0% 100%',primary:'173 58% 39%',border:'214 32% 91%',muted:'215 16% 47%'}}}}</script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -24,6 +24,7 @@
           <a href="/admin/users.html" class="text-muted-foreground hover:text-foreground transition">Users</a>
           <a href="/admin/blog.html" class="text-muted-foreground hover:text-foreground transition">Blog</a>
           <a href="/admin/support.html" class="text-muted-foreground hover:text-foreground transition">Support</a>
+          <a href="/admin/settings.html" class="text-muted-foreground hover:text-foreground transition">Settings</a>
         </div>
         <button onclick="window.API.logout()" class="btn btn-outline btn-sm">Logout</button>
       </div>
@@ -40,7 +41,7 @@
         <div class="card"><div class="text-sm text-muted-foreground mb-1">Completion Rate</div><div class="text-3xl font-bold" id="completionRate">0%</div></div>
       </div>
       <div class="grid md:grid-cols-2 gap-6">
-        <div class="card"><h2 class="text-xl font-bold mb-4">Quick Actions</h2><div class="space-y-2"><a href="/admin/courses.html" class="btn btn-primary w-full">Create Course</a><a href="/admin/blog.html" class="btn btn-outline w-full">Write Blog Post</a><a href="/admin/support.html" class="btn btn-outline w-full">View Support Tickets</a></div></div>
+        <div class="card"><h2 class="text-xl font-bold mb-4">Quick Actions</h2><div class="space-y-2"><a href="/admin/courses.html" class="btn btn-primary w-full">Create Course</a><a href="/admin/blog.html" class="btn btn-outline w-full">Write Blog Post</a><a href="/admin/support.html" class="btn btn-outline w-full">View Support Tickets</a><a href="/admin/settings.html" class="btn btn-outline w-full">System Settings</a></div></div>
         <div class="card"><h2 class="text-xl font-bold mb-4">Recent Activity</h2><div id="recentActivity" class="space-y-2"><p class="text-sm text-muted-foreground">Loading...</p></div></div>
       </div>
     </div>
