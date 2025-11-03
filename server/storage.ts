@@ -15,6 +15,7 @@ import {
   notices,
   supportLogs,
   supportTicketResponses,
+  systemSettings,
   type User,
   type InsertUser,
   type UpsertUser,
@@ -172,6 +173,10 @@ export interface IStorage {
   createTicketResponse(response: InsertSupportTicketResponse): Promise<SupportTicketResponse>;
   getTicketResponses(ticketId: number): Promise<SupportTicketResponse[]>;
   deleteTicketResponse(id: number): Promise<void>;
+  
+  // System settings methods
+  getSystemSetting(key: string): Promise<{id: number; key: string; value: any; updatedAt: Date} | undefined>;
+  setSystemSetting(key: string, value: any): Promise<{id: number; key: string; value: any; updatedAt: Date}>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -726,6 +731,27 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTicketResponse(id: number): Promise<void> {
     await db.delete(supportTicketResponses).where(eq(supportTicketResponses.id, id));
+  }
+
+  async getSystemSetting(key: string): Promise<{id: number; key: string; value: any; updatedAt: Date} | undefined> {
+    const [setting] = await db.select().from(systemSettings).where(eq(systemSettings.key, key));
+    return setting;
+  }
+
+  async setSystemSetting(key: string, value: any): Promise<{id: number; key: string; value: any; updatedAt: Date}> {
+    const existing = await this.getSystemSetting(key);
+    if (existing) {
+      const [updated] = await db.update(systemSettings)
+        .set({ value, updatedAt: new Date() })
+        .where(eq(systemSettings.key, key))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db.insert(systemSettings)
+        .values({ key, value })
+        .returning();
+      return created;
+    }
   }
 }
 

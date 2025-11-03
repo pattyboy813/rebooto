@@ -735,6 +735,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin Stats Routes
+  // System Settings Routes
+  app.get("/api/system-settings/features", async (_req, res) => {
+    try {
+      const settings = await storage.getSystemSetting("features");
+      if (!settings) {
+        // Default: all features enabled
+        return res.json({ signupEnabled: true, loginEnabled: true });
+      }
+      res.json(settings.value);
+    } catch (error) {
+      console.error("Error fetching feature settings:", error);
+      res.json({ signupEnabled: true, loginEnabled: true }); // Default to enabled on error
+    }
+  });
+
+  app.get("/api/admin/system-settings/features", requireAdmin, async (_req, res) => {
+    try {
+      const settings = await storage.getSystemSetting("features");
+      if (!settings) {
+        return res.json({ signupEnabled: true, loginEnabled: true });
+      }
+      res.json(settings.value);
+    } catch (error) {
+      console.error("Error fetching feature settings:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/system-settings/features", requireAdmin, async (req, res) => {
+    try {
+      const { signupEnabled, loginEnabled } = req.body;
+      const value = { signupEnabled, loginEnabled };
+      
+      await storage.setSystemSetting("features", value);
+      res.json(value);
+    } catch (error) {
+      console.error("Error saving feature settings:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/admin/stats", requireAdmin, async (_req, res) => {
     try {
       const totalUsers = await storage.getTotalUsersCount();

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found | Rebooto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '0 0% 100%',
+            foreground: '222 47% 11%',
+            primary: '173 58% 39%',
+            border: '214 32% 91%',
+            muted: '215 16% 47%',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-background text-foreground">
+  <div class="modern-background">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+  </div>
+
+  <div class="relative z-10 min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="text-center">
+      <div class="glitch gradient-text mb-8" data-text="404">404</div>
+      <h1 class="text-4xl font-bold mb-4">Page Not Found</h1>
+      <p class="text-xl text-muted-foreground mb-8 max-w-md mx-auto">
+        Oops! The page you're looking for seems to have rebooted into the void.
+      </p>
+      <div class="flex gap-4 justify-center">
+        <a href="/" class="btn btn-primary">Go Home</a>
+        <a href="/pages/courses.html" class="btn btn-outline">Browse Courses</a>
+      </div>
+      
+      <!-- Fun animated element -->
+      <div class="mt-12 text-6xl animate-bounce">🔌</div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+      }
+      50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      }
+    }
+    .animate-bounce {
+      animation: bounce 1s infinite;
+    }
+  </style>
+</body>
+</html>

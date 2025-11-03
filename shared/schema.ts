@@ -122,6 +122,13 @@ export const adminInvites = pgTable("admin_invites", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const systemSettings = pgTable("system_settings", {
+  id: serial("id").primaryKey(),
+  key: varchar("key").notNull().unique(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const emailTemplates = pgTable("email_templates", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),

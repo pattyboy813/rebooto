@@ -14,19 +14,13 @@
       theme: {
         extend: {
           colors: {
-            background: 'hsl(222 47% 4%)',
-            foreground: 'hsl(210 40% 98%)',
-            card: 'hsl(222 47% 8%)',
-            'card-foreground': 'hsl(210 40% 98%)',
-            primary: 'hsl(173 58% 39%)',
-            'primary-foreground': 'hsl(0 0% 100%)',
-            secondary: 'hsl(217 33% 17%)',
-            'secondary-foreground': 'hsl(210 40% 98%)',
-            accent: 'hsl(16 90% 66%)',
-            'accent-foreground': 'hsl(0 0% 0%)',
-            muted: 'hsl(217 33% 17%)',
-            'muted-foreground': 'hsl(215 20% 65%)',
-            border: 'hsl(217 33% 17%)',
+            background: '0 0% 100%',
+            foreground: '222 47% 11%',
+            card: '0 0% 100%',
+            primary: '173 58% 39%',
+            secondary: '210 40% 96%',
+            muted: '215 16% 47%',
+            border: '214 32% 91%',
           }
         }
       }
@@ -79,7 +73,7 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="relative z-40 border-b border-border backdrop-blur-md bg-background/80 sticky" style="top: 48px;">
+  <nav class="relative z-40 border-b border-border backdrop-blur-md bg-background/90 sticky" style="top: 48px;">
     <div class="container mx-auto px-6 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -92,8 +86,8 @@
           <a href="/pages/blog.html" class="text-muted-foreground hover:text-foreground transition">Blog</a>
         </div>
         <div class="flex items-center space-x-4">
-          <a href="/pages/login.html" class="btn btn-outline">Sign In</a>
-          <a href="/pages/signup.html" class="btn btn-primary">Get Started</a>
+          <a href="/pages/login.html" id="signInBtn" class="btn btn-outline">Sign In</a>
+          <a href="/pages/signup.html" id="getStartedBtn" class="btn btn-primary">Get Started</a>
         </div>
       </div>
     </div>
@@ -109,52 +103,29 @@
       <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto fade-in" style="animation-delay: 0.1s">
         Level up your skills, earn achievements, and build job-ready expertise with real-world IT scenarios
       </p>
-      <div class="flex gap-4 justify-center fade-in" style="animation-delay: 0.2s">
+      <div class="flex gap-4 justify-center fade-in mb-12" style="animation-delay: 0.2s">
         <a href="/pages/signup.html" class="btn btn-primary text-lg px-8 py-4">Start Learning Free</a>
         <a href="#features" class="btn btn-outline text-lg px-8 py-4">Learn More</a>
       </div>
-      
-      <!-- Beta Launch Countdown -->
-      <div class="mt-12 inline-block bg-card/50 backdrop-blur-sm border border-border rounded-lg px-8 py-6">
-        <p class="text-sm text-muted-foreground mb-4">🚀 Beta Launch Countdown</p>
-        <div class="flex gap-6 text-center">
-          <div>
-            <div id="herodays" class="text-4xl font-bold gradient-text">00</div>
-            <div class="text-xs text-muted-foreground mt-1">Days</div>
-          </div>
-          <div class="text-4xl text-muted-foreground">:</div>
-          <div>
-            <div id="herohours" class="text-4xl font-bold gradient-text">00</div>
-            <div class="text-xs text-muted-foreground mt-1">Hours</div>
-          </div>
-          <div class="text-4xl text-muted-foreground">:</div>
-          <div>
-            <div id="herominutes" class="text-4xl font-bold gradient-text">00</div>
-            <div class="text-xs text-muted-foreground mt-1">Minutes</div>
-          </div>
-          <div class="text-4xl text-muted-foreground">:</div>
-          <div>
-            <div id="heroseconds" class="text-4xl font-bold gradient-text">00</div>
-            <div class="text-xs text-muted-foreground mt-1">Seconds</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Early Access Signup -->
-      <div class="mt-8 max-w-md mx-auto">
-        <form id="earlySignupForm" class="flex gap-2">
-          <input 
-            type="email" 
-            id="earlyEmail" 
-            placeholder="Enter your email for early access" 
-            class="input flex-1"
-            required
-          />
-          <button type="submit" class="btn btn-primary whitespace-nowrap" id="earlySubmitBtn">
-            Get Early Access
-          </button>
-        </form>
-        <p id="earlySuccess" class="hidden text-sm text-green-500 mt-2">✓ Thanks! We'll notify you when we launch!</p>
+      <!-- Early Access Signup with Cool Animation -->
+      <div class="mt-8 max-w-lg mx-auto">
+        <div class="email-signup-box relative bg-white border-2 border-border rounded-lg p-6 pulse-glow">
+          <p class="text-sm font-semibold text-foreground mb-3">🎯 Get Early Access</p>
+          <form id="earlySignupForm" class="flex gap-2">
+            <input 
+              type="email" 
+              id="earlyEmail" 
+              placeholder="Enter your email for early access" 
+              class="input flex-1"
+              required
+            />
+            <button type="submit" class="btn btn-primary whitespace-nowrap" id="earlySubmitBtn">
+              Join Waitlist
+            </button>
+          </form>
+          <p id="earlySuccess" class="hidden text-sm text-green-600 mt-3 font-medium">✓ Thanks! We'll notify you when we launch!</p>
+        </div>
       </div>
     </div>
   </section>
@@ -231,7 +202,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="relative z-10 border-t border-border py-12">
+  <footer class="relative z-10 border-t border-border py-12 bg-white">
     <div class="container mx-auto px-6">
       <div class="grid md:grid-cols-4 gap-8">
         <div>
@@ -292,12 +263,6 @@
       document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
       document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
       
-      // Update hero section
-      document.getElementById('herodays').textContent = String(days).padStart(2, '0');
-      document.getElementById('herohours').textContent = String(hours).padStart(2, '0');
-      document.getElementById('herominutes').textContent = String(minutes).padStart(2, '0');
-      document.getElementById('heroseconds').textContent = String(seconds).padStart(2, '0');
-      
       if (distance < 0) {
         document.getElementById('countdownBar').innerHTML = '<div class="container mx-auto text-center">🎉 Beta is now LIVE!</div>';
       }
@@ -305,6 +270,31 @@
     
     updateCountdown();
     setInterval(updateCountdown, 1000);
+
+    // Check if signup/login is enabled
+    async function checkFeatureToggles() {
+      try {
+        const response = await window.API.request('/api/system-settings/features');
+        if (response.signupEnabled === false) {
+          const getStartedBtn = document.getElementById('getStartedBtn');
+          if (getStartedBtn) {
+            getStartedBtn.style.display = 'none';
+          }
+          const signupLinks = document.querySelectorAll('a[href="/pages/signup.html"]');
+          signupLinks.forEach(link => link.style.display = 'none');
+        }
+        if (response.loginEnabled === false) {
+          const signInBtn = document.getElementById('signInBtn');
+          if (signInBtn) {
+            signInBtn.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        // If endpoint doesn't exist, features are enabled by default
+        console.log('Feature toggles not configured, all features enabled');
+      }
+    }
+    checkFeatureToggles();
     
     // Early Access Signup
     document.getElementById('earlySignupForm').addEventListener('submit', async (e) => {
@@ -321,7 +311,7 @@
         document.getElementById('earlySuccess').classList.remove('hidden');
       } catch (error) {
         alert(error.message || 'Failed to sign up');
-        btn.textContent = 'Get Early Access';
+        btn.textContent = 'Join Waitlist';
         btn.disabled = false;
       }
     });
