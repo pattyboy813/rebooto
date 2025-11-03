@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Rebooto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: 'hsl(222 47% 4%)',
+            foreground: 'hsl(210 40% 98%)',
+            card: 'hsl(222 47% 8%)',
+            primary: 'hsl(173 58% 39%)',
+            border: 'hsl(217 33% 17%)',
+            muted: 'hsl(215 20% 65%)',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-background text-foreground">
+  <div class="modern-background">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+  </div>
+
+  <div class="relative z-10 min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <a href="/" class="inline-flex items-center space-x-2 mb-4">
+          <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg"></div>
+          <span class="text-3xl font-bold gradient-text">Rebooto</span>
+        </a>
+        <h1 class="text-3xl font-bold mb-2">Welcome Back</h1>
+        <p class="text-muted-foreground">Sign in to continue your learning journey</p>
+      </div>
+
+      <div class="card">
+        <form id="loginForm" class="space-y-4">
+          <div id="errorMessage" class="hidden bg-red-500/10 border border-red-500 text-red-500 px-4 py-3 rounded-lg text-sm"></div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium mb-2">Email</label>
+            <input
+              type="email"
+              id="email"
+              class="input"
+              placeholder="you@example.com"
+              required
+              data-testid="input-email"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium mb-2">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="input"
+              placeholder="••••••••"
+              required
+              data-testid="input-password"
+            />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="flex items-center">
+              <input type="checkbox" class="mr-2">
+              <span class="text-sm text-muted-foreground">Remember me</span>
+            </label>
+            <a href="/pages/forgot-password.html" class="text-sm text-primary hover:underline">Forgot password?</a>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary w-full"
+            data-testid="button-submit"
+            id="submitBtn"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm">
+          <span class="text-muted-foreground">Don't have an account? </span>
+          <a href="/pages/signup.html" class="text-primary hover:underline">Sign up</a>
+        </div>
+
+        <div class="mt-4 text-center text-sm">
+          <a href="/admin/login" class="text-muted-foreground hover:text-foreground">Admin Login →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      errorMessage.classList.add('hidden');
+      submitBtn.textContent = 'Signing in...';
+      submitBtn.disabled = true;
+
+      try {
+        await window.API.request('/api/login', 'POST', { email, password });
+        window.location.href = '/pages/dashboard.html';
+      } catch (error) {
+        errorMessage.textContent = error.message || 'Invalid email or password';
+        errorMessage.classList.remove('hidden');
+        submitBtn.textContent = 'Sign In';
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
