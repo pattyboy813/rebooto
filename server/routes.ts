@@ -14,6 +14,7 @@ import {
   insertUserRoleSchema,
   insertNoticeSchema,
   insertSupportLogSchema,
+  type InsertCourse,
 } from "@shared/schema";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -1180,14 +1181,14 @@ Make questions challenging but fair. Ensure explanations teach WHY answers are c
   app.get("/api/admin/courses/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const course = await storage.getCourseById(id);
+      const course = await storage.getCourse(id);
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
       const lessons = await storage.getLessonsByCourse(id);
       res.json({ ...course, lessons });
     } catch (error: any) {
       console.error("Error fetching course:", error);
-      if (error.message === "Course not found") {
-        return res.status(404).json({ message: error.message });
-      }
       res.status(500).json({ message: "Failed to fetch course" });
     }
   });
