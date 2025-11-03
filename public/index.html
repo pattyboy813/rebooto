@@ -303,7 +303,7 @@
       document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
       
       if (distance < 0) {
-        document.getElementById('countdownBar').innerHTML = '<div class="container mx-auto text-center">🎉 Beta is now LIVE!</div>';
+        document.getElementById('countdownBar').innerHTML = '<div class="container mx-auto text-center flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg> Beta is now LIVE!</div>';
       }
     }
     
@@ -345,7 +345,7 @@
       btn.disabled = true;
       
       try {
-        await window.API.request('/api/email-signups', 'POST', { email });
+        await window.API.request('/api/signups', 'POST', { email });
         document.getElementById('earlySignupForm').classList.add('hidden');
         document.getElementById('earlySuccess').classList.remove('hidden');
       } catch (error) {
