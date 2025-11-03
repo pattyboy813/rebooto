@@ -36,6 +36,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   
+  <!-- AOS - Animate On Scroll -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
   <!-- Custom Styles -->
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -133,11 +137,11 @@
   <!-- Features Section -->
   <section id="features" class="relative z-10 py-20">
     <div class="container mx-auto px-6">
-      <h2 class="text-4xl font-bold text-center mb-12">
+      <h2 class="text-4xl font-bold text-center mb-12" data-aos="fade-up">
         Why Choose <span class="gradient-text">Rebooto</span>
       </h2>
       <div class="grid md:grid-cols-3 gap-8">
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="100">
           <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg mb-4 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -147,7 +151,7 @@
           <p class="text-muted-foreground">Practice with authentic IT support tickets and troubleshooting challenges</p>
         </div>
         
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="200">
           <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg mb-4 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -157,7 +161,7 @@
           <p class="text-muted-foreground">Earn XP, level up, and unlock achievements as you master new skills</p>
         </div>
         
-        <div class="card">
+        <div class="card" data-aos="fade-up" data-aos-delay="300">
           <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg mb-4 flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -174,15 +178,15 @@
   <section class="relative z-10 py-20 border-t border-border">
     <div class="container mx-auto px-6">
       <div class="grid md:grid-cols-3 gap-8 text-center">
-        <div>
+        <div data-aos="zoom-in" data-aos-delay="100">
           <div class="text-5xl font-bold gradient-text mb-2">15+</div>
           <div class="text-muted-foreground">Hands-On Courses</div>
         </div>
-        <div>
+        <div data-aos="zoom-in" data-aos-delay="200">
           <div class="text-5xl font-bold gradient-text mb-2">100+</div>
           <div class="text-muted-foreground">Real Scenarios</div>
         </div>
-        <div>
+        <div data-aos="zoom-in" data-aos-delay="300">
           <div class="text-5xl font-bold gradient-text mb-2">24/7</div>
           <div class="text-muted-foreground">Learning Access</div>
         </div>
@@ -193,11 +197,11 @@
   <!-- CTA Section -->
   <section class="relative z-10 py-20">
     <div class="container mx-auto px-6 text-center">
-      <h2 class="text-4xl font-bold mb-6">Ready to Level Up Your IT Career?</h2>
-      <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+      <h2 class="text-4xl font-bold mb-6" data-aos="fade-up">Ready to Level Up Your IT Career?</h2>
+      <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
         Join Rebooto today and start your journey to becoming an IT support expert
       </p>
-      <a href="/pages/signup.html" class="btn btn-primary text-lg px-8 py-4">Start Learning Now</a>
+      <a href="/pages/signup.html" class="btn btn-primary text-lg px-8 py-4" data-aos="fade-up" data-aos-delay="200">Start Learning Now</a>
     </div>
   </section>
 
@@ -316,19 +320,49 @@
       }
     });
     
+    // Initialize AOS (Animate On Scroll)
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100,
+      easing: 'ease-out-cubic'
+    });
+    
     // Initialize GSAP animations
     gsap.registerPlugin(ScrollTrigger);
     
-    // Animate cards on scroll
-    gsap.from('.card', {
+    // Parallax effect for hero gradient orbs
+    gsap.to('.orb-1', {
       scrollTrigger: {
-        trigger: '#features',
-        start: 'top center'
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
       },
-      y: 50,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.2
+      y: 300,
+      x: -100
+    });
+    
+    gsap.to('.orb-2', {
+      scrollTrigger: {
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
+      },
+      y: 400,
+      x: 100
+    });
+    
+    gsap.to('.orb-3', {
+      scrollTrigger: {
+        trigger: 'body',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
+      },
+      y: 200,
+      x: -50
     });
   </script>
 </body>
