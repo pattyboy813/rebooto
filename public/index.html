@@ -284,29 +284,33 @@
   <script src="/js/api.js"></script>
   <script>
     // Beta Launch Countdown - Set to 30 days from now
-    const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 30);
-    
+    const launchDate = new Date("2026-01-01T00:00:00");
+
     function updateCountdown() {
       const now = new Date().getTime();
       const distance = launchDate - now;
-      
+
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      
-      // Update top bar
+
       document.getElementById('days').textContent = String(days).padStart(2, '0');
       document.getElementById('hours').textContent = String(hours).padStart(2, '0');
       document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
       document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
-      
+
       if (distance < 0) {
-        document.getElementById('countdownBar').innerHTML = '<div class="container mx-auto text-center flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg> Beta is now LIVE!</div>';
+        document.getElementById('countdownBar').innerHTML = `
+          <div class="container mx-auto text-center flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+            </svg> Beta is now LIVE!
+          </div>`;
       }
     }
-    
+
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
