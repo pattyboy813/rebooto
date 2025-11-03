@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Creator - Rebooto Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{background:'hsl(222 47% 4%)',foreground:'hsl(210 40% 98%)',card:'hsl(222 47% 8%)',primary:'hsl(173 58% 39%)',border:'hsl(217 33% 17%)',muted:'hsl(215 20% 65%)'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-background text-foreground">
+  <div class="modern-background"><div class="gradient-orb orb-1"></div><div class="gradient-orb orb-2"></div><div class="gradient-orb orb-3"></div></div>
+  <nav class="relative z-50 border-b border-border backdrop-blur-md bg-background/80 sticky top-0">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg"></div>
+          <span class="text-2xl font-bold gradient-text">Rebooto Admin</span>
+        </div>
+        <a href="/admin/dashboard.html" class="btn btn-outline btn-sm">← Dashboard</a>
+      </div>
+    </div>
+  </nav>
+  <div class="relative z-10 container mx-auto px-6 py-12 max-w-4xl">
+    <h1 class="text-4xl font-bold mb-8">AI Course <span class="gradient-text">Generator</span></h1>
+    <div class="card">
+      <form id="courseForm" class="space-y-4">
+        <div><label class="block text-sm font-medium mb-2">Course Title</label><input type="text" id="title" class="input" required></div>
+        <div><label class="block text-sm font-medium mb-2">Description</label><textarea id="description" class="input" rows="3" required></textarea></div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium mb-2">Category</label>
+            <select id="category" class="input" required>
+              <option>Hardware Headaches</option>
+              <option>Network Nightmares</option>
+              <option>Software Struggles</option>
+            </select>
+          </div>
+          <div><label class="block text-sm font-medium mb-2">Difficulty</label>
+            <select id="difficulty" class="input" required>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+        </div>
+        <div><label class="block text-sm font-medium mb-2">Number of Lessons</label><input type="number" id="lessonCount" class="input" value="5" min="1" max="15" required></div>
+        <button type="submit" class="btn btn-primary w-full" id="generateBtn">Generate Course with AI</button>
+      </form>
+      <div id="result" class="hidden mt-8">
+        <h3 class="text-xl font-bold mb-4">Generated Course</h3>
+        <div id="preview" class="space-y-4"></div>
+        <button onclick="publishCourse()" class="btn btn-primary w-full mt-4">Publish Course</button>
+      </div>
+    </div>
+  </div>
+  <script src="/js/api.js"></script>
+  <script>
+    let generatedData = null;
+    document.getElementById('courseForm').addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const btn = document.getElementById('generateBtn');
+      btn.textContent = 'Generating...';
+      btn.disabled = true;
+      try{
+        const data = {
+          title:document.getElementById('title').value,
+          description:document.getElementById('description').value,
+          category:document.getElementById('category').value,
+          difficulty:document.getElementById('difficulty').value,
+          lessonCount:parseInt(document.getElementById('lessonCount').value)
+        };
+        generatedData = await window.API.request('/api/admin/generate-course','POST',data);
+        document.getElementById('preview').innerHTML = `<div class="card"><h4 class="font-bold">${data.title}</h4><p class="text-sm text-muted-foreground mt-2">${generatedData.lessons.length} lessons generated</p></div>`;
+        document.getElementById('result').classList.remove('hidden');
+        btn.textContent = 'Generate Course with AI';
+        btn.disabled = false;
+      }catch(error){
+        alert(error.message);
+        btn.textContent = 'Generate Course with AI';
+        btn.disabled = false;
+      }
+    });
+    
+    async function publishCourse(){
+      try{
+        const courseData = {
+          title:document.getElementById('title').value,
+          description:document.getElementById('description').value,
+          category:document.getElementById('category').value,
+          difficulty:document.getElementById('difficulty').value,
+          lessons:generatedData.lessons
+        };
+        await window.API.request('/api/admin/publish-course','POST',courseData);
+        alert('Course published successfully!');
+        window.location.href='/admin/dashboard.html';
+      }catch(error){alert(error.message);}
+    }
+  </script>
+</body>
+</html>

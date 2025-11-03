@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson - Rebooto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{background:'hsl(222 47% 4%)',foreground:'hsl(210 40% 98%)',card:'hsl(222 47% 8%)',primary:'hsl(173 58% 39%)',border:'hsl(217 33% 17%)',muted:'hsl(215 20% 65%)',destructive:'hsl(0 84% 60%)'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-background text-foreground">
+  <div class="modern-background"><div class="gradient-orb orb-1"></div><div class="gradient-orb orb-2"></div><div class="gradient-orb orb-3"></div></div>
+  <div class="relative z-10 container mx-auto px-6 py-12 max-w-4xl">
+    <div id="loading" class="text-center py-12"><div class="spinner"></div></div>
+    <div id="content" class="hidden">
+      <div class="mb-8">
+        <h1 id="lessonTitle" class="text-4xl font-bold mb-2"></h1>
+        <p id="lessonDescription" class="text-muted-foreground"></p>
+      </div>
+      <div class="card mb-6">
+        <div id="contentBlock"></div>
+      </div>
+      <div class="flex justify-between">
+        <button id="prevBtn" class="btn btn-outline" onclick="navigate(-1)">← Previous</button>
+        <span id="progress" class="text-muted-foreground"></span>
+        <button id="nextBtn" class="btn btn-primary" onclick="navigate(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+  <script src="/js/api.js"></script>
+  <script>
+    let lesson, currentIndex = 0, selectedAnswer = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const lessonId = urlParams.get('id');
+    
+    async function loadLesson(){
+      try{
+        lesson = await window.API.request(`/api/lessons/${lessonId}`);
+        document.getElementById('lessonTitle').textContent = lesson.title;
+        document.getElementById('lessonDescription').textContent = lesson.description;
+        showBlock(0);
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('content').classList.remove('hidden');
+      }catch(e){console.error(e);}
+    }
+    
+    function showBlock(index){
+      currentIndex = index;
+      const block = lesson.content[index];
+      const contentDiv = document.getElementById('contentBlock');
+      contentDiv.innerHTML = '';
+      
+      if(block.type === 'text'){
+        contentDiv.innerHTML = `<p class="text-lg leading-relaxed">${block.content}</p>`;
+      }else if(block.type === 'scenario'){
+        contentDiv.innerHTML = `
+          ${block.title ? `<h3 class="text-xl font-bold mb-4">${block.title}</h3>` : ''}
+          <div class="bg-card/50 border border-border rounded-lg p-6">
+            <p class="text-lg leading-relaxed">${block.content}</p>
+          </div>`;
+      }else if(block.type === 'quiz'){
+        let optionsHTML = block.options.map((opt,i)=>`
+          <button class="quiz-option btn btn-outline w-full text-left justify-start p-4" data-index="${i}">
+            ${opt}
+          </button>`).join('');
+        contentDiv.innerHTML = `
+          <h3 class="text-xl font-bold mb-6">${block.question}</h3>
+          <div class="space-y-3 mb-6">${optionsHTML}</div>
+          <div id="quizFeedback" class="hidden"></div>`;
+        
+        document.querySelectorAll('.quiz-option').forEach(btn=>{
+          btn.addEventListener('click',function(){
+            const idx = parseInt(this.dataset.index);
+            checkAnswer(idx, block.correctAnswer, block.explanation);
+          });
+        });
+      }
+      
+      document.getElementById('progress').textContent = `${index+1} / ${lesson.content.length}`;
+      document.getElementById('prevBtn').disabled = index === 0;
+      document.getElementById('nextBtn').textContent = index === lesson.content.length-1 ? 'Complete Lesson' : 'Next →';
+    }
+    
+    function checkAnswer(selected, correct, explanation){
+      const isCorrect = selected === correct;
+      const feedbackDiv = document.getElementById('quizFeedback');
+      feedbackDiv.className = `p-4 rounded-lg border ${isCorrect ? 'bg-green-500/10 border-green-500 text-green-500' : 'bg-red-500/10 border-red-500 text-red-500'}`;
+      feedbackDiv.innerHTML = `
+        <p class="font-bold mb-2">${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
+        <p class="text-foreground">${explanation}</p>`;
+      feedbackDiv.classList.remove('hidden');
+      document.querySelectorAll('.quiz-option').forEach(btn=>btn.disabled=true);
+    }
+    
+    async function navigate(dir){
+      const nextIndex = currentIndex + dir;
+      if(nextIndex >= 0 && nextIndex < lesson.content.length){
+        showBlock(nextIndex);
+      }else if(nextIndex >= lesson.content.length){
+        try{
+          await window.API.request(`/api/lessons/${lessonId}/complete`, 'POST');
+          alert(`Lesson complete! You earned ${lesson.xpReward} XP!`);
+          window.location.href = '/pages/dashboard.html';
+        }catch(e){console.error(e);}
+      }
+    }
+    
+    loadLesson();
+  </script>
+</body>
+</html>

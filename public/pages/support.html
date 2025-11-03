@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support - Rebooto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{background:'hsl(222 47% 4%)',foreground:'hsl(210 40% 98%)',card:'hsl(222 47% 8%)',primary:'hsl(173 58% 39%)',border:'hsl(217 33% 17%)',muted:'hsl(215 20% 65%)'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-background text-foreground">
+  <div class="modern-background"><div class="gradient-orb orb-1"></div><div class="gradient-orb orb-2"></div><div class="gradient-orb orb-3"></div></div>
+  <nav class="relative z-50 border-b border-border backdrop-blur-md bg-background/80 sticky top-0">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg"></div>
+          <span class="text-2xl font-bold gradient-text">Rebooto</span>
+        </div>
+        <button onclick="window.API.logout()" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </nav>
+  <div class="relative z-10 container mx-auto px-6 py-12 max-w-4xl">
+    <h1 class="text-4xl font-bold mb-8">Submit <span class="gradient-text">Support Ticket</span></h1>
+    <div class="card">
+      <form id="supportForm" class="space-y-4">
+        <div><label class="block text-sm font-medium mb-2">Subject</label><input type="text" id="subject" class="input" required></div>
+        <div><label class="block text-sm font-medium mb-2">Category</label>
+          <select id="category" class="input" required>
+            <option>Technical Issue</option>
+            <option>Course Content</option>
+            <option>Account</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div><label class="block text-sm font-medium mb-2">Description</label><textarea id="description" class="input" rows="6" required></textarea></div>
+        <button type="submit" class="btn btn-primary w-full">Submit Ticket</button>
+      </form>
+    </div>
+  </div>
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById('supportForm').addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const subject=document.getElementById('subject').value;
+      const category=document.getElementById('category').value;
+      const description=document.getElementById('description').value;
+      try{
+        await window.API.request('/api/support-tickets','POST',{subject,category,description});
+        alert('Support ticket submitted successfully!');
+        window.location.href='/pages/dashboard.html';
+      }catch(error){alert(error.message);}
+    });
+  </script>
+</body>
+</html>
